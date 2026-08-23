@@ -6,6 +6,35 @@
   const list = document.getElementById("inventoryList");
   if (!list) return;
 
+  const statusRank = { available: 0, pending: 1, hold: 2, sold: 3 };
+  let sortScheduled = false;
+
+  function sortInventory() {
+    const rows = [...list.querySelectorAll(".inventory-row")];
+    if (rows.length < 2) return;
+
+    const ranked = rows.map((row, index) => {
+      const status = String(row.querySelector(".badge")?.textContent || "Available").trim().toLowerCase();
+      return { row, index, rank: statusRank[status] ?? 99 };
+    });
+
+    ranked.sort((a, b) => a.rank - b.rank || a.index - b.index);
+    if (ranked.every((item, index) => item.row === rows[index])) return;
+
+    const fragment = document.createDocumentFragment();
+    ranked.forEach(item => fragment.appendChild(item.row));
+    list.appendChild(fragment);
+  }
+
+  function scheduleSort() {
+    if (sortScheduled) return;
+    sortScheduled = true;
+    requestAnimationFrame(() => {
+      sortScheduled = false;
+      sortInventory();
+    });
+  }
+
   function addFeaturedControls() {
     list.querySelectorAll(".inventory-row").forEach((row) => {
       if (row.querySelector("[data-featured-toggle]")) return;
@@ -44,11 +73,17 @@
     if (!error) {
       window.__featuredVehicles = data || [];
       addFeaturedControls();
+      sortInventory();
     }
   }
 
-  const observer = new MutationObserver(() => addFeaturedControls());
+  const observer = new MutationObserver(() => {
+    addFeaturedControls();
+    scheduleSort();
+  });
   observer.observe(list, { childList: true, subtree: true });
+
   syncVehicles();
+  sortInventory();
   setInterval(syncVehicles, 30000);
 })();
