@@ -4,7 +4,6 @@ Files
 - admin.html: private inventory dashboard
 - admin.js: Supabase login, vehicle creation, bulk photo upload, gallery management
 - admin.css: admin styling
-- supabase-admin-setup.sql: run once in Supabase SQL Editor
 
 SETUP
 1. In Supabase > SQL Editor, run supabase-admin-setup.sql.
@@ -18,3 +17,5 @@ IMPORTANT
 - Do not put a service_role key in the browser.
 - This admin uses the publishable key supplied for the M.O Motors project.
 - The SQL policies allow any authenticated Supabase user to manage inventory. Keep public signup disabled or only create trusted admin accounts.
+
+Deployment trigger: 2026-08-23.
