@@ -1,21 +1,35 @@
 /* Homepage hero redesign */
-#home .hero{position:relative;min-height:760px;background:linear-gradient(90deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.88) 38%,rgba(0,0,0,.34) 68%,rgba(0,0,0,.12) 100%),url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=2200&q=85") center/cover}
-#home .hero-content{position:relative;z-index:2;max-width:900px;padding:118px 8% 90px}
+#home .hero{position:relative;min-height:760px;overflow:hidden;background:linear-gradient(90deg,rgba(2,3,5,.98) 0%,rgba(2,3,5,.96) 34%,rgba(2,3,5,.58) 57%,rgba(2,3,5,.14) 78%,rgba(2,3,5,.05) 100%),url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=2200&q=90") 62% center/cover}
+#home .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.32),transparent 40%);pointer-events:none}
+#home .hero-content{position:relative;z-index:2;max-width:850px;padding:105px 5.3% 80px}
 #home .hero .eyebrow{display:none}
-#home .hero h1{font-size:clamp(64px,7.2vw,108px);line-height:.95;letter-spacing:-1.5px;display:flex;flex-direction:column;gap:8px}
-#home .hero h1 .hero-line{display:block;color:#f5f5f5}
-#home .hero h1 .hero-line .accent{color:var(--red)}
-#home .hero-copy{max-width:620px;font-size:18px;line-height:1.65;margin:30px 0 34px;color:#e0e0e2}
-#home .actions .btn{min-width:190px;text-align:center;padding:18px 24px}
-#home .hero:after{content:"";position:absolute;left:8%;bottom:28px;width:76px;height:4px;background:var(--red)}
-#home .site-header{background:#060708;border-bottom:1px solid #26272b}
+#home .hero h1{font-size:clamp(60px,5.35vw,92px);line-height:1.06;letter-spacing:-1.5px;display:flex;flex-direction:column;gap:20px}
+#home .hero h1 .hero-line{display:block;color:#f4f4f4;white-space:nowrap}
+#home .hero h1 .hero-line .accent{color:#d51d21}
+#home .hero-rule{height:1px;width:90px;background:#707176;margin:24px 0 0;opacity:.72}
+#home .hero-rule-two{margin-top:16px}
+#home .hero-copy{max-width:490px;font-size:18px;line-height:1.7;margin:38px 0 31px;color:#d7d8db}
+#home .actions{gap:22px}
+#home .actions .btn{min-width:208px;text-align:center;padding:18px 25px}
+#home .actions .btn-primary{background:#cf1c21}
+#home .actions .btn-secondary{border-color:#8e9096;color:#eee}
+#home .site-header{background:#030405;border-bottom:1px solid #292a2e}
 #home .topbar{display:none}
-#home .main-nav{min-height:104px}
-#home .main-nav a{color:#f4f4f5}
-#home .brand img{filter:none}
-#home .search-strip{background:#0b0c0f;color:#fff;box-shadow:none;border-top:1px solid #25262a;border-bottom:1px solid #25262a}
+#home .main-nav{min-height:120px;padding-left:2.1%;padding-right:2.1%}
+#home .brand img{width:325px;max-height:90px;object-fit:contain}
+#home .main-nav nav{gap:43px}
+#home .main-nav a,#home .finance-dropdown-toggle{color:#e7e7e9;font-family:"Barlow Condensed",Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:18px;font-weight:600}
+#home .nav-cta{background:#c91b20!important;color:#fff!important;padding:19px 34px;min-width:207px;text-align:center}
+#home .hero-benefits{background:#090a0d;color:#fff;border-top:1px solid #292a2e;border-bottom:1px solid #292a2e;display:grid;grid-template-columns:repeat(4,1fr);padding:12px 5.2%}
+#home .hero-benefits article{min-height:108px;padding:18px 36px;display:flex;align-items:center;gap:22px;border-right:1px solid #202126}
+#home .hero-benefits article:last-child{border-right:0}
+#home .benefit-icon{width:54px;height:54px;display:grid;place-items:center;color:#d51d21;border:2px solid #d51d21;border-radius:50%;font-size:27px;font-weight:800;flex:0 0 auto}
+#home .hero-benefits h3{margin:0 0 7px;font-family:"Barlow Condensed",Arial,sans-serif;text-transform:uppercase;font-size:20px;letter-spacing:.6px}
+#home .hero-benefits p{margin:0;color:#c7c8cc;font-size:14px;line-height:1.4}
+#home .search-strip{background:#0b0c0f;color:#fff;box-shadow:none;border-bottom:1px solid #25262a}
 #home .search-strip strong{color:#fff}
 #home .search-controls select{background:#15161a;color:#fff;border-color:#33353b}
 #home .search-controls option{color:#111;background:#fff}
-@media(max-width:900px){#home .main-nav nav#nav{top:104px;background:#090a0d}#home .main-nav nav#nav a{color:#fff}#home .hero{min-height:680px}#home .hero-content{padding:105px 7% 90px}}
-@media(max-width:560px){#home .hero{min-height:620px;background-position:62% center}#home .hero-content{padding:90px 7% 72px}#home .hero h1{font-size:clamp(50px,15vw,72px);gap:5px}#home .hero-copy{font-size:16px;margin:24px 0 28px}#home .actions{gap:10px}#home .actions .btn{min-width:0;flex:1;padding:16px 12px}}
+@media(max-width:1100px){#home .brand img{width:245px}#home .main-nav nav{gap:24px}#home .hero-benefits article{padding:18px 18px;gap:14px}}
+@media(max-width:900px){#home .main-nav{min-height:92px;padding:7px 6%}#home .brand img{width:190px}#home .main-nav nav#nav{top:92px;background:#090a0d}#home .main-nav nav#nav a{color:#fff}#home .hero{min-height:680px;background-position:68% center}#home .hero-content{padding:90px 7% 75px}#home .hero h1{font-size:clamp(52px,8vw,76px);gap:14px}#home .hero-benefits{grid-template-columns:repeat(2,1fr);padding:0 5%}#home .hero-benefits article:nth-child(2){border-right:0}#home .hero-benefits article{border-bottom:1px solid #202126}.finance-dropdown-toggle{color:#fff!important}}
+@media(max-width:560px){#home .hero{min-height:650px;background-position:66% center}#home .hero-content{padding:70px 7% 62px}#home .hero h1{font-size:clamp(43px,13.5vw,66px);gap:11px;line-height:1}#home .hero h1 .hero-line{white-space:normal}#home .hero-rule{width:70px;margin-top:19px}#home .hero-rule-two{margin-top:12px}#home .hero-copy{font-size:16px;margin:28px 0 27px}#home .actions{gap:10px}#home .actions .btn{min-width:0;flex:1;padding:16px 10px;font-size:11px}#home .hero-benefits{grid-template-columns:1fr;padding:0 7%}#home .hero-benefits article,#home .hero-benefits article:nth-child(2){border-right:0;border-bottom:1px solid #202126;padding:16px 0;min-height:88px}#home .hero-benefits article:last-child{border-bottom:0}#home .benefit-icon{width:45px;height:45px;font-size:22px}#home .hero-benefits h3{font-size:18px}}
