@@ -1,0 +1,35 @@
+/* Vehicle detail gallery containment and spacing fix */
+.vehicle-detail-grid{
+  grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr);
+  column-gap:72px;
+  row-gap:40px;
+}
+.detail-gallery{
+  min-width:0;
+  width:100%;
+  overflow:hidden;
+}
+.detail-main-image{
+  width:100%;
+  max-width:100%;
+}
+.detail-thumbs{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:12px 0;
+  gap:10px;
+  box-sizing:border-box;
+  scrollbar-gutter:stable;
+}
+.detail-thumb{
+  flex:0 0 110px;
+}
+@media(max-width:1100px){
+  .vehicle-detail-grid{column-gap:40px;}
+}
+@media(max-width:900px){
+  .vehicle-detail-grid{grid-template-columns:1fr;}
+}
