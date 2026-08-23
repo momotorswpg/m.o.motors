@@ -1,0 +1,25 @@
+(() => {
+  const list=document.getElementById('bookingsList');
+  if(!list) return;
+  let bookings=[]; let filter='all';
+  const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  const fmt=d=>d?new Date(d).toLocaleString('en-CA',{dateStyle:'medium',timeStyle:'short'}):'—';
+  async function loadBookings(){
+    list.innerHTML='<div class="muted">Loading bookings…</div>';
+    const {data,error}=await db.from('test_drive_bookings').select('*, Vehicles(Year,Make,Model)').order('created_at',{ascending:false});
+    if(error){console.error(error);list.innerHTML=`<div class="booking-empty">Could not load bookings: ${esc(error.message)}</div>`;return;}
+    bookings=data||[]; render();
+  }
+  function render(){
+    const rows=filter==='all'?bookings:bookings.filter(b=>b.status===filter);
+    if(!rows.length){list.innerHTML='<div class="booking-empty">No bookings in this category.</div>';return;}
+    list.innerHTML=rows.map(b=>{const v=b.Vehicles?`${b.Vehicles.Year||''} ${b.Vehicles.Make||''} ${b.Vehicles.Model||''}`.trim():(b.vehicle_name||'Vehicle not specified');return `<article class="booking-card"><div class="booking-main"><div class="booking-title-row"><div><span class="booking-status status-${String(b.status||'New').toLowerCase()}">${esc(b.status||'New')}</span><h4>${esc(b.first_name||'')} ${esc(b.last_name||'')}</h4></div><div class="booking-submitted">Requested ${fmt(b.created_at)}</div></div><div class="booking-details"><div><span>Vehicle</span><strong>${esc(v)}</strong></div><div><span>Preferred appointment</span><strong>${esc(b.preferred_date||'—')} · ${esc(b.preferred_time||'—')}</strong></div><div><span>Phone</span><a href="tel:${esc(b.phone||'')}">${esc(b.phone||'—')}</a></div><div><span>Email</span><a href="mailto:${esc(b.email||'')}">${esc(b.email||'—')}</a></div></div></div><div class="booking-actions"><label>Status<select data-booking-status="${esc(b.id)}"><option ${b.status==='New'?'selected':''}>New</option><option ${b.status==='Confirmed'?'selected':''}>Confirmed</option><option ${b.status==='Completed'?'selected':''}>Completed</option><option ${b.status==='Cancelled'?'selected':''}>Cancelled</option></select></label><button class="mini-btn" data-save-booking="${esc(b.id)}" type="button">Save</button></div></article>`}).join('');
+    list.querySelectorAll('[data-save-booking]').forEach(btn=>btn.addEventListener('click',async()=>{const id=btn.dataset.saveBooking,status=list.querySelector(`[data-booking-status="${CSS.escape(id)}"]`).value;btn.disabled=true;const {error}=await db.from('test_drive_bookings').update({status,updated_at:new Date().toISOString()}).eq('id',id);btn.disabled=false;if(error){toast('Could not update booking: '+error.message);return;}const b=bookings.find(x=>String(x.id)===String(id));if(b)b.status=status;toast('Booking updated.');render();}));
+  }
+  document.getElementById('refreshBookingsBtn')?.addEventListener('click',loadBookings);
+  document.querySelectorAll('[data-booking-filter]').forEach(btn=>btn.addEventListener('click',()=>{filter=btn.dataset.bookingFilter;document.querySelectorAll('[data-booking-filter]').forEach(x=>x.classList.toggle('active',x===btn));render();}));
+  window.loadBookings=loadBookings;
+  const originalShowAdmin=window.showAdmin;
+  const boot=()=>{if(document.getElementById('adminView')&&!document.getElementById('adminView').classList.contains('hidden'))loadBookings();};
+  setInterval(boot,1200); setTimeout(boot,300);
+})();
