@@ -243,16 +243,21 @@ async function handleFiles(files) {
 
 function renderPhotos() {
   const grid = $("photoGrid");
-  const images = (window.allPhotos || []).filter(p => String(p.vehicle_id) === String(selectedVehicleId)).sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+  const images = (window.allPhotos || [])
+    .filter(p => String(p.vehicle_id) === String(selectedVehicleId))
+    .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0));
+
   if (!images.length) {
     grid.className = "photo-grid empty-grid";
     grid.textContent = "No photos yet. Choose multiple files above to upload them all at once.";
     $("photoHelp").textContent = "No photos";
     return;
   }
+
   grid.className = "photo-grid";
-  $("photoHelp").textContent = `${images.length} photo${images.length === 1 ? "" : "s"}`;
-  grid.innerHTML = images.map((img, index) => `<div class="photo-card">
+  $("photoHelp").textContent = `${images.length} photo${images.length === 1 ? "" : "s"} · Drag to reorder`;
+  grid.innerHTML = images.map((img, index) => `<div class="photo-card" draggable="true" data-photo-id="${esc(img.id)}">
+    <div class="photo-drag-handle" title="Drag to reorder" aria-label="Drag to reorder photo">☷</div>
     <img src="${esc(img.image_url)}" alt="${esc(img.alt_text || "Vehicle photo")}" loading="lazy">
     <div class="photo-info">
       ${img.is_primary ? `<strong>Primary photo</strong>` : `<span class="muted">Photo ${index + 1}</span>`}
@@ -265,6 +270,70 @@ function renderPhotos() {
 
   grid.querySelectorAll("[data-primary]").forEach(btn => btn.addEventListener("click", () => makePrimary(btn.dataset.primary)));
   grid.querySelectorAll("[data-delete-image]").forEach(btn => btn.addEventListener("click", () => deleteImage(btn.dataset.deleteImage)));
+
+  let draggedId = null;
+  grid.querySelectorAll(".photo-card").forEach(card => {
+    card.addEventListener("dragstart", (event) => {
+      draggedId = card.dataset.photoId;
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", draggedId);
+    });
+
+    card.addEventListener("dragend", async () => {
+      card.classList.remove("dragging");
+      const ids = [...grid.querySelectorAll(".photo-card")].map(el => el.dataset.photoId);
+      if (!draggedId || !ids.includes(draggedId)) return;
+      await savePhotoOrder(ids);
+      draggedId = null;
+    });
+
+    card.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      const dragging = grid.querySelector(".photo-card.dragging");
+      if (!dragging || dragging === card) return;
+
+      const rect = card.getBoundingClientRect();
+      const before = event.clientY < rect.top + rect.height / 2;
+      const reference = before ? card : card.nextElementSibling;
+      if (reference !== dragging) grid.insertBefore(dragging, reference);
+    });
+  });
+}
+
+async function savePhotoOrder(ids) {
+  if (!selectedVehicleId || !ids.length) return;
+  const photoById = new Map((window.allPhotos || []).map(photo => [String(photo.id), photo]));
+  const ordered = ids.map(id => photoById.get(String(id))).filter(Boolean);
+
+  try {
+    // First move all rows into temporary, unique positions so a DB uniqueness
+    // constraint on (vehicle_id, sort_order) cannot cause collisions.
+    for (let i = 0; i < ordered.length; i++) {
+      const { error } = await db.from("vehicle_images")
+        .update({ sort_order: 1000000 + i })
+        .eq("id", ordered[i].id)
+        .eq("vehicle_id", selectedVehicleId);
+      if (error) throw error;
+    }
+
+    for (let i = 0; i < ordered.length; i++) {
+      const { error } = await db.from("vehicle_images")
+        .update({ sort_order: i + 1 })
+        .eq("id", ordered[i].id)
+        .eq("vehicle_id", selectedVehicleId);
+      if (error) throw error;
+    }
+
+    const byId = new Map(ordered.map((photo, index) => [String(photo.id), { ...photo, sort_order: index + 1 }]));
+    window.allPhotos = (window.allPhotos || []).map(photo => byId.get(String(photo.id)) || photo);
+    renderPhotos();
+    toast("Photo order saved.");
+  } catch (error) {
+    console.error(error);
+    toast("Could not save photo order: " + error.message);
+    renderPhotos();
+  }
 }
 
 async function makePrimary(imageId) {
