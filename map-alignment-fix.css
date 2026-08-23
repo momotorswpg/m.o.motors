@@ -1,0 +1,21 @@
+/* Keep the contact/map split aligned with the 50/50 section directly above. */
+.contact-section{
+  grid-template-columns:1fr 1fr;
+}
+
+/* Prevent the map column from introducing any extra horizontal offset. */
+.map-wrap{
+  margin:0;
+  width:100%;
+  min-width:0;
+}
+
+.map-wrap iframe{
+  display:block;
+  width:100%;
+  margin:0;
+}
+
+@media(max-width:900px){
+  .contact-section{grid-template-columns:1fr;}
+}
