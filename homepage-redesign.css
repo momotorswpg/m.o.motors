@@ -1,5 +1,5 @@
 /* Homepage hero redesign */
-#home .hero{position:relative;min-height:760px;overflow:hidden;background:linear-gradient(90deg,rgba(2,3,5,.98) 0%,rgba(2,3,5,.96) 34%,rgba(2,3,5,.58) 57%,rgba(2,3,5,.14) 78%,rgba(2,3,5,.05) 100%),url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=2200&q=90") 62% center/cover}
+#home .hero{position:relative;min-height:760px;overflow:hidden;background:linear-gradient(90deg,rgba(2,3,5,.98) 0%,rgba(2,3,5,.96) 34%,rgba(2,3,5,.58) 57%,rgba(2,3,5,.14) 78%,rgba(2,3,5,.05) 100%),url("https://listing-images.autoscout24.ch/listing/283/20295283/70834445.JPG?q=90&w=1280") 62% center/cover}
 #home .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.32),transparent 40%);pointer-events:none}
 #home .hero-content{position:relative;z-index:2;max-width:850px;padding:105px 5.3% 80px}
 #home .hero .eyebrow{display:none}
