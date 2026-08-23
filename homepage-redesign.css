@@ -7,7 +7,7 @@
 #home .main-nav a,#home .finance-dropdown-toggle{color:#e8e8ea;font-family:"Barlow Condensed",Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:17px;font-weight:600}
 #home .nav-cta{background:#d0171c!important;color:#fff!important;padding:18px 36px;min-width:205px;text-align:center}
 
-#home .hero{position:relative;min-height:655px;overflow:hidden;background-image:linear-gradient(90deg,rgba(0,0,0,.99) 0%,rgba(0,0,0,.97) 31%,rgba(0,0,0,.76) 49%,rgba(0,0,0,.32) 68%,rgba(0,0,0,.06) 100%),linear-gradient(0deg,rgba(0,0,0,.42),rgba(0,0,0,.04) 42%),url("https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&w=2400&q=92");background-position:center,center,70% center;background-size:cover,cover,cover;background-repeat:no-repeat}
+#home .hero{position:relative;min-height:655px;overflow:hidden;background-image:linear-gradient(90deg,rgba(0,0,0,.99) 0%,rgba(0,0,0,.97) 31%,rgba(0,0,0,.76) 49%,rgba(0,0,0,.32) 68%,rgba(0,0,0,.06) 100%),linear-gradient(0deg,rgba(0,0,0,.42),rgba(0,0,0,.04) 42%),url("assets/momotors-hero-showroom.jpg");background-position:center,center,70% center;background-size:cover,cover,cover;background-repeat:no-repeat}
 #home .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 50%,transparent 0 22%,rgba(0,0,0,.12) 57%,rgba(0,0,0,.42) 100%);pointer-events:none}
 #home .hero-content{position:relative;z-index:2;max-width:870px;padding:82px 5.3% 60px}
 #home .hero .eyebrow{display:none}
@@ -36,3 +36,18 @@
 @media(max-width:1100px){#home .brand img{width:245px}#home .main-nav nav{gap:24px}#home .hero-benefits article{padding:18px 18px;gap:14px}}
 @media(max-width:900px){#home .main-nav{min-height:92px;padding:7px 6%}#home .brand img{width:190px}#home .main-nav nav#nav{top:92px;background:#090a0d}#home .main-nav nav#nav a{color:#fff}#home .hero{min-height:680px;background-position:center,center,66% center}#home .hero-content{padding:90px 7% 75px}#home .hero h1{font-size:clamp(52px,8vw,76px);gap:14px}#home .hero-benefits{grid-template-columns:repeat(2,1fr);padding:0 5%}#home .hero-benefits article:nth-child(2){border-right:0}#home .hero-benefits article{border-bottom:1px solid #202126}.finance-dropdown-toggle{color:#fff!important}}
 @media(max-width:560px){#home .hero{min-height:650px;background-position:center,center,63% center}#home .hero-content{padding:70px 7% 62px}#home .hero h1{font-size:clamp(43px,13.5vw,66px);gap:11px;line-height:1}#home .hero h1 .hero-line{white-space:normal}#home .hero-rule{width:70px;margin-top:19px}#home .hero-rule-two{margin-top:12px}#home .hero-copy{font-size:16px;margin:28px 0 27px}#home .actions{gap:10px}#home .actions .btn{min-width:0;flex:1;padding:16px 10px;font-size:11px}#home .hero-benefits{grid-template-columns:1fr;padding:0 7%}#home .hero-benefits article,#home .hero-benefits article:nth-child(2){border-right:0;border-bottom:1px solid #202126;padding:16px 0;min-height:88px}#home .hero-benefits article:last-child{border-bottom:0}#home .benefit-icon{width:45px;height:45px;font-size:22px}#home .hero-benefits h3{font-size:18px}}
+
+
+/* Source-matched brand mark and benefit icons */
+#home .brand-wordmark{display:flex;flex-direction:column;align-items:flex-start;gap:3px;line-height:1;text-decoration:none;white-space:nowrap}
+#home .brand-name{display:flex;align-items:baseline;font-family:"DM Sans",Arial,sans-serif;font-size:42px;font-weight:800;letter-spacing:1.5px;line-height:.84}
+#home .brand-name-accent{color:#d71920;letter-spacing:0}
+#home .brand-name-main{color:#f4f4f5;font-weight:600;letter-spacing:1px}
+#home .brand-tagline{color:#e9e9eb;font-family:"DM Sans",Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:5.3px}
+#home .nav-chevron{display:inline-block;margin-left:4px;font-size:17px;line-height:0;transform:translateY(-1px)}
+#home .benefit-icon{width:64px;height:64px;border:0;border-radius:0;display:grid;place-items:center;color:#df2024}
+#home .benefit-icon svg{width:58px;height:58px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:3.4}
+#home .benefit-icon svg circle{fill:none}
+@media(max-width:1100px){#home .brand-name{font-size:34px}#home .brand-tagline{font-size:8px;letter-spacing:4.2px}}
+@media(max-width:900px){#home .brand-wordmark{gap:2px}#home .brand-name{font-size:29px}#home .brand-tagline{font-size:7px;letter-spacing:3.4px}}
+@media(max-width:560px){#home .brand-name{font-size:25px}#home .brand-tagline{font-size:6px;letter-spacing:2.9px}#home .benefit-icon{width:52px;height:52px}#home .benefit-icon svg{width:48px;height:48px}}
