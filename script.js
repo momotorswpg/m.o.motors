@@ -1,4 +1,4 @@
-// M.O Motors — Supabase inventory connection
+// M.O Motors — Supabase inventory connection + homepage photo galleries
 const SUPABASE_URL = "https://dpsgtliddmdvfwjahkkq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
 
@@ -29,13 +29,19 @@ const esc = (value = "") => String(value)
 const money = (value) => {
   const n = Number(value);
   return Number.isFinite(n)
-    ? new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n)
+    ? new Intl.NumberFormat("en-CA", {
+        style: "currency",
+        currency: "CAD",
+        maximumFractionDigits: 0
+      }).format(n)
     : "$—";
 };
 
 const km = (value) => {
   const n = Number(value);
-  return Number.isFinite(n) ? `${new Intl.NumberFormat("en-CA").format(n)} km` : "Mileage N/A";
+  return Number.isFinite(n)
+    ? `${new Intl.NumberFormat("en-CA").format(n)} km`
+    : "Mileage N/A";
 };
 
 const pick = (obj, ...keys) => {
@@ -77,8 +83,6 @@ function getVehicleId(vehicle) {
 }
 
 async function getVehicles() {
-  // Pull the newest available vehicles. We use select=* so the site's JS remains
-  // tolerant of the column names used in your Supabase table.
   const vehicles = await supabaseGet("Vehicles", {
     select: "*",
     order: "created_at.desc",
@@ -95,16 +99,33 @@ async function getVehicleImages(vehicles) {
   if (!vehicles.length) return new Map();
 
   try {
-    const rows = await supabaseGet("vehicle_images", { select: "*" });
+    const rows = await supabaseGet("vehicle_images", {
+      select: "*",
+      order: "sort_order.asc,created_at.asc"
+    });
+
+    const vehicleIds = new Set(vehicles.map(getVehicleId).filter(Boolean).map(String));
     const map = new Map();
 
     for (const row of rows) {
       const id = pick(row, "vehicle_id", "vehicleId", "Vehicles_id", "vehicles_id", "vehicle");
       const url = imageUrl(row);
-      if (!id || !url) continue;
+      if (!id || !url || !vehicleIds.has(String(id))) continue;
+
       const key = String(id);
       if (!map.has(key)) map.set(key, []);
-      map.get(key).push(url);
+      map.get(key).push({
+        url,
+        isPrimary: Boolean(pick(row, "is_primary", "isPrimary")),
+        sortOrder: Number(pick(row, "sort_order", "sortOrder")) || 999999
+      });
+    }
+
+    for (const photos of map.values()) {
+      photos.sort((a, b) => {
+        if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
+        return a.sortOrder - b.sortOrder;
+      });
     }
 
     return map;
@@ -157,12 +178,38 @@ function renderVehicles(vehicles, imageMap) {
     const price = pick(vehicle, "Price", "price");
     const transmission = pick(vehicle, "Transmission", "transmission", "transmission_type") || "Automatic";
     const photos = imageMap.get(String(id)) || [];
-    const photo = photos[0];
     const title = [year, make, model].filter(Boolean).join(" ") || "Vehicle";
+    const safeId = esc(id);
 
-    return `<article class="vehicle-card">
-      <div class="vehicle-image ${photo ? "" : "placeholder"}">
-        ${photo ? `<img src="${esc(photo)}" alt="${esc(title)}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('placeholder')">` : `<span>PHOTO COMING SOON</span>`}
+    if (!photos.length) {
+      return `<article class="vehicle-card">
+        <div class="vehicle-image placeholder">
+          <span>PHOTO COMING SOON</span>
+        </div>
+        <div class="vehicle-info">
+          <p class="vehicle-year">FEATURED VEHICLE</p>
+          <h3>${esc(title)}</h3>
+          <div class="vehicle-meta"><span>${esc(km(mileage))}</span><span>${esc(transmission)}</span><span>Pre-Owned</span></div>
+          <div class="price-row"><strong>${esc(money(price))}</strong><a href="#contact" aria-label="Ask about ${esc(title)}">View Details →</a></div>
+        </div>
+      </article>`;
+    }
+
+    const startIndex = 0;
+    const photoSources = photos.map((p) => p.url);
+    const dots = photos.map((_, index) =>
+      `<button class="vehicle-dot${index === startIndex ? " active" : ""}" type="button" data-gallery-id="${safeId}" data-gallery-index="${index}" aria-label="View photo ${index + 1}"></button>`
+    ).join("");
+
+    return `<article class="vehicle-card" data-vehicle-id="${safeId}">
+      <div class="vehicle-image vehicle-gallery" data-gallery-id="${safeId}" data-gallery-index="${startIndex}">
+        <img class="vehicle-gallery-image" src="${esc(photoSources[startIndex])}" alt="${esc(title)}" loading="lazy">
+        ${photos.length > 1 ? `
+          <button class="gallery-arrow gallery-prev" type="button" data-gallery-id="${safeId}" data-gallery-direction="prev" aria-label="Previous photo">‹</button>
+          <button class="gallery-arrow gallery-next" type="button" data-gallery-id="${safeId}" data-gallery-direction="next" aria-label="Next photo">›</button>
+          <div class="vehicle-dots" aria-label="Photo selector">${dots}</div>
+          <span class="photo-count">1 / ${photos.length}</span>
+        ` : ""}
       </div>
       <div class="vehicle-info">
         <p class="vehicle-year">FEATURED VEHICLE</p>
@@ -172,7 +219,85 @@ function renderVehicles(vehicles, imageMap) {
       </div>
     </article>`;
   }).join("");
+
+  inventoryGrid.querySelectorAll(".vehicle-gallery").forEach((gallery) => {
+    gallery.dataset.photos = JSON.stringify((imageMap.get(String(gallery.dataset.galleryId)) || []).map(p => p.url));
+  });
 }
+
+function changeGallery(gallery, nextIndex) {
+  const photos = JSON.parse(gallery.dataset.photos || "[]");
+  if (!photos.length) return;
+
+  const current = Number(gallery.dataset.galleryIndex) || 0;
+  const index = ((nextIndex % photos.length) + photos.length) % photos.length;
+  if (index === current && photos.length > 1) return;
+
+  gallery.dataset.galleryIndex = String(index);
+  const img = gallery.querySelector(".vehicle-gallery-image");
+  if (img) {
+    img.classList.add("is-changing");
+    window.setTimeout(() => {
+      img.src = photos[index];
+      img.classList.remove("is-changing");
+    }, 100);
+  }
+
+  gallery.querySelectorAll(".vehicle-dot").forEach((dot, dotIndex) => {
+    dot.classList.toggle("active", dotIndex === index);
+  });
+
+  const count = gallery.querySelector(".photo-count");
+  if (count) count.textContent = `${index + 1} / ${photos.length}`;
+}
+
+inventoryGrid?.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-gallery-id]");
+  if (!button) return;
+
+  const galleryId = button.dataset.galleryId;
+  const gallery = inventoryGrid.querySelector(`.vehicle-gallery[data-gallery-id="${CSS.escape(String(galleryId))}"]`);
+  if (!gallery) return;
+
+  if (button.dataset.galleryIndex !== undefined) {
+    changeGallery(gallery, Number(button.dataset.galleryIndex));
+    return;
+  }
+
+  const photos = JSON.parse(gallery.dataset.photos || "[]");
+  const current = Number(gallery.dataset.galleryIndex) || 0;
+  const direction = button.dataset.galleryDirection === "prev" ? -1 : 1;
+  changeGallery(gallery, current + direction);
+});
+
+function enableSwipeGalleries() {
+  if (!inventoryGrid) return;
+  let startX = 0;
+  let startY = 0;
+
+  inventoryGrid.addEventListener("touchstart", (event) => {
+    const gallery = event.target.closest(".vehicle-gallery");
+    if (!gallery || event.touches.length !== 1) return;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    gallery.dataset.touching = "true";
+  }, { passive: true });
+
+  inventoryGrid.addEventListener("touchend", (event) => {
+    const gallery = event.target.closest(".vehicle-gallery");
+    if (!gallery || gallery.dataset.touching !== "true") return;
+    gallery.dataset.touching = "false";
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+
+    const current = Number(gallery.dataset.galleryIndex) || 0;
+    changeGallery(gallery, current + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+}
+
+enableSwipeGalleries();
 
 function applyFilters(allVehicles, imageMap) {
   const make = makeFilter?.value || "";
