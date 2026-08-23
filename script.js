@@ -1,4 +1,210 @@
-document.getElementById("year").textContent=new Date().getFullYear();
-const menuBtn=document.getElementById("menuBtn"),nav=document.getElementById("nav");
-menuBtn.addEventListener("click",()=>nav.classList.toggle("open"));
-nav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
+// M.O Motors — Supabase inventory connection
+const SUPABASE_URL = "https://dpsgtliddmdvfwjahkkq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
+
+const menuBtn = document.getElementById("menuBtn");
+const nav = document.getElementById("nav");
+const inventoryGrid = document.getElementById("inventoryGrid");
+const makeFilter = document.getElementById("makeFilter");
+const modelFilter = document.getElementById("modelFilter");
+const priceFilter = document.getElementById("priceFilter");
+const searchButton = document.getElementById("searchInventory");
+
+if (document.getElementById("year")) {
+  document.getElementById("year").textContent = new Date().getFullYear();
+}
+
+menuBtn?.addEventListener("click", () => nav?.classList.toggle("open"));
+nav?.querySelectorAll("a").forEach((a) =>
+  a.addEventListener("click", () => nav?.classList.remove("open"))
+);
+
+const esc = (value = "") => String(value)
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#039;");
+
+const money = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n)
+    ? new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n)
+    : "$—";
+};
+
+const km = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? `${new Intl.NumberFormat("en-CA").format(n)} km` : "Mileage N/A";
+};
+
+const pick = (obj, ...keys) => {
+  for (const key of keys) {
+    if (obj?.[key] !== undefined && obj?.[key] !== null && obj?.[key] !== "") return obj[key];
+  }
+  return "";
+};
+
+async function supabaseGet(table, params = {}) {
+  const qs = new URLSearchParams(params);
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${encodeURIComponent(table)}?${qs}`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json"
+    }
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${table} request failed (${response.status}): ${text}`);
+  }
+  return response.json();
+}
+
+function imageUrl(row) {
+  const direct = pick(row, "image_url", "imageUrl", "url", "public_url", "publicUrl", "storage_url");
+  if (direct && /^https?:\/\//i.test(direct)) return direct;
+
+  const path = pick(row, "storage_path", "storagePath", "path", "file_path", "filePath");
+  if (!path) return "";
+
+  const bucket = pick(row, "bucket", "bucket_name", "bucketName") || "vehicle-images";
+  return `${SUPABASE_URL}/storage/v1/object/public/${encodeURIComponent(bucket)}/${String(path).split("/").map(encodeURIComponent).join("/")}`;
+}
+
+function getVehicleId(vehicle) {
+  return pick(vehicle, "id", "ID");
+}
+
+async function getVehicles() {
+  // Pull the newest available vehicles. We use select=* so the site's JS remains
+  // tolerant of the column names used in your Supabase table.
+  const vehicles = await supabaseGet("Vehicles", {
+    select: "*",
+    order: "created_at.desc",
+    limit: "24"
+  });
+
+  return vehicles.filter((v) => {
+    const status = String(pick(v, "Status", "status") || "Available").toLowerCase();
+    return !status || status === "available" || status === "in stock" || status === "active";
+  });
+}
+
+async function getVehicleImages(vehicles) {
+  if (!vehicles.length) return new Map();
+
+  try {
+    const rows = await supabaseGet("vehicle_images", { select: "*" });
+    const map = new Map();
+
+    for (const row of rows) {
+      const id = pick(row, "vehicle_id", "vehicleId", "Vehicles_id", "vehicles_id", "vehicle");
+      const url = imageUrl(row);
+      if (!id || !url) continue;
+      const key = String(id);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(url);
+    }
+
+    return map;
+  } catch (error) {
+    console.warn("Vehicle image table could not be loaded:", error);
+    return new Map();
+  }
+}
+
+function populateFilters(vehicles) {
+  const makes = [...new Set(vehicles.map(v => String(pick(v, "Make", "make")).trim()).filter(Boolean))].sort();
+  const models = [...new Set(vehicles.map(v => String(pick(v, "Model", "model")).trim()).filter(Boolean))].sort();
+  const priceRanges = [
+    ["under-20000", "Under $20,000"],
+    ["20000-30000", "$20,000–$29,999"],
+    ["30000-50000", "$30,000–$49,999"],
+    ["50000-plus", "$50,000+"]
+  ];
+
+  if (makeFilter) makeFilter.innerHTML = '<option value="">Any Make</option>' + makes.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  if (modelFilter) modelFilter.innerHTML = '<option value="">Any Model</option>' + models.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  if (priceFilter) priceFilter.innerHTML = '<option value="">Any Price</option>' + priceRanges.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+}
+
+function priceMatches(price, range) {
+  if (!range) return true;
+  const n = Number(price);
+  if (!Number.isFinite(n)) return false;
+  if (range === "under-20000") return n < 20000;
+  if (range === "20000-30000") return n >= 20000 && n < 30000;
+  if (range === "30000-50000") return n >= 30000 && n < 50000;
+  if (range === "50000-plus") return n >= 50000;
+  return true;
+}
+
+function renderVehicles(vehicles, imageMap) {
+  if (!inventoryGrid) return;
+
+  if (!vehicles.length) {
+    inventoryGrid.innerHTML = `<div class="inventory-empty">No vehicles match your search. Check back soon for new inventory.</div>`;
+    return;
+  }
+
+  inventoryGrid.innerHTML = vehicles.slice(0, 6).map((vehicle) => {
+    const id = getVehicleId(vehicle);
+    const year = pick(vehicle, "Year", "year");
+    const make = pick(vehicle, "Make", "make");
+    const model = pick(vehicle, "Model", "model");
+    const mileage = pick(vehicle, "Mileage", "mileage");
+    const price = pick(vehicle, "Price", "price");
+    const transmission = pick(vehicle, "Transmission", "transmission", "transmission_type") || "Automatic";
+    const photos = imageMap.get(String(id)) || [];
+    const photo = photos[0];
+    const title = [year, make, model].filter(Boolean).join(" ") || "Vehicle";
+
+    return `<article class="vehicle-card">
+      <div class="vehicle-image ${photo ? "" : "placeholder"}">
+        ${photo ? `<img src="${esc(photo)}" alt="${esc(title)}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('placeholder')">` : `<span>PHOTO COMING SOON</span>`}
+      </div>
+      <div class="vehicle-info">
+        <p class="vehicle-year">FEATURED VEHICLE</p>
+        <h3>${esc(title)}</h3>
+        <div class="vehicle-meta"><span>${esc(km(mileage))}</span><span>${esc(transmission)}</span><span>Pre-Owned</span></div>
+        <div class="price-row"><strong>${esc(money(price))}</strong><a href="#contact" aria-label="Ask about ${esc(title)}">View Details →</a></div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function applyFilters(allVehicles, imageMap) {
+  const make = makeFilter?.value || "";
+  const model = modelFilter?.value || "";
+  const range = priceFilter?.value || "";
+  const filtered = allVehicles.filter((v) => {
+    const vMake = String(pick(v, "Make", "make"));
+    const vModel = String(pick(v, "Model", "model"));
+    const vPrice = pick(v, "Price", "price");
+    return (!make || vMake === make) && (!model || vModel === model) && priceMatches(vPrice, range);
+  });
+  renderVehicles(filtered, imageMap);
+}
+
+async function loadInventory() {
+  if (!inventoryGrid) return;
+  inventoryGrid.innerHTML = `<div class="inventory-loading">Loading our latest vehicles…</div>`;
+
+  try {
+    const allVehicles = await getVehicles();
+    populateFilters(allVehicles);
+    const imageMap = await getVehicleImages(allVehicles);
+    renderVehicles(allVehicles, imageMap);
+
+    searchButton?.addEventListener("click", () => applyFilters(allVehicles, imageMap));
+    makeFilter?.addEventListener("change", () => applyFilters(allVehicles, imageMap));
+    modelFilter?.addEventListener("change", () => applyFilters(allVehicles, imageMap));
+    priceFilter?.addEventListener("change", () => applyFilters(allVehicles, imageMap));
+  } catch (error) {
+    console.error(error);
+    inventoryGrid.innerHTML = `<div class="inventory-empty">We couldn't load inventory right now. Please call M.O Motors at <a href="tel:+12049634462">204-963-4462</a>.</div>`;
+  }
+}
+
+loadInventory();

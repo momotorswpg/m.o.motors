@@ -41,10 +41,10 @@
         <strong>Search our inventory</strong>
       </div>
       <div class="search-controls">
-        <select><option>Any Make</option></select>
-        <select><option>Any Model</option></select>
-        <select><option>Any Price</option></select>
-        <a href="#inventory" class="btn btn-primary">Search Inventory</a>
+        <select id="makeFilter"><option value="">Any Make</option></select>
+        <select id="modelFilter"><option value="">Any Model</option></select>
+        <select id="priceFilter"><option value="">Any Price</option></select>
+        <button type="button" id="searchInventory" class="btn btn-primary">Search Inventory</button>
       </div>
     </section>
 
@@ -56,34 +56,8 @@
         </div>
         <a href="#" class="text-link">View All Inventory →</a>
       </div>
-      <div class="inventory-grid" id="inventoryGrid">
-        <article class="vehicle-card">
-          <div class="vehicle-image placeholder"><span>YOUR VEHICLE PHOTO</span></div>
-          <div class="vehicle-info">
-            <p class="vehicle-year">FEATURED VEHICLE</p>
-            <h3>Inventory will appear here</h3>
-            <div class="vehicle-meta"><span>Year</span><span>Mileage</span><span>Automatic</span></div>
-            <div class="price-row"><strong>$—</strong><a href="#">View Details →</a></div>
-          </div>
-        </article>
-        <article class="vehicle-card">
-          <div class="vehicle-image placeholder"><span>LIVE SUPABASE INVENTORY</span></div>
-          <div class="vehicle-info">
-            <p class="vehicle-year">COMING FROM DATABASE</p>
-            <h3>Add your first vehicle</h3>
-            <div class="vehicle-meta"><span>Make</span><span>Model</span><span>Trim</span></div>
-            <div class="price-row"><strong>$—</strong><a href="#">View Details →</a></div>
-          </div>
-        </article>
-        <article class="vehicle-card">
-          <div class="vehicle-image placeholder"><span>M.O MOTORS</span></div>
-          <div class="vehicle-info">
-            <p class="vehicle-year">READY FOR YOUR INVENTORY</p>
-            <h3>Multiple photos supported</h3>
-            <div class="vehicle-meta"><span>VIN</span><span>Fuel</span><span>Status</span></div>
-            <div class="price-row"><strong>$—</strong><a href="#">View Details →</a></div>
-          </div>
-        </article>
+      <div class="inventory-grid" id="inventoryGrid" aria-live="polite">
+        <div class="inventory-loading">Loading our latest vehicles…</div>
       </div>
     </section>
 
