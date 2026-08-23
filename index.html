@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DriveMax Motors | Find Your Next Car</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    /* NAVBAR */
+    nav {
+      background: #111827;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 8%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #e63946;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #e63946;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #e63946;
+      color: white;
+      padding: 13px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #c92f3a;
+      transform: translateY(-2px);
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 650px;
+      display: flex;
+      align-items: center;
+      padding: 80px 8%;
+      background:
+        linear-gradient(rgba(17, 24, 39, 0.75), rgba(17, 24, 39, 0.8)),
+        url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+      color: white;
+    }
+
+    .hero-content {
+      max-width: 700px;
+    }
+
+    .hero h1 {
+      font-size: 60px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: #e63946;
+    }
+
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 30px;
+      color: #e5e7eb;
+    }
+
+    .search-box {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: 15px;
+      margin-top: 35px;
+    }
+
+    .search-box select {
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    /* GENERAL */
+    section {
+      padding: 90px 8%;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .section-title h2 {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .section-title p {
+      color: #6b7280;
+    }
+
+    /* CARS */
+    .car-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .car-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transition: 0.3s;
+    }
+
+    .car-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .car-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .car-info {
+      padding: 22px;
+    }
+
+    .car-info h3 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .car-details {
+      display: flex;
+      gap: 15px;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .price {
+      font-size: 25px;
+      font-weight: bold;
+      color: #e63946;
+      margin-bottom: 18px;
+    }
+
+    /* FINANCE */
+    .finance {
+      background: #111827;
+      color: white;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .finance h2 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    .finance p {
+      color: #d1d5db;
+      margin-bottom: 25px;
+    }
+
+    .finance-box {
+      background: white;
+      color: #111827;
+      padding: 35px;
+      border-radius: 12px;
+    }
+
+    .finance-box input,
+    .finance-box select {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .feature {
+      background: white;
+      padding: 35px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    }
+
+    .feature-icon {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials {
+      background: #eef1f5;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .testimonial {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    .stars {
+      color: #f4b400;
+      margin-bottom: 15px;
+    }
+
+    .customer {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    /* CONTACT */
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+    }
+
+    .contact-info h3 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .contact-info p {
+      margin-bottom: 15px;
+      color: #4b5563;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+
+    .contact-form textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 30px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .car-grid,
+      .features,
+      .testimonial-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .finance,
+      .contact-container {
+        grid-template-columns: 1fr;
+      }
+
+      .search-box {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .nav-links {
+        gap: 12px;
+        font-size: 14px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .car-grid,
+      .features,
+      .testimonial-grid,
+      .search-box {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 60px 6%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="logo">Drive<span>Max</span> Motors</div>
+
+    <ul class="nav-links">
+      <li><a href="#inventory">Inventory</a></li>
+      <li><a href="#finance">Financing</a></li>
+      <li><a href="#about">Why Us</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <a href="#contact" class="btn">Book a Test Drive</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Find the Car That <span>Moves You.</span></h1>
+
+      <p>
+        Explore quality new and pre-owned vehicles at competitive prices.
+        Your next adventure starts here.
+      </p>
+
+      <a href="#inventory" class="btn">Browse Inventory</a>
+
+      <div class="search-box">
+        <select>
+          <option>Any Make</option>
+          <option>Toyota</option>
+          <option>Honda</option>
+          <option>Ford</option>
+          <option>BMW</option>
+        </select>
+
+        <select>
+          <option>Any Model</option>
+          <option>Sedan</option>
+          <option>SUV</option>
+          <option>Truck</option>
+          <option>Luxury</option>
+        </select>
+
+        <select>
+          <option>Any Price</option>
+          <option>Under $20,000</option>
+          <option>$20,000 - $40,000</option>
+          <option>$40,000 - $60,000</option>
+          <option>$60,000+</option>
+        </select>
+
+        <button class="btn">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVENTORY -->
+  <section id="inventory">
+    <div class="section-title">
+      <h2>Featured Vehicles</h2>
+      <p>Hand-picked vehicles ready for their next owner.</p>
+    </div>
+
+    <div class="car-grid">
+
+      <div class="car-card">
+        <img src="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=900&q=80" alt="BMW">
+        <div class="car-info">
+          <h3>2023 BMW 3 Series</h3>
+          <div class="car-details">
+            <span>Automatic</span>
+            <span>25,000 km</span>
+            <span>Gasoline</span>
+          </div>
+          <div class="price">$42,900</div>
+          <a href="#contact" class="btn">View Details</a>
+        </div>
+      </div>
+
+      <div class="car-card">
+        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80" alt="Sports Car">
+        <div class="car-info">
+          <h3>2024 Ford Mustang</h3>
+          <div class="car-details">
+            <span>Automatic</span>
+            <span>12,000 km</span>
+            <span>Gasoline</span>
+          </div>
+          <div class="price">$51,500</div>
+          <a href="#contact" class="btn">View Details</a>
+        </div>
+      </div>
+
+      <div class="car-card">
+        <img src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80" alt="SUV">
+        <div class="car-info">
+          <h3>2023 Toyota RAV4</h3>
+          <div class="car-details">
+            <span>Automatic</span>
+            <span>18,500 km</span>
+            <span>Hybrid</span>
+          </div>
+          <div class="price">$38,750</div>
+          <a href="#contact" class="btn">View Details</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FINANCING -->
+  <section class="finance" id="finance">
+    <div>
+      <h2>Flexible Financing Options</h2>
+      <p>
+        Whether you're buying your first vehicle or upgrading to something
+        new, our financing specialists can help you find a payment plan that
+        works for your budget.
+      </p>
+
+      <a href="#contact" class="btn">Get Pre-Approved</a>
+    </div>
+
+    <div class="finance-box">
+      <h3>Quick Payment Estimate</h3>
+      <br>
+
+      <input type="number" placeholder="Vehicle Price" />
+      <input type="number" placeholder="Down Payment" />
+
+      <select>
+        <option>Loan Term</option>
+        <option>36 Months</option>
+        <option>48 Months</option>
+        <option>60 Months</option>
+        <option>72 Months</option>
+      </select>
+
+      <button class="btn" style="width: 100%;">Calculate Payment</button>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US -->
+  <section id="about">
+    <div class="section-title">
+      <h2>Why Choose DriveMax?</h2>
+      <p>Buying a car should be exciting, simple, and stress-free.</p>
+    </div>
+
+    <div class="features">
+
+      <div class="feature">
+        <div class="feature-icon">🚗</div>
+        <h3>Quality Vehicles</h3>
+        <p>
+          Every vehicle is carefully inspected before it reaches our lot.
+        </p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">💰</div>
+        <h3>Competitive Pricing</h3>
+        <p>
+          Transparent pricing with no unnecessary surprises.
+        </p>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">🤝</div>
+        <h3>Customer First</h3>
+        <p>
+          Our team is here to help you find the right vehicle—not pressure you.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="section-title">
+      <h2>What Our Customers Say</h2>
+    </div>
+
+    <div class="testimonial-grid">
+
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>
+          "The easiest car-buying experience I've ever had. The team was
+          professional and transparent from start to finish."
+        </p>
+        <div class="customer">— Michael R.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>
+          "Great selection and absolutely no pressure. I found exactly the SUV
+          I was looking for."
+        </p>
+        <div class="customer">— Sarah T.</div>
+      </div>
+
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>
+          "Their financing team made everything simple. I was driving my new
+          car home the same day!"
+        </p>
+        <div class="customer">— Daniel K.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-title">
+      <h2>Let's Find Your Next Car</h2>
+      <p>Contact our team or schedule your test drive today.</p>
+    </div>
+
+    <div class="contact-container">
+
+      <div class="contact-info">
+        <h3>Visit DriveMax Motors</h3>
+
+        <p>📍 123 Auto Drive, Your City</p>
+        <p>📞 (555) 123-4567</p>
+        <p>✉ sales@drivemaxmotors.com</p>
+        <p>🕒 Mon–Sat: 9:00 AM – 7:00 PM</p>
+      </div>
+
+      <form class="contact-form">
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+        <input type="tel" placeholder="Phone Number" />
+        <textarea placeholder="Tell us what vehicle you're looking for..."></textarea>
+
+        <button type="submit" class="btn">Send Inquiry</button>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 DriveMax Motors. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>
