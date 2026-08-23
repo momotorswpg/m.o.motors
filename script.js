@@ -1,7 +1,7 @@
 const SUPABASE_URL="https://dpsgtliddmdvfwjahkkq.supabase.co",SUPABASE_KEY="sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
 const menuBtn=document.getElementById("menuBtn"),nav=document.getElementById("nav"),inventoryGrid=document.getElementById("inventoryGrid"),makeFilter=document.getElementById("makeFilter"),modelFilter=document.getElementById("modelFilter"),priceFilter=document.getElementById("priceFilter"),searchButton=document.getElementById("searchInventory");
 document.getElementById("year")&&(document.getElementById("year").textContent=new Date().getFullYear());
-menuBtn?.addEventListener("click",()=>nav?.classList.toggle("open"));nav?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav?.classList.remove("open")));
+
 const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 const money=v=>Number.isFinite(Number(v))?new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD",maximumFractionDigits:0}).format(Number(v)):"$—";
 const km=v=>Number.isFinite(Number(v))?`${new Intl.NumberFormat("en-CA").format(Number(v))} km`:"Mileage N/A";
