@@ -1,0 +1,11 @@
+/* Make the Trade-In CTA visible on the light card */
+.two-cards article:first-child .btn-secondary{
+  background:var(--red);
+  border-color:var(--red);
+  color:#fff;
+}
+.two-cards article:first-child .btn-secondary:hover{
+  background:#b9151b;
+  border-color:#b9151b;
+  color:#fff;
+}
