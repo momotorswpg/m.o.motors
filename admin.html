@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M.O Motors | Admin</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">M.O</div>
+        <div>
+          <strong>M.O MOTORS</strong>
+          <span>ADMIN</span>
+        </div>
+      </div>
+      <div class="sidebar-copy">
+        <span class="eyebrow">DEALERSHIP INVENTORY</span>
+        <h1>Manage your vehicles.</h1>
+        <p>Add vehicles, upload multiple photos at once, choose the primary photo, and keep your public inventory current.</p>
+      </div>
+      <div class="sidebar-foot">
+        <span id="sessionEmail"></span>
+        <button id="signOutBtn" class="ghost-btn" type="button">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="authView" class="view auth-view">
+        <div class="panel auth-panel">
+          <span class="eyebrow">M.O MOTORS</span>
+          <h2>Admin sign in</h2>
+          <p class="muted">Use the admin account you created in Supabase Authentication.</p>
+          <form id="loginForm" class="stack-form">
+            <label>Email<input id="email" type="email" autocomplete="username" required /></label>
+            <label>Password<input id="password" type="password" autocomplete="current-password" required /></label>
+            <button class="primary-btn" type="submit">Sign in</button>
+            <p id="loginStatus" class="status"></p>
+          </form>
+        </div>
+      </div>
+
+      <div id="adminView" class="view hidden">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">CONTROL CENTER</span>
+            <h2>Inventory</h2>
+          </div>
+          <button id="refreshBtn" class="secondary-btn" type="button">Refresh</button>
+        </header>
+
+        <section class="stats-row">
+          <div class="stat-card"><span>Available</span><strong id="availableCount">0</strong></div>
+          <div class="stat-card"><span>Photos</span><strong id="photoCount">0</strong></div>
+          <div class="stat-card"><span>Selected</span><strong id="selectedVehicleLabel">None</strong></div>
+        </section>
+
+        <div class="layout-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">STEP 1</span>
+                <h3>Add a vehicle</h3>
+              </div>
+              <button id="resetFormBtn" class="link-btn" type="button">Clear</button>
+            </div>
+            <form id="vehicleForm" class="form-grid">
+              <label>VIN<input id="vin" name="vin" type="text" required /></label>
+              <label>Status<select id="status" name="status"><option>Available</option><option>Sold</option><option>Pending</option><option>Hold</option></select></label>
+              <label>Year<input id="year" name="year" type="number" min="1980" max="2100" required /></label>
+              <label>Mileage (km)<input id="mileage" name="mileage" type="number" min="0" required /></label>
+              <label>Make<input id="make" name="make" type="text" required /></label>
+              <label>Model<input id="model" name="model" type="text" required /></label>
+              <label class="wide">Price (CAD)<input id="price" name="price" type="number" min="0" step="1" required /></label>
+              <div class="wide form-actions">
+                <button class="primary-btn" type="submit">Add Vehicle</button>
+                <p id="vehicleStatus" class="status"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <span class="eyebrow">STEP 2</span>
+                <h3>Upload photos</h3>
+              </div>
+            </div>
+            <div id="uploadHint" class="notice">Select a vehicle below, then choose multiple photos at once.</div>
+            <div id="dropZone" class="drop-zone">
+              <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple disabled />
+              <div class="drop-title">Drop photos here</div>
+              <div class="drop-sub">or click to choose multiple files</div>
+              <div class="drop-note">The first uploaded photo becomes the primary photo.</div>
+            </div>
+            <div id="uploadProgressWrap" class="progress-wrap hidden">
+              <div class="progress-bar"><span id="uploadProgress"></span></div>
+              <small id="uploadProgressText">Uploading…</small>
+            </div>
+            <div class="photo-section-head">
+              <h4>Current photos</h4>
+              <span id="photoHelp" class="muted">No vehicle selected</span>
+            </div>
+            <div id="photoGrid" class="photo-grid empty-grid">Select a vehicle to manage its photos.</div>
+          </section>
+        </div>
+
+        <section class="panel inventory-panel">
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">INVENTORY</span>
+              <h3>Your vehicles</h3>
+            </div>
+            <input id="inventorySearch" class="search-input" type="search" placeholder="Search VIN, make or model" />
+          </div>
+          <div id="inventoryList" class="inventory-list"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
