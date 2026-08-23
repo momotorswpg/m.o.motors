@@ -9,14 +9,14 @@
 
 #home .hero{position:relative;min-height:655px;overflow:hidden;background-image:linear-gradient(90deg,rgba(0,0,0,.99) 0%,rgba(0,0,0,.97) 31%,rgba(0,0,0,.76) 49%,rgba(0,0,0,.32) 68%,rgba(0,0,0,.06) 100%),linear-gradient(0deg,rgba(0,0,0,.42),rgba(0,0,0,.04) 42%),url("assets/momotors-hero-showroom.jpg");background-position:center,center,70% center;background-size:cover,cover,cover;background-repeat:no-repeat}
 #home .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 50%,transparent 0 22%,rgba(0,0,0,.12) 57%,rgba(0,0,0,.42) 100%);pointer-events:none}
-#home .hero-content{position:relative;z-index:2;max-width:870px;padding:82px 5.3% 60px}
+#home .hero-content{position:relative;z-index:2;max-width:1150px;padding:82px 5.3% 60px}
 #home .hero .eyebrow{display:none}
 #home .hero h1{margin:0;font-size:clamp(60px,5.25vw,91px);line-height:1.03;letter-spacing:-1.7px;display:flex;flex-direction:column;gap:23px}
 #home .hero h1 .hero-line{display:block;color:#f2f2f2;white-space:nowrap}
 #home .hero h1 .hero-line .accent{color:#dc1b20}
 #home .hero-rule{height:1px;width:90px;background:#777a80;margin:27px 0 0;opacity:.72}
 #home .hero-rule-two{margin-top:18px}
-#home .hero-copy{max-width:700px;font-size:18px;line-height:1.68;margin:38px 0 31px;color:#dadadd}
+#home .hero-copy{max-width:1050px;font-size:18px;line-height:1.68;margin:38px 0 31px;color:#dadadd}
 #home .actions{gap:22px}
 #home .actions .btn{min-width:208px;text-align:center;padding:18px 25px}
 #home .actions .btn-primary{background:#d7191e}
@@ -33,8 +33,8 @@
 #home .search-controls select{background:#15161a;color:#fff;border-color:#33353b}
 #home .search-controls option{color:#111;background:#fff}
 
-@media(max-width:1100px){.brand img{width:245px}.main-nav nav{gap:24px}#home .hero-benefits article{padding:18px 18px;gap:14px}}
-@media(max-width:900px){.main-nav{min-height:92px;padding:7px 6%}.brand img{width:190px}.main-nav nav#nav{top:92px;background:#090a0d}.main-nav nav#nav a{color:#fff}#home .hero{min-height:680px;background-position:center,center,66% center}#home .hero-content{padding:90px 7% 75px}#home .hero h1{font-size:clamp(52px,8vw,76px);gap:14px}#home .hero-benefits{grid-template-columns:repeat(2,1fr);padding:0 5%}#home .hero-benefits article:nth-child(2){border-right:0}#home .hero-benefits article{border-bottom:1px solid #202126}.finance-dropdown-toggle{color:#fff!important}}
+@media(max-width:1100px){.brand img{width:245px}.main-nav nav{gap:24px}#home .hero-content{max-width:950px}#home .hero-copy{max-width:850px}#home .hero-benefits article{padding:18px 18px;gap:14px}}
+@media(max-width:900px){.main-nav{min-height:92px;padding:7px 6%}.brand img{width:190px}.main-nav nav#nav{top:92px;background:#090a0d}.main-nav nav#nav a{color:#fff}#home .hero{min-height:680px;background-position:center,center,66% center}#home .hero-content{padding:90px 7% 75px;max-width:none}#home .hero h1{font-size:clamp(52px,8vw,76px);gap:14px}#home .hero-copy{max-width:100%}#home .hero-benefits{grid-template-columns:repeat(2,1fr);padding:0 5%}#home .hero-benefits article:nth-child(2){border-right:0}#home .hero-benefits article{border-bottom:1px solid #202126}.finance-dropdown-toggle{color:#fff!important}}
 @media(max-width:560px){#home .hero{min-height:650px;background-position:center,center,63% center}#home .hero-content{padding:70px 7% 62px}#home .hero h1{font-size:clamp(43px,13.5vw,66px);gap:11px;line-height:1}#home .hero h1 .hero-line{white-space:normal}#home .hero-rule{width:70px;margin-top:19px}#home .hero-rule-two{margin-top:12px}#home .hero-copy{max-width:100%;font-size:16px;margin:28px 0 27px}#home .actions{gap:10px}#home .actions .btn{min-width:0;flex:1;padding:16px 10px;font-size:11px}#home .hero-benefits{grid-template-columns:1fr;padding:0 7%}#home .hero-benefits article,#home .hero-benefits article:nth-child(2){border-right:0;border-bottom:1px solid #202126;padding:16px 0;min-height:88px}#home .hero-benefits article:last-child{border-bottom:0}#home .benefit-icon{width:45px;height:45px;font-size:22px}#home .hero-benefits h3{font-size:18px}}
 
 /* Source-matched brand mark and benefit icons */
