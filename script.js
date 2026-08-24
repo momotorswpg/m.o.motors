@@ -8,9 +8,9 @@ const km=v=>Number.isFinite(Number(v))?`${new Intl.NumberFormat("en-CA").format(
 let finance={apr:8.99,term_months:84,down_payment:0};
 async function get(table,params={}){const r=await fetch(`${SUPABASE_URL}/rest/v1/${encodeURIComponent(table)}?${new URLSearchParams(params)}`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});if(!r.ok)throw new Error(await r.text());return r.json()}
 async function loadFinance(){try{const x=await get("finance_settings",{select:"*",id:"eq.1"});if(x[0])finance=x[0]}catch(e){console.warn("Using default finance settings",e)}}
-function biweekly(price){const p=Math.max(0,Number(price)-Number(finance.down_payment||0)),apr=Number(finance.apr)/100,n=Number(finance.term_months)/12*26;if(!p||!n)return 0;const annual=(1+apr/2)**2-1,r=(1+annual)**(1/26)-1;return r?p*r/(1-(1+r)**-n):p/n}
+const TAX_RATE=.12,PAYMENT_BUFFER=1000,DISPLAY_TERM_MONTHS=72;function biweekly(price){const p=Math.max(0,Number(price||0)*(1+TAX_RATE)+PAYMENT_BUFFER),apr=Number(finance.apr||8.99)/100,n=DISPLAY_TERM_MONTHS/12*26;if(!p||!n)return 0;const annual=(1+apr/2)**2-1,r=(1+annual)**(1/26)-1;return r?p*r/(1-(1+r)**-n):p/n}
 function paymentInline(price){return `<span class="featured-payment">or <b>${money(Math.round(biweekly(price)))}</b> bi-weekly</span>`}
-function paymentNote(){return `<p class="featured-finance-note">Price excl. GST/PST. Financing based on ${finance.term_months} mo. with ${money(finance.down_payment||0)} down, no trade-in. OAC.</p>`}
+function paymentNote(){return `<p class="featured-finance-note">Price incl. GST/PST. Financing based on 72 mo. with $0 down, no trade-in. OAC.</p>`}
 function active(v){return["available","in stock","active"].includes(String(v.Status||v.status||"Available").toLowerCase())}
 function featured(v){const x=v.Featured??v.featured??false;return x===true||String(x).toLowerCase()==="true"||Number(x)===1}
 async function loadInventory(){try{await loadFinance();const all=(await get("Vehicles",{select:"*",order:"created_at.desc"})).filter(active);const photos=await get("vehicle_images",{select:"*",order:"is_primary.desc,sort_order.asc"});const imageMap=new Map();photos.forEach(p=>{const key=String(p.vehicle_id);if(!imageMap.has(key))imageMap.set(key,[]);imageMap.get(key).push(p.image_url)});
