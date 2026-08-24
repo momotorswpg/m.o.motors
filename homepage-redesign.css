@@ -154,3 +154,50 @@
     white-space:nowrap;
   }
 }
+
+
+/* Final mobile hero composition from approved layout: larger signature, tighter header, and rear tail-light framing. */
+@media(max-width:560px){
+  .site-header .main-nav{
+    min-height:96px;
+    padding:12px 5% 6px;
+  }
+  .site-header .mobile-contact-info{
+    left:3%;
+    right:3%;
+    top:58px;
+    width:94%;
+    font-size:8px;
+    letter-spacing:.42px;
+    line-height:1.1;
+  }
+  .site-header .mobile-contact-info span,
+  .site-header .mobile-contact-info a{
+    padding:0 8px;
+  }
+  .site-header #nav.page-nav.open{top:96px}
+
+  #home .hero{
+    min-height:660px;
+    background-position:center center,center center,43% center;
+    background-size:cover,cover,cover;
+  }
+  #home .hero:before{
+    background:radial-gradient(circle at 73% 54%,transparent 0 18%,rgba(0,0,0,.10) 53%,rgba(0,0,0,.36) 100%);
+  }
+  #home .hero-content{
+    padding:50px 7% 44px;
+  }
+  #home .hero h1{
+    max-width:96%;
+  }
+  #home .hero-copy{
+    max-width:66%;
+    margin-top:24px;
+    margin-bottom:26px;
+  }
+  #home .actions{
+    width:100%;
+    max-width:none;
+  }
+}
