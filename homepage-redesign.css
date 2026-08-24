@@ -49,4 +49,11 @@
 /* Preview: reduce homepage hero headline by 20% */
 #home .hero h1{font-size:clamp(48px,4.2vw,72.8px)}
 @media(max-width:900px){#home .hero h1{font-size:clamp(41.6px,6.4vw,60.8px)}}
-@media(max-width:560px){#home .hero h1{font-size:clamp(34.4px,10.8vw,52.8px)}}
+@media(max-width:560px){
+  /* Mobile-only: reduce the hero headline by 30% from the original scale. */
+  #home .hero h1{font-size:clamp(30px,9.45vw,46.2px);line-height:1.02}
+  /* Shift the source image left in the viewport so more of the red tail-light area is visible. */
+  #home .hero{background-position:center,center,48% center}
+  /* The base mobile rule hides .page-nav with !important; this explicitly allows the opened menu through. */
+  .site-header #nav.page-nav.open{display:flex!important;position:absolute;left:0;right:0;top:92px;z-index:100;box-shadow:0 12px 24px rgba(0,0,0,.35)}
+}
