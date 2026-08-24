@@ -1,0 +1,25 @@
+/* Mobile-only header adjustments for local/test review */
+@media (max-width: 560px) {
+  .mobile-contact-info {
+    font-size: 13px !important;
+    line-height: 1.2;
+    gap: 3px !important;
+    margin-bottom: -4px !important;
+  }
+
+  .mobile-contact-info span,
+  .mobile-contact-info a {
+    font-size: 13px !important;
+  }
+
+  .menu-btn {
+    color: var(--red) !important;
+    line-height: 1;
+    margin-bottom: -4px;
+  }
+
+  .main-nav {
+    padding-bottom: 3px !important;
+    min-height: 0 !important;
+  }
+}
