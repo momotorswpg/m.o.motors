@@ -13,11 +13,22 @@
 
   .menu-btn {
     color: var(--red) !important;
-    line-height: 1;
+    line-height: 1.1;
+    padding: 4px 0;
   }
 
-  /* Keep the divider below the contact information, but tighten the gap above it. */
+  /* Keep the divider below the contact information and avoid clipping the wordmark. */
   .main-nav {
-    padding-bottom: 3px !important;
+    min-height: 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 4px !important;
+    overflow: visible !important;
+  }
+
+  .brand,
+  .brand-name,
+  .brand-name-accent,
+  .brand-name-main {
+    overflow: visible !important;
   }
 }
