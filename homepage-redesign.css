@@ -105,3 +105,52 @@
   }
   .site-header #nav.page-nav.open{top:104px}
 }
+
+
+/* Preview mobile hero: overlap copy with vehicle imagery while keeping the tail-light and rear rim visible. */
+@media(max-width:560px){
+  .brand-tagline{font-size:8px;letter-spacing:3px}
+  .site-header .mobile-contact-info{
+    top:61px;
+    font-size:8px;
+    letter-spacing:.35px;
+    font-weight:700;
+  }
+  .site-header .main-nav{min-height:106px}
+  .site-header #nav.page-nav.open{top:106px}
+
+  #home .hero{
+    min-height:640px;
+    background-position:center center, center center, 58% center;
+    background-size:auto, auto, cover;
+  }
+  #home .hero-content{
+    position:relative;
+    z-index:2;
+    max-width:none;
+    padding:56px 7% 48px;
+  }
+  #home .hero h1{
+    max-width:92%;
+    font-size:clamp(30px,9.45vw,46.2px);
+  }
+  #home .hero-copy{
+    position:relative;
+    z-index:3;
+    max-width:72%;
+    margin-top:26px;
+    margin-bottom:26px;
+    padding:0;
+  }
+  #home .actions{
+    position:relative;
+    z-index:4;
+    display:flex;
+    width:min(100%,420px);
+    gap:10px;
+  }
+  #home .actions .btn{
+    flex:1 1 0;
+    white-space:nowrap;
+  }
+}
