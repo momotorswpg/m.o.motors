@@ -16,3 +16,6 @@
 @media(max-width:1100px){.site-header .brand-name{font-size:34px}.site-header .brand-tagline{font-size:8px;letter-spacing:4.2px}.site-header .main-nav nav{gap:24px}}
 @media(max-width:900px){.site-header .main-nav{min-height:92px;padding:7px 6%}.site-header .brand-wordmark{gap:2px}.site-header .brand-name{font-size:29px}.site-header .brand-tagline{font-size:7px;letter-spacing:3.4px}.site-header .main-nav nav#nav{top:92px;background:#090a0d}.site-header .main-nav nav#nav a{color:#fff}.site-header .finance-dropdown-toggle{color:#fff!important}}
 @media(max-width:560px){.site-header .brand-name{font-size:25px}.site-header .brand-tagline{font-size:6px;letter-spacing:2.9px}}
+
+/* Keep the About section clear of the sticky header when navigated to from the home page. */
+#about{scroll-margin-top:110px;}
