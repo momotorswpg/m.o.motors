@@ -10,12 +10,12 @@
     ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
     ["Transmission","Transmission","text"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","text"],["EngineSize","Engine Size","text"],
     ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","text"],["InteriorColor","Interior Colour","text"],
-    ["Doors","Doors","text"],["FuelType","Fuel Type","text"],["Passengers","Passengers","text"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
+    ["Doors","Doors","text"],["FuelType","Fuel Type","text"],["Passengers","Passengers","text"],["Description","Additional Information / Features","textarea"],["CarfaxURL","CARFAX URL","url"]
   ];
 
   function esc(v="") { return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
   function input(field, label, type, value) {
-    if (type === "textarea") return `<label class="edit-wide">${label}<textarea name="${field}" rows="5">${esc(value || "")}</textarea></label>`;
+    if (type === "textarea") return `<label class="edit-wide">${label}<textarea name="${field}" rows="5" placeholder="Add features, options, condition notes or other vehicle details not covered above.">${esc(value || "")}</textarea></label>`;
     if (type.startsWith("select:")) {
       const options = type.slice(7).split(",").map(x => `<option value="${x}" ${String(value||"Available")===x?"selected":""}>${x}</option>`).join("");
       return `<label>${label}<select name="${field}">${options}</select></label>`;
