@@ -57,3 +57,13 @@
   /* The base mobile rule hides .page-nav with !important; this explicitly allows the opened menu through. */
   .site-header #nav.page-nav.open{display:flex!important;position:absolute;left:0;right:0;top:92px;z-index:100;box-shadow:0 12px 24px rgba(0,0,0,.35)}
 }
+
+/* Mobile-only quick contact details beneath the M.O. MOTORS wordmark. */
+.mobile-contact-info{display:none}
+@media(max-width:560px){
+  .site-header .main-nav{min-height:118px;align-items:flex-start;padding-top:18px;padding-bottom:12px}
+  .site-header .brand-wordmark{gap:3px}
+  .site-header .mobile-contact-info{display:flex;flex-wrap:wrap;gap:3px 9px;margin-top:5px;color:#b9bbc1;font-family:"DM Sans",Arial,sans-serif;font-size:7px;font-weight:600;letter-spacing:.15px;line-height:1.35;text-transform:none}
+  .site-header .mobile-contact-info a{color:#f0f0f2!important;font-family:"DM Sans",Arial,sans-serif;font-size:7px;font-weight:700;letter-spacing:.15px;text-transform:none;text-decoration:none}
+  .site-header #nav.page-nav.open{top:118px}
+}
