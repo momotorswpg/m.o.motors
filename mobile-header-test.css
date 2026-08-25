@@ -1,6 +1,5 @@
 /* Mobile-only header + homepage composition for local/test review. */
 @media (max-width: 560px) {
-  /* Keep the mobile page inside the viewport and prevent sideways scrolling. */
   html,
   body {
     width: 100%;
@@ -8,12 +7,12 @@
     overflow-x: hidden !important;
   }
 
-  /* Do not let the sticky desktop header sit on top of scrolled mobile content. */
   .site-header {
     position: relative !important;
     width: 100%;
     max-width: 100%;
     overflow: visible !important;
+    border-bottom: 0 !important;
   }
 
   .site-header .main-nav {
@@ -29,6 +28,7 @@
     min-height: 0 !important;
     padding: 12px 5% 0 !important;
     overflow: visible !important;
+    border-bottom: 0 !important;
   }
 
   .site-header .brand-wordmark {
@@ -73,22 +73,19 @@
     line-height: .9 !important;
   }
 
-  /* Contact row stays in normal document flow — never absolute over the hero. */
   .site-header .mobile-contact-info {
     grid-area: contact;
     position: static !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
     width: 100%;
     display: grid !important;
-    grid-template-columns: minmax(0, 1.34fr) minmax(0, .92fr) minmax(0, 1.12fr);
+    grid-template-columns: minmax(0, 1.36fr) minmax(0, .96fr) minmax(0, 1.08fr);
     align-items: stretch;
     gap: 0 !important;
     margin: 2px 0 0 !important;
     padding: 8px 0 9px !important;
-    border-top: 1px solid #24262a;
-    border-bottom: 2px solid var(--red);
+    border-top: 0 !important;
+    border-bottom: 2px solid var(--red) !important;
+    box-shadow: none !important;
     box-sizing: border-box;
     overflow: hidden !important;
   }
@@ -103,35 +100,33 @@
     margin: 0;
     color: #f2f2f2 !important;
     font-family: "DM Sans", Arial, sans-serif !important;
-    font-size: clamp(9px, 2.45vw, 10.5px) !important;
+    font-size: clamp(8.4px, 2.15vw, 9.2px) !important;
     font-weight: 700 !important;
     line-height: 1.15 !important;
-    letter-spacing: .05px !important;
+    letter-spacing: .02px !important;
     text-transform: uppercase;
     text-decoration: none;
     box-sizing: border-box;
-    min-width: 0;
     overflow: hidden !important;
   }
 
   .site-header .mobile-contact-info span:first-child {
-    padding: 2px 7px 2px 30px;
+    padding: 2px 6px 2px 27px;
     white-space: normal;
   }
 
   .site-header .mobile-contact-info a {
-    padding: 2px 6px 2px 30px;
+    padding: 2px 5px 2px 27px;
     white-space: nowrap;
-    border-left: 2px solid var(--red);
+    border-left: 2px solid var(--red) !important;
   }
 
   .site-header .mobile-contact-info span:last-child {
-    padding: 2px 0 2px 29px;
+    padding: 2px 0 2px 27px;
     white-space: nowrap;
-    border-left: 2px solid var(--red);
+    border-left: 2px solid var(--red) !important;
   }
 
-  /* Red location / phone / hours icons. */
   .site-header .mobile-contact-info span:first-child::before,
   .site-header .mobile-contact-info a::before,
   .site-header .mobile-contact-info span:last-child::before {
@@ -139,8 +134,8 @@
     position: absolute;
     left: 6px;
     top: 50%;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     transform: translateY(-50%);
     background: var(--red);
     -webkit-mask-repeat: no-repeat;
@@ -162,11 +157,10 @@
   }
 
   .site-header .mobile-contact-info span:last-child::before {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0-20 0m1 5v5.6l4 2.4-1 1.7-5-3V7z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 5v5.6l4 2.4-1 1.7-5-3V7z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0-20 0m1 5v5.6l4 2.4-1 1.7-5-3V7z'/%3E%3C/svg%3E");
   }
 
-  /* Reduce the large dead space between the contact divider and hero content. */
   #home .hero-content {
     padding: 54px 7% 44px !important;
   }
@@ -195,31 +189,31 @@
   }
 
   .site-header .mobile-contact-info {
-    grid-template-columns: minmax(0, 1.30fr) minmax(0, .9fr) minmax(0, 1.06fr);
+    grid-template-columns: minmax(0, 1.32fr) minmax(0, .92fr) minmax(0, 1.04fr);
   }
 
   .site-header .mobile-contact-info span,
   .site-header .mobile-contact-info a {
-    font-size: 8.6px !important;
+    font-size: 8.2px !important;
   }
 
   .site-header .mobile-contact-info span:first-child {
-    padding-left: 26px;
+    padding-left: 25px;
   }
 
   .site-header .mobile-contact-info a {
-    padding-left: 26px;
+    padding-left: 25px;
   }
 
   .site-header .mobile-contact-info span:last-child {
-    padding-left: 25px;
+    padding-left: 24px;
   }
 
   .site-header .mobile-contact-info span:first-child::before,
   .site-header .mobile-contact-info a::before,
   .site-header .mobile-contact-info span:last-child::before {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
   }
 
   #home .hero-content {
