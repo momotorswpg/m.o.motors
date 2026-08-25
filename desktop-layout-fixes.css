@@ -1,0 +1,5 @@
+/* Desktop-only layout fixes. Mobile layout remains unchanged. */
+@media (min-width: 901px) {
+  #home .trade-test-cards article:first-child { order: 2; }
+  #home .trade-test-cards article:last-child { order: 1; }
+}
