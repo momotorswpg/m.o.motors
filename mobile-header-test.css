@@ -1,14 +1,18 @@
 /* Mobile-only header adjustments for local/test review */
 @media (max-width: 560px) {
-  .mobile-contact-info {
-    font-size: 13px !important;
-    line-height: 1.2;
-    gap: 3px !important;
+  .site-header .main-nav {
+    min-height: 0 !important;
+    padding: 7px 5% 4px !important;
+    overflow: visible !important;
+    flex-wrap: wrap;
+    row-gap: 7px;
   }
 
-  .mobile-contact-info span,
-  .mobile-contact-info a {
-    font-size: 13px !important;
+  .brand,
+  .brand-name,
+  .brand-name-accent,
+  .brand-name-main {
+    overflow: visible !important;
   }
 
   .menu-btn {
@@ -17,18 +21,83 @@
     padding: 4px 0;
   }
 
-  /* Keep the divider below the contact information and avoid clipping the wordmark. */
-  .main-nav {
-    min-height: 0 !important;
-    padding-top: 6px !important;
-    padding-bottom: 4px !important;
-    overflow: visible !important;
+  /* Contact row: icon + detail groups, with red separators and divider below. */
+  .mobile-contact-info {
+    order: 3;
+    width: 100%;
+    display: flex !important;
+    align-items: center;
+    gap: 0 !important;
+    padding: 7px 0 8px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--red);
+    font-size: 12px !important;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
-  .brand,
-  .brand-name,
-  .brand-name-accent,
-  .brand-name-main {
-    overflow: visible !important;
+  .mobile-contact-info span,
+  .mobile-contact-info a {
+    position: relative;
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px !important;
+    font-weight: 700;
+    letter-spacing: .3px;
+    min-width: 0;
+  }
+
+  .mobile-contact-info span:first-child {
+    flex: 1.28 1 0;
+    padding-left: 24px;
+    padding-right: 8px;
+    white-space: normal;
+  }
+
+  .mobile-contact-info a {
+    flex: 1 1 0;
+    padding: 3px 8px 3px 28px;
+    border-left: 1px solid var(--red);
+  }
+
+  .mobile-contact-info span:last-child {
+    flex: 1.08 1 0;
+    padding: 3px 0 3px 28px;
+    border-left: 1px solid var(--red);
+  }
+
+  /* Red mobile contact icons. */
+  .mobile-contact-info span:first-child::before {
+    content: "⌖";
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--red);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .mobile-contact-info a::before {
+    content: "⌕";
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-28deg);
+    color: var(--red);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .mobile-contact-info span:last-child::before {
+    content: "◷";
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--red);
+    font-size: 22px;
+    line-height: 1;
   }
 }
