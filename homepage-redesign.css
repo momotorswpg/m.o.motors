@@ -179,7 +179,7 @@
 
   #home .hero{
     min-height:660px;
-    background-position:center center,center center,43% center;
+    background-position:center center,center center,83% center;
     background-size:cover,cover,cover;
   }
   #home .hero:before{
