@@ -1,0 +1,15 @@
+/* Mobile-only cleanup: remove inherited gray separator edges behind red dividers. */
+@media (max-width: 560px) {
+  .site-header .mobile-contact-info span,
+  .site-header .mobile-contact-info a {
+    border: 0 !important;
+    border-right: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+  }
+
+  .site-header .mobile-contact-info a,
+  .site-header .mobile-contact-info span:last-child {
+    border-left: 2px solid var(--red) !important;
+  }
+}
