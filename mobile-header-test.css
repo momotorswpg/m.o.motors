@@ -1,17 +1,5 @@
 /* Mobile-only header + homepage composition for local/test review. */
 
-/* Desktop: match the Test Drive card to the Payment Estimator card styling. */
-@media (min-width: 561px) {
-  .trade-test-cards article:first-child {
-    background: #1a1b20;
-    color: #fff;
-  }
-
-  .trade-test-cards article:first-child p:not(.eyebrow) {
-    color: #74757b;
-  }
-}
-
 @media (max-width: 560px) {
   html,
   body {
@@ -163,7 +151,7 @@
   }
 
   .site-header .mobile-contact-info span:first-child::before {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 4a3 3 0 1 0 0 6a3 3 0 0 0 0-6Z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 4a3 3 0 1 0 0 6a3 3 0 1 0 0-6Z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 4a3 3 0 1 0 0 6a3 3 0 1 0 0-6Z'/%3E%3C/svg%3E");
   }
 
