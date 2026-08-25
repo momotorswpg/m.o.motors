@@ -1,0 +1,36 @@
+/* Desktop-only layout fixes. Mobile layout remains unchanged. */
+@media (min-width: 901px) {
+  #home .trade-test-cards article:first-child { order: 2; }
+  #home .trade-test-cards article:last-child { order: 1; }
+}
+
+/* Payment Estimator: remove the light seams/edges around the dark panel. */
+#home > section.section:has(> .two-cards) .two-cards {
+  gap: 0;
+}
+
+#home > section.section:has(> .two-cards) .two-cards > article:nth-child(2) {
+  border: 0;
+  box-shadow: none;
+}
+
+/* Desktop: let the estimator panel run cleanly to the right edge of the content area. */
+@media (min-width: 901px) {
+  #home > section.section:has(> .two-cards) {
+    padding-right: 0;
+  }
+}
+
+/* Phone: make only the dark estimator panel full-bleed, without changing the heading or pre-approval card. */
+@media (max-width: 900px) {
+  #home > section.section:has(> .two-cards) .two-cards {
+    gap: 0;
+  }
+
+  #home > section.section:has(> .two-cards) .two-cards > article:nth-child(2) {
+    margin-left: -6%;
+    margin-right: -6%;
+    width: calc(100% + 12%);
+    border: 0;
+  }
+}

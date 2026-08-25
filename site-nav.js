@@ -1,2 +1,85 @@
-(()=>{document.querySelectorAll(".brand-tagline").forEach(tagline=>{tagline.textContent="CERTIFIED PRE-OWNED VEHICLES"});document.querySelectorAll(".hero-line .accent").forEach(accent=>{accent.textContent=accent.textContent.replace(/\./g,"")});const nav=document.getElementById("nav"),menuBtn=document.getElementById("menuBtn");menuBtn?.addEventListener("click",()=>{const open=nav?.classList.toggle("open")||false;menuBtn.setAttribute("aria-expanded",String(open))});nav?.querySelectorAll("a").forEach(link=>link.addEventListener("click",()=>{nav.classList.remove("open");menuBtn?.setAttribute("aria-expanded","false")}));document.querySelectorAll(".finance-dropdown-toggle").forEach(button=>button.addEventListener("click",()=>{const menu=button.closest(".finance-dropdown"),open=menu?.classList.toggle("open")||false;button.setAttribute("aria-expanded",String(open))}));
-if(document.body.id==="home"){const style=document.createElement("style");style.textContent=`@media(max-width:560px){.site-header .main-nav{min-height:104px!important;height:104px!important;padding:14px 6% 7px!important;position:relative!important}.site-header .mobile-contact-info{display:grid!important;position:absolute!important;left:6%!important;right:6%!important;top:68px!important;grid-template-columns:1.45fr 1fr 1fr!important;align-items:center!important;width:auto!important;margin:0!important;padding:0!important;gap:0!important;color:#d8d9dc!important;font-family:"DM Sans",Arial,sans-serif!important;font-size:6.3px!important;font-weight:700!important;letter-spacing:.55px!important;line-height:1!important;text-align:center!important;text-transform:uppercase!important;white-space:nowrap!important}.site-header .mobile-contact-info>*{min-width:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 7px!important}.site-header .mobile-contact-info>*+*{border-left:1px solid #44474d!important}.site-header .mobile-contact-info a{color:#f1f1f3!important;font-family:"DM Sans",Arial,sans-serif!important;font-size:6.3px!important;font-weight:700!important;letter-spacing:.55px!important;text-transform:uppercase!important;text-decoration:none!important}.site-header #nav.page-nav.open{top:104px!important}}`;document.head.appendChild(style)}})();
+(()=>{
+  document.querySelectorAll('.brand-tagline').forEach(tagline=>{tagline.textContent='CERTIFIED PRE-OWNED VEHICLES'});
+  document.querySelectorAll('.hero-line .accent').forEach(accent=>{accent.textContent=accent.textContent.replace(/\./g,'')});
+
+  const nav=document.getElementById('nav');
+  const menuBtn=document.getElementById('menuBtn');
+
+  if(menuBtn&&nav){
+    menuBtn.addEventListener('click',()=>{
+      const open=nav.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded',String(open));
+      menuBtn.setAttribute('aria-label',open?'Close navigation':'Open navigation');
+    });
+
+    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+      nav.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.setAttribute('aria-label','Open navigation');
+    }));
+  }
+
+  document.querySelectorAll('.finance-dropdown-toggle').forEach(button=>button.addEventListener('click',()=>{
+    const menu=button.closest('.finance-dropdown');
+    const open=menu?.classList.toggle('open')||false;
+    button.setAttribute('aria-expanded',String(open));
+  }));
+
+  const style=document.createElement('style');
+  style.textContent=`
+    @media(max-width:560px){
+      .site-header .main-nav{
+        position:relative!important;
+        z-index:50!important;
+      }
+      .site-header .menu-btn{
+        display:block!important;
+        position:relative!important;
+        z-index:201!important;
+        cursor:pointer!important;
+        pointer-events:auto!important;
+      }
+      .site-header #nav.page-nav{
+        display:none!important;
+        position:absolute!important;
+        left:0!important;
+        right:0!important;
+        top:100%!important;
+        z-index:200!important;
+        width:100%!important;
+        margin:0!important;
+        background:#090a0d!important;
+        padding:22px 7%!important;
+        flex-direction:column!important;
+        align-items:flex-start!important;
+        gap:18px!important;
+        box-shadow:0 12px 24px rgba(0,0,0,.35)!important;
+      }
+      .site-header #nav.page-nav.open{
+        display:flex!important;
+      }
+      .site-header #nav.page-nav.open a,
+      .site-header #nav.page-nav.open .finance-dropdown-toggle{
+        color:#fff!important;
+      }
+      .site-header #nav.page-nav.open .nav-cta{
+        width:100%!important;
+        text-align:center!important;
+      }
+      .site-header .finance-dropdown-menu{
+        position:static!important;
+        display:none!important;
+      }
+      .site-header .finance-dropdown.open .finance-dropdown-menu{
+        display:flex!important;
+        flex-direction:column!important;
+        gap:10px!important;
+        padding:10px 0 0 14px!important;
+      }
+      .site-header .mobile-contact-info{
+        overflow:visible!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();

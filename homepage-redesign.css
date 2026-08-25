@@ -179,7 +179,7 @@
 
   #home .hero{
     min-height:660px;
-    background-position:center center,center center,43% center;
+    background-position:center center,center center,83% center;
     background-size:cover,cover,cover;
   }
   #home .hero:before{
@@ -199,5 +199,57 @@
   #home .actions{
     width:100%;
     max-width:none;
+  }
+
+  /* Mobile-only benefits: halve the post-button dead space and use a 2x2 grid. */
+  #home .hero{
+    min-height:576px;
+  }
+  #home .hero-content{
+    padding-bottom:22px;
+  }
+  #home .actions{
+    margin-bottom:0;
+  }
+  #home .hero-benefits{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    padding:0 4% !important;
+  }
+  #home .hero-benefits article,
+  #home .hero-benefits article:nth-child(2),
+  #home .hero-benefits article:nth-child(3),
+  #home .hero-benefits article:nth-child(4){
+    min-width:0;
+    min-height:112px;
+    padding:18px 8px;
+    gap:10px;
+    border-right:1px solid #202126;
+    border-bottom:1px solid #202126;
+  }
+  #home .hero-benefits article:nth-child(2n){
+    border-right:0;
+  }
+  #home .hero-benefits article:nth-child(3),
+  #home .hero-benefits article:nth-child(4){
+    border-bottom:0;
+  }
+  #home .hero-benefits article .benefit-icon{
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+  }
+  #home .hero-benefits article .benefit-icon svg{
+    width:38px;
+    height:38px;
+  }
+  #home .hero-benefits h3{
+    margin:0 0 4px;
+    font-size:15px;
+    line-height:1.05;
+    letter-spacing:.35px;
+  }
+  #home .hero-benefits p{
+    font-size:11px;
+    line-height:1.25;
   }
 }
