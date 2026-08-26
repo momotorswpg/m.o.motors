@@ -1,10 +1,7 @@
 (() => {
-  const SUPABASE_URL = "https://dpsgtliddmdvfwjahkkq.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
-  const { createClient } = window.supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = window.db;
   const list = document.getElementById("inventoryList");
-  if (!list) return;
+  if (!db || !list) return;
 
   const statusRank = { available: 0, pending: 1, hold: 2, sold: 3 };
   let sortScheduled = false;
@@ -38,8 +35,12 @@
     });
   }
 
-  async function refreshControls() {
-    await syncVehicles();
+  async function syncVehicles() {
+    const { data, error } = await db.from("Vehicles").select("id, Featured, featured_order");
+    if (error) { console.error(error); return; }
+    window.__featuredVehicles = data || [];
+    addFeaturedControls();
+    sortInventory();
   }
 
   async function moveFeatured(id, direction) {
@@ -54,11 +55,11 @@
     if (firstError) { alert("Could not save featured order: " + firstError.message); return; }
     const { error: secondError } = await db.from("Vehicles").update({ featured_order: currentOrder }).eq("id", target.id);
     if (secondError) { alert("Could not save featured order: " + secondError.message); return; }
-    await refreshControls();
+    await syncVehicles();
   }
 
   function addFeaturedControls() {
-    list.querySelectorAll(".inventory-row").forEach((row) => {
+    list.querySelectorAll(".inventory-row").forEach(row => {
       const actions = row.querySelector(".row-actions");
       if (!actions) return;
       const id = row.dataset.id;
@@ -79,10 +80,11 @@
           const update = next ? { Featured: true, featured_order: nextOrder } : { Featured: false, featured_order: null };
           const { error } = await db.from("Vehicles").update(update).eq("id", id);
           if (error) alert("Could not update featured status: " + error.message);
-          await refreshControls();
+          await syncVehicles();
         });
         actions.prepend(button);
       }
+      button.disabled = false;
       button.className = `featured-toggle ${featured ? "is-featured" : ""}`;
       button.innerHTML = `<span class="featured-dot"></span>${featured ? "Featured" : "Feature"}`;
 
@@ -107,15 +109,6 @@
     });
   }
 
-  async function syncVehicles() {
-    const { data, error } = await db.from("Vehicles").select("id, Featured, featured_order");
-    if (!error) {
-      window.__featuredVehicles = data || [];
-      addFeaturedControls();
-      sortInventory();
-    } else console.error(error);
-  }
-
   const observer = new MutationObserver(() => {
     addFeaturedControls();
     scheduleSort();
@@ -123,6 +116,7 @@
   observer.observe(list, { childList: true, subtree: true });
 
   syncVehicles();
-  sortInventory();
-  setInterval(syncVehicles, 30000);
+  setInterval(() => {
+    if (!document.getElementById("adminView")?.classList.contains("hidden")) syncVehicles();
+  }, 30000);
 })();
