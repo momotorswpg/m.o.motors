@@ -5,3 +5,4 @@
 .site-header .main-nav .finance-dropdown-menu a{color:#e8e8ea}
 .site-header .main-nav .finance-dropdown-menu a:hover{background:#18191d;color:#fff}
 @media(max-width:900px){.site-header .finance-dropdown-menu{background:#15161a;border-left:2px solid var(--red);box-shadow:none}}
+.site-header .main-nav{gap:24px}.site-header .main-nav a,.site-header .main-nav .finance-dropdown-toggle{font-size:15px}@media(max-width:1180px){.site-header .main-nav{gap:15px}.site-header .main-nav a,.site-header .main-nav .finance-dropdown-toggle{font-size:13px}.site-header .nav-cta{padding-left:20px!important;padding-right:20px!important;min-width:165px}}
