@@ -3,7 +3,9 @@ const SUPABASE_KEY = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
 const BUCKET = "vehicle-images";
 
 const { createClient } = window.supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Keep one client for the whole admin page. Other admin scripts reuse this
+// instance so Supabase does not register competing auth listeners.
+const db = window.__moAdminDb || (window.__moAdminDb = createClient(SUPABASE_URL, SUPABASE_KEY));
 
 const $ = (id) => document.getElementById(id);
 const toast = (message) => {
@@ -20,6 +22,8 @@ const esc = (value = "") => String(value).replaceAll("&","&amp;").replaceAll("<"
 let vehicles = [];
 let selectedVehicleId = null;
 let selectedImages = [];
+let activeAdminUserId = null;
+let loadAllPromise = null;
 
 async function requireSession() {
   const { data: { session } } = await db.auth.getSession();
@@ -28,15 +32,20 @@ async function requireSession() {
 }
 
 function showAuth() {
+  activeAdminUserId = null;
   $("authView").classList.remove("hidden");
   $("adminView").classList.add("hidden");
   $("sessionEmail").textContent = "";
 }
 
 function showAdmin(session) {
+  const userId = session?.user?.id;
+  const alreadyVisible = !$("adminView").classList.contains("hidden");
   $("authView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
   $("sessionEmail").textContent = session.user.email || "Signed in";
+  if (alreadyVisible && activeAdminUserId === userId) return;
+  activeAdminUserId = userId;
   loadAll();
 }
 
@@ -118,8 +127,11 @@ dropZone.addEventListener("drop", (e) => {
 });
 $("photoInput").addEventListener("change", (e) => handleFiles([...e.target.files]));
 
-async function loadAll() {
-  try {
+function loadAll() {
+  if (loadAllPromise) return loadAllPromise;
+
+  loadAllPromise = (async () => {
+    try {
     const { data, error } = await db.from("Vehicles").select("*").order("created_at", { ascending: false });
     if (error) throw error;
     vehicles = data || [];
@@ -127,10 +139,15 @@ async function loadAll() {
     await loadAllPhotos();
     renderInventory();
     if (selectedVehicleId) selectVehicle(selectedVehicleId);
-  } catch (error) {
-    console.error(error);
-    toast("Could not load inventory: " + error.message);
-  }
+    } catch (error) {
+      console.error(error);
+      toast("Could not load inventory: " + error.message);
+    }
+  })().finally(() => {
+    loadAllPromise = null;
+  });
+
+  return loadAllPromise;
 }
 
 async function loadAllPhotos() {

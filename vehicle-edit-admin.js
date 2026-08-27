@@ -1,7 +1,6 @@
 (() => {
-  const SUPABASE_URL = "https://dpsgtliddmdvfwjahkkq.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = window.__moAdminDb;
+  if (!db) return;
   const list = document.getElementById("inventoryList");
   if (!list) return;
 
