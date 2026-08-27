@@ -7,9 +7,9 @@
   const fields = [
     ["VIN","VIN","text"],["Year","Year","number"],["Make","Make","text"],["Model","Model","text"],["Trim","Trim","text"],
     ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
-    ["Transmission","Transmission","text"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","text"],["EngineSize","Engine Size","text"],
-    ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","text"],["InteriorColor","Interior Colour","text"],
-    ["Doors","Doors","text"],["FuelType","Fuel Type","text"],["Passengers","Passengers","text"],["Description","Additional Information / Features","textarea"],["CarfaxURL","CARFAX URL","url"]
+    ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","number"],
+    ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
+    ["Doors","Doors","number"],["FuelType","Fuel Type","text"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
   ];
 
   function esc(v="") { return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
@@ -18,6 +18,11 @@
     if (type.startsWith("select:")) {
       const options = type.slice(7).split(",").map(x => `<option value="${x}" ${String(value||"Available")===x?"selected":""}>${x}</option>`).join("");
       return `<label>${label}<select name="${field}">${options}</select></label>`;
+    }
+    if (type.startsWith("customselect:")) {
+      const options = type.slice(13).split(",");
+      const known = options.includes(String(value));
+      return `<label>${label}<select name="${field}"><option value="">Select ${label.toLowerCase()}</option>${options.map(x => `<option value="${x}" ${String(value)===x?"selected":""}>${x}</option>`).join("")}<option value="Other" ${value&&!known?"selected":""}>Other</option></select><input class="edit-custom-value ${value&&!known?"":"hidden"}" name="${field}Custom" value="${value&&!known?esc(value):""}" placeholder="Enter custom ${label.toLowerCase()}"></label>`;
     }
     return `<label>${label}<input name="${field}" type="${type}" value="${esc(value ?? "")}"></label>`;
   }
@@ -30,6 +35,11 @@
     modal.innerHTML = `<div class="vehicle-edit-backdrop" data-close-edit></div><div class="vehicle-edit-dialog" role="dialog" aria-modal="true"><div class="vehicle-edit-head"><div><span class="eyebrow">EDIT VEHICLE</span><h3 id="editVehicleTitle">Vehicle</h3></div><button type="button" class="edit-close" data-close-edit>×</button></div><form id="editVehicleForm"><div id="editVehicleFields" class="edit-vehicle-grid"></div><label class="featured-check"><input type="checkbox" name="Featured"> <span><strong>Feature this vehicle on the homepage</strong><small>Turn this off to keep it in inventory but remove it from Featured Vehicles.</small></span></label><div class="edit-actions"><button type="button" class="secondary-btn" data-close-edit>Cancel</button><button type="submit" class="primary-btn">Save Changes</button><span id="editVehicleStatus" class="status"></span></div></form></div>`;
     document.body.appendChild(modal);
     modal.querySelectorAll("[data-close-edit]").forEach(b => b.addEventListener("click", close));
+    document.getElementById("editVehicleFields").addEventListener("change", event => {
+      if (!event.target.matches("select")) return;
+      const custom = event.target.closest("label")?.querySelector(".edit-custom-value");
+      if (custom) custom.classList.toggle("hidden", event.target.value !== "Other");
+    });
     document.getElementById("editVehicleForm").addEventListener("submit", save);
   }
 
@@ -58,6 +68,7 @@
     const row = { Featured: form.Featured.checked };
     fields.forEach(([f,,t]) => {
       let value = fd.get(f);
+      if (t.startsWith("customselect:") && value === "Other") value = fd.get(f + "Custom")?.trim() || null;
       if (t === "number") value = value === "" ? null : Number(value);
       row[f] = value === "" ? null : value;
     });

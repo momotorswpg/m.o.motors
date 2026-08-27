@@ -2,12 +2,125 @@
   if (typeof db === "undefined") return;
   const list = document.getElementById("inventoryList");
   if (!list) return;
-  const statusRank={available:0,pending:1,hold:2,sold:3};let sortScheduled=false;
-  const featuredVehicles=()=> (window.__featuredVehicles||[]).filter(v=>v.Featured===true).sort((a,b)=>(Number(a.featured_order)||999999)-(Number(b.featured_order)||999999));
-  function sortInventory(){const rows=[...list.querySelectorAll(".inventory-row")];if(rows.length<2)return;const ranked=rows.map((row,index)=>({row,index,rank:statusRank[String(row.querySelector(".badge")?.textContent||"Available").trim().toLowerCase()]??99}));ranked.sort((a,b)=>a.rank-b.rank||a.index-b.index);if(ranked.every((x,i)=>x.row===rows[i]))return;const f=document.createDocumentFragment();ranked.forEach(x=>f.appendChild(x.row));list.appendChild(f)}
-  function scheduleSort(){if(sortScheduled)return;sortScheduled=true;requestAnimationFrame(()=>{sortScheduled=false;sortInventory()})}
-  async function syncVehicles(){const{data,error}=await db.from("Vehicles").select("id, Featured, featured_order");if(error){console.error(error);return}window.__featuredVehicles=data||[];addFeaturedControls();sortInventory()}
-  async function moveFeatured(id,direction){const ordered=featuredVehicles(),index=ordered.findIndex(v=>String(v.id)===String(id)),targetIndex=index+direction;if(index<0||targetIndex<0||targetIndex>=ordered.length)return;const current=ordered[index],target=ordered[targetIndex],currentOrder=Number(current.featured_order)||index+1,targetOrder=Number(target.featured_order)||targetIndex+1;const{error:firstError}=await db.from("Vehicles").update({featured_order:targetOrder}).eq("id",current.id);if(firstError){alert("Could not save featured order: "+firstError.message);return}const{error:secondError}=await db.from("Vehicles").update({featured_order:currentOrder}).eq("id",target.id);if(secondError){alert("Could not save featured order: "+secondError.message);return}await syncVehicles()}
-  function addFeaturedControls(){list.querySelectorAll(".inventory-row").forEach(row=>{const actions=row.querySelector(".row-actions");if(!actions)return;const id=row.dataset.id,vehicle=(window.__featuredVehicles||[]).find(v=>String(v.id)===String(id));if(!vehicle)return;const featured=vehicle.Featured===true;let button=row.querySelector("[data-featured-toggle]");if(!button){button=document.createElement("button");button.type="button";button.dataset.featuredToggle=id;button.addEventListener("click",async()=>{const next=!button.classList.contains("is-featured");button.disabled=true;button.textContent="Saving…";const currentFeatured=featuredVehicles(),nextOrder=currentFeatured.length?Math.max(...currentFeatured.map(v=>Number(v.featured_order)||0))+1:1,update=next?{Featured:true,featured_order:nextOrder}:{Featured:false,featured_order:null};const{error}=await db.from("Vehicles").update(update).eq("id",id);if(error)alert("Could not update featured status: "+error.message);await syncVehicles()});actions.prepend(button)}button.disabled=false;button.className=`featured-toggle ${featured?"is-featured":""}`;const buttonHtml=`<span class="featured-dot"></span>${featured?"Featured":"Feature"}`;if(button.innerHTML!==buttonHtml)button.innerHTML=buttonHtml;let orderControls=row.querySelector("[data-featured-order]");if(featured&&!orderControls){orderControls=document.createElement("span");orderControls.className="featured-order-controls";orderControls.dataset.featuredOrder=id;orderControls.innerHTML='<button type="button" aria-label="Move featured vehicle up">↑</button><button type="button" aria-label="Move featured vehicle down">↓</button>';const[up,down]=orderControls.querySelectorAll("button");up.addEventListener("click",()=>moveFeatured(id,-1));down.addEventListener("click",()=>moveFeatured(id,1));button.insertAdjacentElement("afterend",orderControls)}if(!featured&&orderControls)orderControls.remove();if(featured&&orderControls){const index=featuredVehicles().findIndex(v=>String(v.id)===String(id)),buttons=orderControls.querySelectorAll("button");buttons[0].disabled=index<=0;buttons[1].disabled=index<0||index>=featuredVehicles().length-1}})}
-  const observer=new MutationObserver(()=>{addFeaturedControls();scheduleSort()});observer.observe(list,{childList:true});syncVehicles();setInterval(()=>{if(!document.getElementById("adminView")?.classList.contains("hidden"))syncVehicles()},30000);
+  let rows = [], dirty = false, saving = false;
+  const featured = () => rows.filter(v => v.Featured === true).sort((a,b) => (Number(a.featured_order)||999) - (Number(b.featured_order)||999));
+
+  async function sync() {
+    const {data,error} = await db.from("Vehicles").select("id,Featured,featured_order");
+    if (error) { console.error(error); return; }
+    rows = data || [];
+    dirty = false;
+    decorate();
+  }
+
+  function toggle(id, on) {
+    const vehicle = rows.find(v => String(v.id) === String(id));
+    if (!vehicle) return;
+    if (on) {
+      if (featured().length >= 6) { toast("You can feature up to 6 vehicles."); decorate(); return; }
+      vehicle.Featured = true;
+      vehicle.featured_order = featured().length + 1;
+    } else {
+      vehicle.Featured = false;
+      vehicle.featured_order = null;
+    }
+    dirty = true;
+    decorate();
+  }
+
+  function setPosition(id, position) {
+    const ordered = featured();
+    const vehicle = ordered.find(v => String(v.id) === String(id));
+    if (!vehicle) return;
+    const nextPosition = Math.max(1, Math.min(6, Number(position) || 1));
+    const without = ordered.filter(v => String(v.id) !== String(id));
+    without.splice(Math.min(nextPosition - 1, without.length), 0, vehicle);
+    without.forEach((v,index) => v.featured_order = index + 1);
+    dirty = true;
+    decorate();
+  }
+
+  async function save() {
+    if (saving || !dirty) return;
+    saving = true;
+    decorate();
+    try {
+      const active = featured();
+      for (let index = 0; index < active.length; index++) {
+        const {error} = await db.from("Vehicles").update({Featured:true,featured_order:index+1}).eq("id", active[index].id);
+        if (error) throw error;
+      }
+      for (const vehicle of rows.filter(v => v.Featured !== true)) {
+        const {error} = await db.from("Vehicles").update({Featured:false,featured_order:null}).eq("id", vehicle.id);
+        if (error) throw error;
+      }
+      dirty = false;
+      toast("Featured vehicles saved.");
+      await sync();
+    } catch (error) {
+      console.error(error);
+      toast("Could not save featured vehicles: " + error.message);
+    } finally {
+      saving = false;
+      decorate();
+    }
+  }
+
+  function ensureSaveButton() {
+    let bar = document.getElementById("featuredSaveBar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "featuredSaveBar";
+      bar.className = "featured-save-bar";
+      bar.innerHTML = '<span>Featured changes not saved</span><button type="button" class="primary-btn">Save Featured Order</button>';
+      list.parentElement?.insertBefore(bar, list);
+      bar.querySelector("button").addEventListener("click", save);
+    }
+    bar.classList.toggle("hidden", !dirty);
+    const button = bar.querySelector("button");
+    button.disabled = saving;
+    button.textContent = saving ? "Saving…" : "Save Featured Order";
+  }
+
+  function decorate() {
+    list.querySelectorAll(".inventory-row").forEach(row => {
+      const actions = row.querySelector(".row-actions");
+      if (!actions) return;
+      const id = row.dataset.id;
+      const vehicle = rows.find(v => String(v.id) === String(id));
+      if (!vehicle) return;
+      let toggleButton = row.querySelector("[data-feature-toggle]");
+      if (!toggleButton) {
+        toggleButton = document.createElement("button");
+        toggleButton.type = "button";
+        toggleButton.className = "featured-toggle";
+        toggleButton.dataset.featureToggle = id;
+        actions.prepend(toggleButton);
+        toggleButton.addEventListener("click", () => toggle(id, !vehicle.Featured));
+      }
+      toggleButton.textContent = vehicle.Featured ? "Remove Featured" : "Feature";
+      toggleButton.classList.toggle("is-featured", vehicle.Featured);
+
+      let control = row.querySelector("[data-featured-position]");
+      if (!vehicle.Featured) { control?.remove(); return; }
+      if (!control) {
+        control = document.createElement("label");
+        control.className = "featured-position";
+        control.dataset.featuredPosition = id;
+        control.innerHTML = 'Featured order <select aria-label="Featured order"></select>';
+        actions.appendChild(control);
+        control.querySelector("select").addEventListener("change", event => setPosition(id, event.target.value));
+      }
+      const position = featured().findIndex(v => String(v.id) === String(id)) + 1;
+      const select = control.querySelector("select");
+      const options = [1,2,3,4,5,6].map(number => `<option value="${number}" ${number===position?"selected":""}>${number}</option>`).join("");
+      if (select.innerHTML !== options) select.innerHTML = options;
+      select.disabled = saving;
+    });
+    ensureSaveButton();
+  }
+
+  const observer = new MutationObserver(() => requestAnimationFrame(decorate));
+  observer.observe(list, {childList:true,subtree:false});
+  sync();
 })();

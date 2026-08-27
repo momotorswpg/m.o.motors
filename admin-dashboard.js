@@ -1,1 +1,106 @@
-(()=>{const $=id=>document.getElementById(id);const pages=['dashboard','inventory','bookings','finance','settings'];let initialized=false;function ensurePanel(cls,html){let el=document.querySelector('.'+cls);if(!el){el=document.createElement('section');el.className='panel '+cls;el.innerHTML=html;document.getElementById('adminView')?.appendChild(el)}return el}function init(){const admin=$('adminView');if(!admin||initialized)return;initialized=true;const top=admin.querySelector('.topbar');const stats=admin.querySelector('.stats-row');const grid=admin.querySelector('.layout-grid');const inventory=admin.querySelector('.inventory-panel');const bookings=ensurePanel('bookings-panel','<div class="panel-head"><div><span class="eyebrow">TEST DRIVES</span><h3>All bookings</h3></div><button id="refreshBookingsBtn" class="secondary-btn" type="button">Refresh</button></div><div class="booking-filters"><button type="button" data-booking-filter="all" class="active">All</button><button type="button" data-booking-filter="New">New</button><button type="button" data-booking-filter="Confirmed">Confirmed</button><button type="button" data-booking-filter="Completed">Completed</button><button type="button" data-booking-filter="Cancelled">Cancelled</button></div><div id="bookingsList" class="bookings-list"></div>');const finance=ensurePanel('finance-panel','<div class="panel-head"><div><span class="eyebrow">FINANCE</span><h3>Finance settings</h3></div></div><form id="financeSettingsForm" class="form-grid"><label>APR (%)<input id="financeApr" type="number" step="0.01" min="0"></label><label>Term (months)<input id="financeTerm" type="number" min="1"></label><label>Default down payment ($)<input id="financeDown" type="number" min="0"></label><div class="wide form-actions"><button class="primary-btn" type="submit">Save finance settings</button><p id="financeSettingsStatus" class="status"></p></div></form>');const settings=ensurePanel('settings-panel','<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');const dash=document.createElement('section');dash.className='admin-page dashboard-page';dash.innerHTML='<div class="dashboard-hero"><span class="eyebrow">DASHBOARD</span><h3>Dealership overview</h3><p class="muted">A quick summary of your dealership.</p></div><div class="dashboard-stats"><div class="stat-card"><span>Available</span><strong id="dashAvailable">0</strong></div><div class="stat-card"><span>Sold</span><strong id="dashSold">0</strong></div><div class="stat-card"><span>Inventory value</span><strong id="dashValue">$0</strong></div></div><section class="panel"><div class="panel-head"><div><span class="eyebrow">TEST DRIVES</span><h3>Booking summary</h3></div><button id="viewBookingsFromDash" class="secondary-btn" type="button">View all bookings</button></div><div id="dashBookingSummary" class="bookings-list"></div></section>';top?.after(dash);const nav=document.createElement('nav');nav.className='admin-page-nav';nav.innerHTML=pages.map(p=>`<button type="button" data-page="${p}">${p[0].toUpperCase()+p.slice(1)}</button>`).join('');top?.after(nav);const targets={inventory:[stats,grid,inventory],bookings:[bookings],finance:[finance],settings:[settings]};function show(page){if(!pages.includes(page))page='dashboard';dash.style.display=page==='dashboard'?'block':'none';Object.entries(targets).forEach(([name,els])=>els.forEach(el=>{if(!el)return;if(name===page){if(name==='inventory'&&el===stats)el.style.display='grid';else if(name==='inventory'&&el===grid)el.style.display='grid';else el.style.display='block'}else el.style.display='none'}));nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='inventory')window.loadAll?.();if(page==='bookings')window.loadBookings?.();if(page==='finance')window.loadFinanceSettings?.();if(page==='dashboard')loadDashboard();location.hash=page}nav.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)show(b.dataset.page)});dash.querySelector('#viewBookingsFromDash')?.addEventListener('click',()=>show('bookings'));window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(p&&pages.includes(p)&&!nav.querySelector(`[data-page="${p}"].active`))show(p)});show(pages.includes(location.hash.slice(1))?location.hash.slice(1):'dashboard')}async function loadDashboard(){const admin=$('adminView');if(!admin||admin.classList.contains('hidden'))return;try{const {data:vs,error:ve}=await db.from('Vehicles').select('Status,Price');if(ve)throw ve;const rows=vs||[],avail=rows.filter(v=>String(v.Status||'Available').toLowerCase()==='available');$('dashAvailable').textContent=avail.length;$('dashSold').textContent=rows.filter(v=>String(v.Status||'').toLowerCase()==='sold').length;$('dashValue').textContent=new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0}).format(avail.reduce((n,v)=>n+(Number(v.Price)||0),0));const {data:bs,error:be}=await db.from('test_drive_bookings').select('preferred_date,status');if(be)throw be;const today=new Date();today.setHours(0,0,0,0);const active=(bs||[]).filter(b=>{if(String(b.status||'').toLowerCase()==='cancelled')return false;const d=String(b.preferred_date||'').slice(0,10);if(!d)return false;const bookingDate=new Date(d+'T12:00:00');bookingDate.setHours(0,0,0,0);return bookingDate>=today});const groups={};active.forEach(b=>{const d=String(b.preferred_date||'').slice(0,10);groups[d]=(groups[d]||0)+1});$('dashBookingSummary').innerHTML=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0])).map(([d,n])=>`<div class="booking-card"><div class="booking-main"><h4>${new Date(d+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</h4><div class="booking-details"><div><span>Bookings</span><strong>${n}</strong></div></div></div></div>`).join('')||'<div class="booking-empty">No current or upcoming bookings found.</div>'}catch(e){console.error(e);const x=$('dashBookingSummary');if(x)x.innerHTML='<div class="booking-empty">Could not load dashboard summary.</div>'}}function start(){if($('adminView')&&!$('adminView').classList.contains('hidden'))init();else setTimeout(start,100)}document.addEventListener('DOMContentLoaded',start)})();
+(() => {
+  const $ = id => document.getElementById(id);
+  const pages = ["dashboard", "inventory", "bookings", "tradeins", "finance", "settings"];
+  let initialized = false;
+
+  function ensurePanel(className, html) {
+    let panel = document.querySelector(`.${className}`);
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.className = `panel ${className}`;
+      panel.innerHTML = html;
+      $("adminView")?.appendChild(panel);
+    }
+    return panel;
+  }
+
+  function init() {
+    const admin = $("adminView");
+    if (!admin || initialized) return;
+    initialized = true;
+    const top = admin.querySelector(".topbar");
+    const stats = admin.querySelector(".stats-row");
+    const grid = admin.querySelector(".layout-grid");
+    const inventory = admin.querySelector(".inventory-panel");
+    const bookings = document.querySelector(".bookings-panel");
+    const tradeins = document.querySelector(".tradeins-panel");
+    const finance = document.querySelector(".finance-panel");
+    const settings = ensurePanel("settings-panel", '<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');
+
+    const dashboard = document.createElement("section");
+    dashboard.className = "admin-page dashboard-page";
+    dashboard.innerHTML = '<div class="dashboard-hero"><span class="eyebrow">DASHBOARD</span><h3>Dealership overview</h3><p class="muted">A quick summary of your dealership.</p></div><div class="dashboard-stats"><div class="stat-card"><span>Available</span><strong id="dashAvailable">0</strong></div><div class="stat-card"><span>Sold</span><strong id="dashSold">0</strong></div><div class="stat-card"><span>Inventory value</span><strong id="dashValue">$0</strong></div></div><section class="panel"><div class="panel-head"><div><span class="eyebrow">TEST DRIVES</span><h3>Booking summary</h3></div><button id="viewBookingsFromDash" class="secondary-btn" type="button">View all bookings</button></div><div id="dashBookingSummary" class="bookings-list"></div></section>';
+    top?.after(dashboard);
+
+    const nav = document.createElement("nav");
+    nav.className = "admin-page-nav";
+    nav.innerHTML = pages.map(page => `<button type="button" data-page="${page}">${page === "tradeins" ? "Trade-Ins" : page[0].toUpperCase() + page.slice(1)}</button>`).join("");
+    top?.after(nav);
+
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],tradeins:[tradeins],finance:[finance],settings:[settings]};
+    function show(page) {
+      if (!pages.includes(page)) page = "dashboard";
+      dashboard.style.display = page === "dashboard" ? "block" : "none";
+      Object.entries(targets).forEach(([name,elements]) => elements.forEach(element => {
+        if (!element) return;
+        if (name !== page) { element.style.display = "none"; return; }
+        element.style.display = name === "inventory" && (element === stats || element === grid) ? "grid" : "block";
+      }));
+      nav.querySelectorAll("button").forEach(button => button.classList.toggle("active", button.dataset.page === page));
+      if (page === "inventory") window.loadAll?.();
+      if (page === "bookings") window.loadBookings?.();
+      if (page === "tradeins") window.loadTradeins?.();
+      if (page === "finance") window.loadFinanceSettings?.();
+      if (page === "dashboard") loadDashboard();
+      if (location.hash.slice(1) !== page) location.hash = page;
+    }
+
+    nav.addEventListener("click", event => {
+      const button = event.target.closest("[data-page]");
+      if (button) show(button.dataset.page);
+    });
+    dashboard.querySelector("#viewBookingsFromDash")?.addEventListener("click", () => show("bookings"));
+    window.addEventListener("hashchange", () => {
+      const page = location.hash.slice(1);
+      if (page && pages.includes(page) && !nav.querySelector(`[data-page="${page}"].active`)) show(page);
+    });
+    show(pages.includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard");
+  }
+
+  async function loadDashboard() {
+    if (!$("adminView") || $("adminView").classList.contains("hidden")) return;
+    try {
+      const {data:vehicleRows,error:vehicleError} = await db.from("Vehicles").select("Status,Price");
+      if (vehicleError) throw vehicleError;
+      const rows = vehicleRows || [];
+      const available = rows.filter(vehicle => String(vehicle.Status || "Available").toLowerCase() === "available");
+      $("dashAvailable").textContent = available.length;
+      $("dashSold").textContent = rows.filter(vehicle => String(vehicle.Status || "").toLowerCase() === "sold").length;
+      $("dashValue").textContent = new Intl.NumberFormat("en-CA", {style:"currency",currency:"CAD",maximumFractionDigits:0}).format(available.reduce((total,vehicle) => total + (Number(vehicle.Price)||0), 0));
+
+      const {data:bookingRows,error:bookingError} = await db.from("test_drive_bookings").select("preferred_date,status");
+      if (bookingError) throw bookingError;
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const groups = {};
+      (bookingRows || []).forEach(booking => {
+        if (String(booking.status || "").toLowerCase() === "cancelled") return;
+        const date = String(booking.preferred_date || "").slice(0,10);
+        if (!date) return;
+        const bookingDate = new Date(`${date}T12:00:00`);
+        bookingDate.setHours(0,0,0,0);
+        if (bookingDate >= today) groups[date] = (groups[date] || 0) + 1;
+      });
+      $("dashBookingSummary").innerHTML = Object.entries(groups).sort((a,b) => a[0].localeCompare(b[0])).map(([date,count]) => `<div class="booking-card"><div class="booking-main"><h4>${new Date(`${date}T12:00:00`).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</h4><div class="booking-details"><div><span>Bookings</span><strong>${count}</strong></div></div></div></div>`).join("") || '<div class="booking-empty">No current or upcoming bookings found.</div>';
+    } catch (error) {
+      console.error(error);
+      if ($("dashBookingSummary")) $("dashBookingSummary").innerHTML = '<div class="booking-empty">Could not load dashboard summary.</div>';
+    }
+  }
+
+  function start() {
+    if ($("adminView") && !$("adminView").classList.contains("hidden")) init();
+    else setTimeout(start, 100);
+  }
+  document.addEventListener("DOMContentLoaded", start);
+})();

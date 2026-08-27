@@ -65,6 +65,14 @@ $("loginForm").addEventListener("submit", async (event) => {
   showAdmin(data.session);
 });
 
+const formValue = id => $(id)?.value?.trim() || "";
+const optionalNumber = id => formValue(id) === "" ? null : Number(formValue(id));
+const customSelectValue = (id, customId) => formValue(id) === "Other" ? (formValue(customId) || null) : (formValue(id) || null);
+
+[["transmission", "transmissionCustom"], ["exteriorColor", "exteriorColorCustom"], ["interiorColor", "interiorColorCustom"]].forEach(([selectId, customId]) => {
+  $(selectId)?.addEventListener("change", () => $(customId)?.classList.toggle("hidden", formValue(selectId) !== "Other"));
+});
+
 $("signOutBtn").addEventListener("click", async () => {
   await db.auth.signOut();
   selectedVehicleId = null;
@@ -82,13 +90,27 @@ $("vehicleForm").addEventListener("submit", async (event) => {
   status.textContent = "Saving vehicle…";
 
   const row = {
-    VIN: $("vin").value.trim(),
-    Year: Number($("year").value),
-    Make: $("make").value.trim(),
-    Model: $("model").value.trim(),
-    Mileage: Number($("mileage").value),
-    Price: Number($("price").value),
-    Status: $("status").value
+    VIN: formValue("vin"),
+    Year: optionalNumber("year"),
+    Make: formValue("make"),
+    Model: formValue("model"),
+    Trim: formValue("trim") || null,
+    Mileage: optionalNumber("mileage"),
+    Price: optionalNumber("price"),
+    Status: formValue("status"),
+    Transmission: customSelectValue("transmission", "transmissionCustom"),
+    BodyStyle: formValue("bodyStyle") || null,
+    EngineCylinders: optionalNumber("engineCylinders"),
+    EngineSize: optionalNumber("engineSize"),
+    Drivetrain: formValue("drivetrain") || null,
+    ExteriorColor: customSelectValue("exteriorColor", "exteriorColorCustom"),
+    InteriorColor: customSelectValue("interiorColor", "interiorColorCustom"),
+    Doors: optionalNumber("doors"),
+    FuelType: formValue("fuelType") || null,
+    Passengers: optionalNumber("passengers"),
+    AdditionalInfo: formValue("additionalInfo") || null,
+    Description: formValue("description") || null,
+    CarfaxURL: formValue("carfaxUrl") || null
   };
 
   const { data, error } = await db.from("Vehicles").insert(row).select().single();
@@ -102,6 +124,7 @@ $("vehicleForm").addEventListener("submit", async (event) => {
   toast("Vehicle added successfully.");
   $("vehicleForm").reset();
   $("status").value = "Available";
+  ["transmissionCustom", "exteriorColorCustom", "interiorColorCustom"].forEach(id => $(id)?.classList.add("hidden"));
   selectedVehicleId = data.id;
   await loadAll();
   selectVehicle(data.id);
@@ -111,6 +134,8 @@ $("resetFormBtn").addEventListener("click", () => {
   $("vehicleForm").reset();
   $("status").value = "Available";
   $("vehicleStatus").textContent = "";
+  $("vinLookupStatus").textContent = "";
+  ["transmissionCustom", "exteriorColorCustom", "interiorColorCustom"].forEach(id => $(id)?.classList.add("hidden"));
 });
 
 $("refreshBtn").addEventListener("click", loadAll);
@@ -170,7 +195,7 @@ function renderInventory() {
     list.innerHTML = `<div class="muted">No vehicles found.</div>`;
     return;
   }
-  list.innerHTML = filtered.map(v => {
+  const renderRow = v => {
     const selected = String(v.id) === String(selectedVehicleId);
     const status = String(v.Status || "Available");
     const photoCount = (window.allPhotos || []).filter(p => String(p.vehicle_id) === String(v.id)).length;
@@ -182,6 +207,17 @@ function renderInventory() {
       <span class="badge ${status.toLowerCase() === "available" ? "available" : ""}">${esc(status)}</span>
       <div class="row-actions"><button class="mini-btn" type="button" data-select="${esc(v.id)}">${selected ? "Selected" : "Manage Photos"}</button></div>
     </div>`;
+  };
+  const statusOf = vehicle => String(vehicle.Status || "Available").toLowerCase();
+  const groups = [
+    ["Available", vehicle => statusOf(vehicle) === "available"],
+    ["Sold", vehicle => statusOf(vehicle) === "sold"],
+    ["Other", vehicle => !["available", "sold"].includes(statusOf(vehicle))]
+  ];
+  list.innerHTML = groups.map(([name, matches]) => {
+    const groupVehicles = filtered.filter(matches);
+    if (!groupVehicles.length) return "";
+    return `<details class="inventory-group" ${name === "Available" ? "open" : ""}><summary>${name} vehicles <span>${groupVehicles.length}</span></summary><div class="inventory-group-list">${groupVehicles.map(renderRow).join("")}</div></details>`;
   }).join("");
 
   list.querySelectorAll("[data-select]").forEach(btn => btn.addEventListener("click", () => selectVehicle(btn.dataset.select)));
