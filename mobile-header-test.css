@@ -15,18 +15,21 @@
     width: 100%;
     max-width: 100%;
     overflow: visible !important;
-    border-bottom: 2px solid var(--red) !important;
+    border-bottom: 0 !important;
   }
 
   .site-header .main-nav {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "brand menu";
+    grid-template-areas:
+      "brand menu"
+      "contact contact";
     align-items: center;
     column-gap: 10px;
+    row-gap: 6px;
     width: 100%;
     min-height: 0 !important;
-    padding: 12px 5% !important;
+    padding: 12px 5% 0 !important;
     overflow: visible !important;
     border-bottom: 0 !important;
   }
