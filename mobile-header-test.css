@@ -5,11 +5,13 @@
   body {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
   }
 
   .site-header {
-    position: relative !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
     width: 100%;
     max-width: 100%;
     overflow: visible !important;
@@ -114,26 +116,26 @@
     overflow: hidden !important;
   }
 
-  .site-header .mobile-contact-info span:first-child {
+  .site-header .mobile-contact-info .mobile-location {
     padding: 2px 5px 2px 25px;
     white-space: normal;
   }
 
-  .site-header .mobile-contact-info a {
+  .site-header .mobile-contact-info .mobile-phone {
     padding: 2px 4px 2px 25px;
     white-space: nowrap;
     border-left: 2px solid var(--red);
   }
 
-  .site-header .mobile-contact-info span:last-child {
+  .site-header .mobile-contact-info .mobile-hours {
     padding: 2px 0 2px 24px;
     white-space: nowrap;
     border-left: 2px solid var(--red);
   }
 
-  .site-header .mobile-contact-info span:first-child::before,
-  .site-header .mobile-contact-info a::before,
-  .site-header .mobile-contact-info span:last-child::before {
+  .site-header .mobile-contact-info .mobile-location::before,
+  .site-header .mobile-contact-info .mobile-phone::before,
+  .site-header .mobile-contact-info .mobile-hours::before {
     content: "";
     position: absolute;
     left: 5px;
@@ -150,17 +152,17 @@
     mask-size: contain;
   }
 
-  .site-header .mobile-contact-info span:first-child::before {
+  .site-header .mobile-contact-info .mobile-location::before {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 4a3 3 0 1 0 0 6a3 3 0 1 0 0-6Z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 4a3 3 0 1 0 0 6a3 3 0 1 0 0-6Z'/%3E%3C/svg%3E");
   }
 
-  .site-header .mobile-contact-info a::before {
+  .site-header .mobile-contact-info .mobile-phone::before {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M6.6 10.8c1.5 3 3.9 5.4 6.9 6.9l2.3-2.3c.3-.3.7-.4 1.1-.3 1.2.3 2.5.6 3.8.6.7 0 1.3.6 1.3 1.3V21c0 .7-.6 1.3-1.3 1.3C10.9 22.3 1.7 13.1 1.7 1.7.4 1 1 0 1.7 0H6c.7 0 1.3.6 1.3 1.3.1.4 0 .8-.3 1.1z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M6.6 10.8c1.5 3 3.9 5.4 6.9 6.9l2.3-2.3c.3-.3.7-.4 1.1-.3 1.2.3 2.5.6 3.8.6.7 0 1.3.6 1.3 1.3V21c0 .7-.6 1.3-1.3 1.3C10.9 22.3 1.7 13.1 1.7 1.7.4 1 1 0 1.7 0H6c.7 0 1.3.6 1.3 1.3.1.4 0 .8-.3 1.1z'/%3E%3C/svg%3E");
   }
 
-  .site-header .mobile-contact-info span:last-child::before {
+  .site-header .mobile-contact-info .mobile-hours::before {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 5v5.6l4 2.4-1 1.7-5-3V7z'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 5v5.6l4 2.4-1 1.7-5-3V7z'/%3E%3C/svg%3E");
   }
@@ -188,11 +190,11 @@
   .site-header .mobile-contact-info { grid-template-columns: minmax(0, 1.04fr) minmax(0, .76fr) minmax(0, 1.20fr); }
   .site-header .mobile-contact-info span,
   .site-header .mobile-contact-info a { font-size: 8.3px !important; }
-  .site-header .mobile-contact-info span:first-child { padding-left: 24px; }
-  .site-header .mobile-contact-info a { padding-left: 24px; }
-  .site-header .mobile-contact-info span:last-child { padding-left: 23px; }
-  .site-header .mobile-contact-info span:first-child::before,
-  .site-header .mobile-contact-info a::before,
-  .site-header .mobile-contact-info span:last-child::before { width: 15px; height: 15px; }
+  .site-header .mobile-contact-info .mobile-location { padding-left: 24px; }
+  .site-header .mobile-contact-info .mobile-phone { padding-left: 24px; }
+  .site-header .mobile-contact-info .mobile-hours { padding-left: 23px; }
+  .site-header .mobile-contact-info .mobile-location::before,
+  .site-header .mobile-contact-info .mobile-phone::before,
+  .site-header .mobile-contact-info .mobile-hours::before { width: 15px; height: 15px; }
   #home .hero-content { padding-top: 48px !important; }
 }

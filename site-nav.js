@@ -4,6 +4,13 @@
 
   const nav=document.getElementById('nav');
   const menuBtn=document.getElementById('menuBtn');
+  const mainNav=document.querySelector('.site-header .main-nav');
+  let mobileContact=mainNav?.querySelector('.mobile-contact-info');
+
+  if(mainNav){
+    if(!mobileContact){mobileContact=document.createElement('div');mobileContact.className='mobile-contact-info';mainNav.appendChild(mobileContact)}
+    mobileContact.innerHTML='<a class="mobile-location" href="https://www.google.com/maps/search/?api=1&query=420+Des+Meurons+St%2C+Winnipeg%2C+MB+R2H+2N9" target="_blank" rel="noopener">420 DES MEURONS ST, WINNIPEG</a><a class="mobile-phone" href="tel:+12049634462">204-963-4462</a><span class="mobile-hours">MON–SAT: 10 AM–6 PM</span>';
+  }
 
   if(nav){
     nav.innerHTML=`<div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Inventory</button><div class="finance-dropdown-menu"><a href="inventory.html">Browse Inventory</a><a href="vehicle-sourcing.html">Find a Vehicle for Me</a></div></div><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="warranty.html">Warranty</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Trade-In</button><div class="finance-dropdown-menu"><a href="trade-in.html?intent=trade">Trade In Your Vehicle</a><a href="trade-in.html?intent=sell">Sell Your Vehicle</a><a href="trade-in.html?intent=consign">Consign Your Vehicle</a></div></div><a href="service-repairs.html">Services &amp; Repairs</a><a href="index.html#contact">Contact</a><a class="nav-cta" href="book-test-drive.html">Book a Test Drive</a>`;

@@ -8,8 +8,8 @@
     outline: 0 !important;
   }
 
-  .site-header .mobile-contact-info a,
-  .site-header .mobile-contact-info span:last-child {
+  .site-header .mobile-contact-info .mobile-phone,
+  .site-header .mobile-contact-info .mobile-hours {
     border-left: 2px solid var(--red) !important;
   }
 }
