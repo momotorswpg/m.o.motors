@@ -5,6 +5,9 @@
   let vehicles = [];
   let loaded = false;
   let previewUrl = "";
+  let addressTimer = 0;
+  let addressController = null;
+  const addressCache = new Map();
 
   const value = id => ($(id)?.value || "").trim();
   const escapeHtml = input => String(input ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -37,6 +40,11 @@
     const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
     set("bosDateSold", iso);
     set("bosInvoice", `MO-${iso.replaceAll("-","")}`);
+    set("bosSalesperson", "Mohaimen Ornob");
+    set("bosTerms", "N/A");
+    set("bosVehicleSelect", "");
+    closeSuggestions("bosVehicleSearch","bosVehicleSuggestions");
+    closeSuggestions("bosBuyerAddress","bosAddressSuggestions");
     moneyIds.forEach(id => set(id, "0.00"));
     setStatus("");
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -57,7 +65,40 @@
     set("bosModel", vehicle.Model ?? vehicle.model);
     set("bosMileage", vehicle.Mileage ?? vehicle.mileage);
     set("bosSalePrice", Number(vehicle.Price ?? vehicle.price ?? 0).toFixed(2));
+    set("bosVehicleSearch", vehicleLabel(vehicle));
+    closeSuggestions("bosVehicleSearch","bosVehicleSuggestions");
     recalculate();
+  }
+
+  function vehicleLabel(vehicle) {
+    const title = `${vehicle.Year ?? vehicle.year ?? ""} ${vehicle.Make ?? vehicle.make ?? ""} ${vehicle.Model ?? vehicle.model ?? ""}`.trim();
+    const vin = vehicle.VIN ?? vehicle.vin ?? "No VIN";
+    return `${title} - ${vin}`;
+  }
+
+  function closeSuggestions(inputId,listId) {
+    const list = $(listId);
+    if (list) { list.hidden = true; list.innerHTML = ""; }
+    $(inputId)?.setAttribute("aria-expanded","false");
+  }
+
+  function renderVehicleSuggestions() {
+    const input = $("bosVehicleSearch");
+    const list = $("bosVehicleSuggestions");
+    if (!input || !list) return;
+    const query = input.value.trim().toLowerCase();
+    const matches = vehicles.filter(vehicle => !query || vehicleLabel(vehicle).toLowerCase().includes(query)).slice(0,8);
+    if (!matches.length) {
+      list.innerHTML = '<div class="bos-suggestion"><span>No available vehicles match your search.</span></div>';
+    } else {
+      list.innerHTML = matches.map(vehicle => {
+        const title = `${vehicle.Year ?? vehicle.year ?? ""} ${vehicle.Make ?? vehicle.make ?? ""} ${vehicle.Model ?? vehicle.model ?? ""}`.trim();
+        const vin = vehicle.VIN ?? vehicle.vin ?? "No VIN";
+        return `<button class="bos-suggestion" type="button" role="option" data-bos-vehicle="${escapeHtml(vehicle.id)}"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(vin)}</span></button>`;
+      }).join("");
+    }
+    list.hidden = false;
+    input.setAttribute("aria-expanded","true");
   }
 
   async function loadVehicles() {
@@ -65,20 +106,69 @@
     if (!select || typeof db === "undefined" || loaded) return;
     setStatus("Loading inventory...");
     try {
-      const {data,error} = await db.from("Vehicles").select("*").order("created_at", {ascending:false});
+      const {data,error} = await db.from("Vehicles").select("*").eq("Status","Available").order("created_at", {ascending:false});
       if (error) throw error;
       vehicles = data || [];
-      select.innerHTML = '<option value="">Choose a vehicle</option>' + vehicles.map(vehicle => {
-        const title = `${vehicle.Year ?? vehicle.year ?? ""} ${vehicle.Make ?? vehicle.make ?? ""} ${vehicle.Model ?? vehicle.model ?? ""}`.trim();
-        const vin = vehicle.VIN ?? vehicle.vin ?? "No VIN";
-        return `<option value="${escapeHtml(vehicle.id)}">${escapeHtml(title)} - ${escapeHtml(vin)}</option>`;
-      }).join("");
+      select.value = "";
       loaded = true;
       setStatus(vehicles.length ? `${vehicles.length} inventory vehicles available.` : "No inventory vehicles found.");
     } catch (error) {
       console.error(error);
       setStatus(`Could not load inventory: ${error.message}`);
     }
+  }
+
+  function formatPhotonAddress(feature) {
+    const p = feature?.properties || {};
+    const street = [p.housenumber,p.street || p.name].filter(Boolean).join(" ");
+    const city = p.city || p.town || p.village || p.municipality || p.county;
+    const province = p.state || p.county;
+    const provincePostal = [province,p.postcode].filter(Boolean).join(" ");
+    return [street,city,provincePostal,"Canada"].filter((part,index,array) => part && array.indexOf(part) === index).join(", ");
+  }
+
+  function renderAddressSuggestions(features) {
+    const input = $("bosBuyerAddress");
+    const list = $("bosAddressSuggestions");
+    if (!input || !list) return;
+    const suggestions = features.map(formatPhotonAddress).filter(Boolean).filter((item,index,array) => array.indexOf(item) === index).slice(0,6);
+    if (!suggestions.length) { closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); return; }
+    list.innerHTML = suggestions.map(address => `<button class="bos-suggestion" type="button" role="option" data-bos-address="${escapeHtml(address)}"><strong>${escapeHtml(address)}</strong></button>`).join("");
+    list.hidden = false;
+    input.setAttribute("aria-expanded","true");
+  }
+
+  async function lookupAddress() {
+    const query = value("bosBuyerAddress");
+    if (query.length < 4) { closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); return; }
+    if (addressCache.has(query.toLowerCase())) { renderAddressSuggestions(addressCache.get(query.toLowerCase())); return; }
+    addressController?.abort();
+    addressController = new AbortController();
+    try {
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(`${query}, Canada`)}&limit=6&lang=en`;
+      const response = await fetch(url,{signal:addressController.signal,headers:{Accept:"application/json"}});
+      if (!response.ok) throw new Error("Address lookup unavailable");
+      const data = await response.json();
+      const features = (data.features || []).filter(feature => String(feature?.properties?.countrycode || feature?.properties?.country || "").toLowerCase().includes("ca") || String(feature?.properties?.country || "").toLowerCase() === "canada");
+      addressCache.set(query.toLowerCase(),features);
+      renderAddressSuggestions(features);
+    } catch (error) {
+      if (error.name !== "AbortError") closeSuggestions("bosBuyerAddress","bosAddressSuggestions");
+    }
+  }
+
+  function moveSuggestion(event,listId) {
+    const list = $(listId);
+    if (!list || list.hidden || !["ArrowDown","ArrowUp","Enter","Escape"].includes(event.key)) return;
+    const options = [...list.querySelectorAll("button.bos-suggestion")];
+    if (!options.length) return;
+    event.preventDefault();
+    let index = options.findIndex(option => option.classList.contains("active"));
+    if (event.key === "Escape") { list.hidden = true; return; }
+    if (event.key === "Enter") { (options[index] || options[0]).click(); return; }
+    index = event.key === "ArrowDown" ? (index + 1) % options.length : (index <= 0 ? options.length - 1 : index - 1);
+    options.forEach((option,i) => option.classList.toggle("active",i === index));
+    options[index].scrollIntoView({block:"nearest"});
   }
 
   function wrapText(text, font, size, maxWidth, maxLines = 3) {
@@ -110,6 +200,7 @@
 
   async function createPdf() {
     if (!window.PDFLib) throw new Error("The PDF generator did not load. Please refresh the page and try again.");
+    if (!value("bosVehicleSelect")) throw new Error("Choose an available inventory vehicle from the suggestions first.");
     if (!value("bosVin") || !value("bosBuyerName") || !value("bosDateSold") || !value("bosInvoice")) throw new Error("Complete the invoice number, date sold, buyer name and vehicle information first.");
     const response = await fetch(TEMPLATE_URL, {cache:"no-store"});
     if (!response.ok) throw new Error("The original bill of sale template could not be loaded.");
@@ -198,7 +289,14 @@
   function init() {
     if (!$("billOfSaleForm")) return;
     resetForm();
-    $("bosVehicleSelect")?.addEventListener("change",populateVehicle);
+    $("bosVehicleSearch")?.addEventListener("focus",renderVehicleSuggestions);
+    $("bosVehicleSearch")?.addEventListener("input",()=>{ set("bosVehicleSelect",""); renderVehicleSuggestions(); });
+    $("bosVehicleSearch")?.addEventListener("keydown",event=>moveSuggestion(event,"bosVehicleSuggestions"));
+    $("bosVehicleSuggestions")?.addEventListener("click",event=>{ const option=event.target.closest("[data-bos-vehicle]"); if(!option)return; set("bosVehicleSelect",option.dataset.bosVehicle); populateVehicle(); });
+    $("bosBuyerAddress")?.addEventListener("input",()=>{ clearTimeout(addressTimer); addressTimer=setTimeout(lookupAddress,650); });
+    $("bosBuyerAddress")?.addEventListener("keydown",event=>moveSuggestion(event,"bosAddressSuggestions"));
+    $("bosAddressSuggestions")?.addEventListener("click",event=>{ const option=event.target.closest("[data-bos-address]"); if(!option)return; set("bosBuyerAddress",option.dataset.bosAddress); closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); });
+    document.addEventListener("click",event=>{ if(!event.target.closest(".bos-vehicle-select"))closeSuggestions("bosVehicleSearch","bosVehicleSuggestions"); if(!event.target.closest("#bosBuyerAddress")&&!event.target.closest("#bosAddressSuggestions"))closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); });
     ["bosSalePrice","bosTradeValue","bosWarranty","bosDocumentFee","bosDeposit"].forEach(id => $(id)?.addEventListener("input",recalculate));
     $("bosRecalculate")?.addEventListener("click",recalculate);
     $("bosReset")?.addEventListener("click",resetForm);
