@@ -1,5 +1,7 @@
 (() => {
   const TEMPLATE_URL = "/assets/documents/mo-motors-bill-of-sale-template.pdf";
+  const TREATY_TEMPLATE_URL = "/assets/documents/mo-motors-bill-of-sale-treaty-template.pdf";
+  const SIGNATURE_URL = "/assets/images/mohaimen-ornob-signature.png";
   const $ = id => document.getElementById(id);
   const moneyIds = ["bosSalePrice","bosTradeValue","bosWarranty","bosDocumentFee","bosSubtotal","bosGst","bosRst","bosTotal","bosDeposit","bosBalance"];
   let vehicles = [];
@@ -24,14 +26,23 @@
 
   function recalculate() {
     const subtotal = round(number("bosSalePrice") - number("bosTradeValue") + number("bosWarranty") + number("bosDocumentFee"));
-    const gst = round(subtotal * .05);
-    const rst = round(subtotal * .07);
+    const treatySale = value("bosSaleType") === "treaty";
+    const gst = treatySale ? 0 : round(subtotal * .05);
+    const rst = treatySale ? 0 : round(subtotal * .07);
     const total = round(subtotal + gst + rst);
     set("bosSubtotal", subtotal.toFixed(2));
     set("bosGst", gst.toFixed(2));
     set("bosRst", rst.toFixed(2));
     set("bosTotal", total.toFixed(2));
     set("bosBalance", round(total - number("bosDeposit")).toFixed(2));
+  }
+
+  function updateSaleType() {
+    const treatySale = value("bosSaleType") === "treaty";
+    if ($("bosTreatyFields")) $("bosTreatyFields").hidden = !treatySale;
+    ["bosTreatyNumber","bosRequestedDeliveryDate"].forEach(id => { if ($(id)) $(id).required = treatySale; });
+    ["bosGst","bosRst"].forEach(id => { if ($(id)) $(id).disabled = treatySale; });
+    recalculate();
   }
 
   function resetForm() {
@@ -42,6 +53,8 @@
     set("bosInvoice", `MO-${iso.replaceAll("-","")}`);
     set("bosSalesperson", "Mohaimen Ornob");
     set("bosTerms", "N/A");
+    set("bosSaleType", "standard");
+    if ($("bosIncludeSignature")) $("bosIncludeSignature").checked = true;
     set("bosVehicleSelect", "");
     closeSuggestions("bosVehicleSearch","bosVehicleSuggestions");
     closeSuggestions("bosBuyerAddress","bosAddressSuggestions");
@@ -50,6 +63,7 @@
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = "";
     if ($("bosPreviewWrap")) $("bosPreviewWrap").hidden = true;
+    updateSaleType();
   }
 
   function selectedVehicle() {
@@ -202,7 +216,9 @@
     if (!window.PDFLib) throw new Error("The PDF generator did not load. Please refresh the page and try again.");
     if (!value("bosVehicleSelect")) throw new Error("Choose an available inventory vehicle from the suggestions first.");
     if (!value("bosVin") || !value("bosBuyerName") || !value("bosDateSold") || !value("bosInvoice")) throw new Error("Complete the invoice number, date sold, buyer name and vehicle information first.");
-    const response = await fetch(TEMPLATE_URL, {cache:"no-store"});
+    const treatySale = value("bosSaleType") === "treaty";
+    if (treatySale && (!value("bosTreatyNumber") || !value("bosRequestedDeliveryDate"))) throw new Error("Complete the treaty number and requested delivery date first.");
+    const response = await fetch(treatySale ? TREATY_TEMPLATE_URL : TEMPLATE_URL, {cache:"no-store"});
     if (!response.ok) throw new Error("The original bill of sale template could not be loaded.");
     const template = await response.arrayBuffer();
     const pdf = await PDFLib.PDFDocument.load(template);
@@ -242,6 +258,18 @@
     drawText(page,font,formatDate(value("bosBuyerSignatureDate")),337,237,{maxWidth:115,size:8.5});
     drawText(page,font,formatDate(value("bosSellerSignatureDate")),337,129,{maxWidth:115,size:8.5});
 
+    if ($("bosIncludeSignature")?.checked) {
+      const signatureResponse = await fetch(SIGNATURE_URL,{cache:"no-store"});
+      if (!signatureResponse.ok) throw new Error("The dealership signature could not be loaded.");
+      const signature = await pdf.embedPng(await signatureResponse.arrayBuffer());
+      page.drawImage(signature,{x:325,y:170,width:53,height:21});
+    }
+
+    if (treatySale) {
+      drawText(page,font,value("bosTreatyNumber"),94,61,{maxWidth:115,size:8.5});
+      drawText(page,font,formatDate(value("bosRequestedDeliveryDate")),248,45,{maxWidth:118,size:8.5});
+    }
+
     return pdf.save();
   }
 
@@ -269,7 +297,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `M-O-Motors-Bill-of-Sale-${value("bosInvoice") || "draft"}.pdf`;
+      link.download = `M-O-Motors-${value("bosSaleType") === "treaty" ? "Treaty-" : ""}Bill-of-Sale-${value("bosInvoice") || "draft"}.pdf`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url),1000);
     } catch (error) { setStatus(error.message); }
@@ -289,6 +317,7 @@
   function init() {
     if (!$("billOfSaleForm")) return;
     resetForm();
+    $("bosSaleType")?.addEventListener("change",updateSaleType);
     $("bosVehicleSearch")?.addEventListener("focus",renderVehicleSuggestions);
     $("bosVehicleSearch")?.addEventListener("input",()=>{ set("bosVehicleSelect",""); renderVehicleSuggestions(); });
     $("bosVehicleSearch")?.addEventListener("keydown",event=>moveSuggestion(event,"bosVehicleSuggestions"));

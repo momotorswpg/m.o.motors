@@ -22,6 +22,11 @@
 .bos-attribution{display:block;color:#7a7e86;font-size:10px;font-weight:500;letter-spacing:0;line-height:1.4;text-transform:none}
 .bos-attribution a{color:inherit}
 .bos-optional{color:#858992;font-size:9px;font-weight:600;letter-spacing:.4px}
+.bos-signature-toggle{align-self:end;grid-template-columns:auto 1fr!important;align-items:center;gap:9px!important;padding:10px 12px;border:1px solid #d4d6dc;background:#fff}
+.bos-signature-toggle input{width:auto;margin:0;accent-color:#d71920}
+.bos-signature-toggle span{line-height:1.35}
+.bos-treaty-fields{border-color:#d9b55f!important;background:#fffaf0!important}
+.bos-form input:disabled{background:#eceef1;color:#6e727b}
 .bos-signature-note{margin:14px 0 0;color:#6e727b;font-size:12px}
 .bos-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
 .bos-actions .status{flex:1 1 260px;margin:0}
