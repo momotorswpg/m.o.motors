@@ -2,15 +2,11 @@
 .services-intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.75fr);align-items:end;gap:60px;margin-bottom:38px}
 .services-intro h2{max-width:720px;margin-bottom:0}
 .services-intro>p{max-width:560px;margin:0;color:#5b6069;font-size:16px;line-height:1.75}
-.services-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:18px}
-.service-card{position:relative;grid-column:span 2;min-height:360px;padding:34px 30px 28px;background:#fff;border:1px solid #dfe2e6;display:flex;flex-direction:column;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
-.service-card:nth-child(4){grid-column:2/span 2}
-.service-card:nth-child(5){grid-column:4/span 2}
+.services-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.service-card{position:relative;min-height:330px;padding:30px 26px 26px;background:#fff;border:1px solid #dfe2e6;display:flex;flex-direction:column;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
 .service-card:hover{transform:translateY(-4px);border-color:#c6c9ce;box-shadow:0 16px 35px rgba(17,20,26,.09)}
 .service-card-featured{background:#0b0c0f;border-color:#0b0c0f;color:#fff}
-.service-card-number{position:absolute;right:22px;top:16px;color:#e2e4e8;font-family:"Barlow Condensed",Arial,sans-serif;font-size:62px;font-weight:800;line-height:1;letter-spacing:-2px}
-.service-card-featured .service-card-number{color:#23252a}
-.service-icon{position:relative;width:54px;height:54px;margin-bottom:26px;border:1px solid #d71920;color:#d71920;display:grid;place-items:center;font-size:27px;font-weight:700}
+.service-icon{position:relative;width:48px;height:48px;margin-bottom:22px;border:1px solid #d71920;color:#d71920;display:grid;place-items:center;font-size:25px;font-weight:700}
 .service-card .eyebrow{position:relative;margin-bottom:10px;font-size:11px;letter-spacing:2px}
 .service-card h3{position:relative;margin:0 0 14px;font-family:"Barlow Condensed",Arial,sans-serif;font-size:29px;line-height:1.08;text-transform:uppercase;letter-spacing:.15px}
 .service-card>p:not(.eyebrow){position:relative;margin:0 0 24px;color:#656a73;font-size:14px;line-height:1.65}
@@ -19,6 +15,13 @@
 .service-card-featured .service-link{color:#fff}
 .service-link span{margin-left:6px;color:#d71920;font-size:18px;transition:margin-left .2s ease}
 .service-link:hover span{margin-left:11px}
-.service-partner{position:relative;margin-top:13px;color:#8a8f98;font-size:10px;line-height:1.4}
-@media(max-width:980px){.services-intro{grid-template-columns:1fr;gap:18px}.services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-card,.service-card:nth-child(4),.service-card:nth-child(5){grid-column:auto}.service-card:last-child{grid-column:1/-1;min-height:300px}}
-@media(max-width:620px){.dealership-services{padding-left:6%;padding-right:6%}.services-intro{margin-bottom:26px}.services-intro>p{font-size:14px}.services-grid{grid-template-columns:1fr;gap:12px}.service-card,.service-card:nth-child(4),.service-card:nth-child(5),.service-card:last-child{grid-column:1;min-height:0;padding:28px 24px 24px}.service-card-number{font-size:50px}.service-icon{width:46px;height:46px;margin-bottom:22px}.service-card h3{font-size:25px}}
+.featured-finance-summary{max-width:760px;margin:18px auto 0;color:#6f7278;font-size:11px;line-height:1.5;text-align:center}
+.financing-compact{background:#111216;color:#fff}
+.financing-compact-copy{display:flex;align-items:center;justify-content:space-between;gap:40px}
+.financing-compact-copy h2{margin:0}
+.financing-compact-copy>div:first-child>p{margin:14px 0 0;color:#b9bbc1}
+.financing-compact-actions{display:flex;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+.financing-compact .btn-secondary{color:#fff}
+@media(max-width:1100px){.services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:980px){.services-intro{grid-template-columns:1fr;gap:18px}.financing-compact-copy{align-items:flex-start;flex-direction:column}}
+@media(max-width:620px){.dealership-services{padding-left:6%;padding-right:6%}.services-intro{margin-bottom:26px}.services-intro>p{font-size:14px}.services-grid{grid-template-columns:1fr;gap:12px}.service-card{min-height:0;padding:26px 22px 22px}.service-icon{width:44px;height:44px;margin-bottom:18px}.service-card h3{font-size:25px}.financing-compact-actions{width:100%;flex-direction:column}.financing-compact-actions .btn{text-align:center}.featured-finance-summary{text-align:left}}
