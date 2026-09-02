@@ -232,6 +232,11 @@
     const font = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
     const bold = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
 
+    page.drawRectangle({x:6,y:782,width:206,height:59,color:PDFLib.rgb(1,1,1)});
+    drawText(page,bold,"Mohaimen Ornob O/A M.O.Motors",10,821,{maxWidth:198,size:8.5});
+    drawText(page,font,"420 Des Meurons St",10,806,{maxWidth:198,size:8.5});
+    drawText(page,font,"Winnipeg, MB R2H 2N9",10,791,{maxWidth:198,size:8.5});
+
     drawText(page,font,value("bosInvoice"),82,692,{maxWidth:112});
     drawText(page,font,formatDate(value("bosDateSold")),266,692,{maxWidth:116});
     drawText(page,font,value("bosSalesperson"),472,692,{maxWidth:102});
@@ -239,11 +244,11 @@
     drawText(page,font,value("bosBuyerAddress"),158,642,{maxWidth:410,size:8.5,maxLines:3,lineHeight:11});
     drawText(page,font,value("bosBuyerPhone"),158,612,{maxWidth:220,size:9});
 
-    drawText(page,font,value("bosVin"),24,554,{maxWidth:140,size:8});
-    drawText(page,font,value("bosYear"),174,554,{maxWidth:48,size:8});
-    drawText(page,font,value("bosMake"),249,554,{maxWidth:105,size:8});
-    drawText(page,font,value("bosModel"),368,554,{maxWidth:105,size:8});
-    drawText(page,font,value("bosMileage"),487,554,{maxWidth:82,size:8});
+    drawText(page,font,value("bosVin"),24,550,{maxWidth:140,size:8});
+    drawText(page,font,value("bosYear"),174,550,{maxWidth:48,size:8});
+    drawText(page,font,value("bosMake"),249,550,{maxWidth:105,size:8});
+    drawText(page,font,value("bosModel"),368,550,{maxWidth:105,size:8});
+    drawText(page,font,value("bosMileage"),487,550,{maxWidth:82,size:8});
 
     drawText(page,font,value("bosTerms"),23,480,{maxWidth:263,size:8,maxLines:4,lineHeight:10});
     drawText(page,font,value("bosManagementInitials"),76,455,{maxWidth:64,size:8});
