@@ -23,6 +23,12 @@
     return year && month && day ? `${month}/${day}/${year}` : iso;
   };
   const currency = amount => Number(amount || 0).toLocaleString("en-CA", {minimumFractionDigits:2,maximumFractionDigits:2});
+  const generateInvoiceNumber = date => {
+    const pad = (part,length = 2) => String(part).padStart(length,"0");
+    const day = `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}`;
+    const time = `${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+    return `MO-${day}-${time}-${pad(date.getMilliseconds(),3)}`;
+  };
 
   function recalculate() {
     const subtotal = round(number("bosSalePrice") - number("bosTradeValue") + number("bosWarranty") + number("bosDocumentFee"));
@@ -50,7 +56,7 @@
     const today = new Date();
     const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
     set("bosDateSold", iso);
-    set("bosInvoice", `MO-${iso.replaceAll("-","")}`);
+    set("bosInvoice", generateInvoiceNumber(today));
     set("bosSalesperson", "Mohaimen Ornob");
     set("bosTerms", "N/A");
     set("bosSaleType", "standard");
