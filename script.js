@@ -5,11 +5,11 @@ document.getElementById("year")&&(document.getElementById("year").textContent=ne
 const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 const money=v=>Number.isFinite(Number(v))?new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD",maximumFractionDigits:0}).format(Number(v)):"$—";
 const km=v=>Number.isFinite(Number(v))?`${new Intl.NumberFormat("en-CA").format(Number(v))} km`:"Mileage N/A";
-let finance={apr:8.99,term_months:84,down_payment:0};
+let finance={apr:8.99,term_months:84,down_payment:0,financing_fee:1000,payment_frequency:"biweekly"};
 async function get(table,params={}){const r=await fetch(`${SUPABASE_URL}/rest/v1/${encodeURIComponent(table)}?${new URLSearchParams(params)}`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});if(!r.ok)throw new Error(await r.text());return r.json()}
 async function loadFinance(){try{const x=await get("finance_settings",{select:"*",id:"eq.1"});if(x[0])finance=x[0]}catch(e){console.warn("Using default finance settings",e)}}
-const TAX_RATE=.12,PAYMENT_BUFFER=1000,DISPLAY_TERM_MONTHS=72;function biweekly(price){const p=Math.max(0,Number(price||0)*(1+TAX_RATE)+PAYMENT_BUFFER),apr=Number(finance.apr||8.99)/100,n=DISPLAY_TERM_MONTHS/12*26;if(!p||!n)return 0;const annual=(1+apr/2)**2-1,r=(1+annual)**(1/26)-1;return r?p*r/(1-(1+r)**-n):p/n}
-function paymentInline(price){return `<span class="featured-payment">or <b>${money(Math.round(biweekly(price)))}</b> bi-weekly</span>`}
+const TAX_RATE=.12,frequencyInfo=()=>finance.payment_frequency==="weekly"?{periods:52,label:"weekly"}:finance.payment_frequency==="monthly"?{periods:12,label:"monthly"}:{periods:26,label:"bi-weekly"};function estimatedPayment(price){const fee=Number.isFinite(Number(finance.financing_fee))?Number(finance.financing_fee):1000,down=Number.isFinite(Number(finance.down_payment))?Number(finance.down_payment):0,months=Number(finance.term_months)||84,{periods}=frequencyInfo(),p=Math.max(0,Number(price||0)*(1+TAX_RATE)+fee-down),apr=Number(finance.apr||8.99)/100,n=months/12*periods;if(!p||!n)return 0;const r=apr/periods;return r?p*r/(1-(1+r)**-n):p/n}
+function paymentInline(price){return `<span class="featured-payment">or <b>${money(Math.round(estimatedPayment(price)))}</b> ${frequencyInfo().label}</span>`}
 function active(v){return["available","in stock","active"].includes(String(v.Status||v.status||"Available").toLowerCase())}
 function featured(v){const x=v.Featured??v.featured??false;return x===true||String(x).toLowerCase()==="true"||Number(x)===1}
 function featuredOrder(v){const n=Number(v.featured_order??v.FeaturedOrder);return Number.isFinite(n)&&n>0?n:Number.MAX_SAFE_INTEGER}
