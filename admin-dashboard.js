@@ -1,6 +1,6 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const pages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "requests", "billsale", "finance", "settings"];
+  const pages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "requests", "billsale", "finance", "resources", "settings"];
   let initialized = false;
 
   function ensurePanel(className, html) {
@@ -28,6 +28,7 @@
     const requests = ensurePanel("requests-panel", '<div class="panel-head"><div><span class="eyebrow">CUSTOMER REQUESTS</span><h3>Website leads</h3><p class="muted">Warranty, vehicle sourcing, service, vehicle sale and referral requests.</p></div><button id="refreshRequestsBtn" class="secondary-btn" type="button">Refresh Requests</button></div><div id="requestFilters" class="request-filters"><button type="button" data-request-filter="all" class="mini-btn active">All</button><button type="button" data-request-filter="warranty" class="mini-btn">Warranty</button><button type="button" data-request-filter="vehicle_sourcing" class="mini-btn">Sourcing</button><button type="button" data-request-filter="service_repair" class="mini-btn">Service</button><button type="button" data-request-filter="vehicle_disposition" class="mini-btn">Sell / Trade</button><button type="button" data-request-filter="referral" class="mini-btn">Referrals</button></div><div id="requestsList" class="requests-list"><div class="muted">Loading customer requests…</div></div>');
     const billsale = document.querySelector(".bill-of-sale-panel");
     const finance = document.querySelector(".finance-panel");
+    const resources = document.querySelector(".resources-panel");
     const settings = ensurePanel("settings-panel", '<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');
 
     const dashboard = document.createElement("section");
@@ -40,7 +41,7 @@
     nav.innerHTML = pages.map(page => `<button type="button" data-page="${page}">${page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page[0].toUpperCase() + page.slice(1)}</button>`).join("");
     top?.after(nav);
 
-    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],settings:[settings]};
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],settings:[settings]};
     function show(page) {
       if (!pages.includes(page)) page = "dashboard";
       dashboard.style.display = page === "dashboard" ? "block" : "none";

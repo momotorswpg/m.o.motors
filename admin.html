@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="tradeins-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="requests-admin.css?v=requests1">
   <link rel="stylesheet" href="admin-dashboard.css?v=adminrestore1">
+  <link rel="stylesheet" href="resources-admin.css?v=resources1">
   <link rel="stylesheet" href="vehicle-edit-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="bill-of-sale-admin.css?v=bill1">
 </head>
@@ -20,7 +21,7 @@
     <aside class="sidebar">
       <div class="brand"><div class="brand-mark">M.O</div><div><strong>M.O MOTORS</strong><span>ADMIN</span></div></div>
       <div class="sidebar-copy"><span class="eyebrow">DEALERSHIP CONTROL CENTER</span><h1>Manage your dealership.</h1><p>Inventory, customer bookings, trade-ins and finance tools in one place.</p></div>
-      <div class="sidebar-snapshot"><span class="eyebrow">WORKSPACE</span><div>Dashboard overview</div><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>Finance settings</div></div>
+      <div class="sidebar-snapshot"><span class="eyebrow">WORKSPACE</span><div>Dashboard overview</div><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>Finance settings</div><div>Resources</div></div>
       <div class="sidebar-foot"><span id="sessionEmail"></span><button id="signOutBtn" class="ghost-btn" type="button">Sign out</button></div>
     </aside>
 
@@ -112,6 +113,14 @@
             <div class="bos-actions"><button id="bosPreview" class="secondary-btn" type="button">Preview PDF</button><button id="bosDownload" class="secondary-btn" type="button">Download PDF</button><button id="bosPrint" class="primary-btn" type="button">Open / Print Bill of Sale</button><p id="bosStatus" class="status" aria-live="polite"></p></div>
           </form>
           <div id="bosPreviewWrap" class="bos-preview-wrap" hidden><iframe id="bosPreviewFrame" title="Bill of sale PDF preview"></iframe></div>
+        </section>
+
+        <section class="panel resources-panel">
+          <div class="panel-head"><div><span class="eyebrow">TEAM RESOURCES</span><h3>Warranty plan reference</h3><p class="muted">Internal guide matching the customer-facing plan names to the original warranty brochures.</p></div></div>
+          <div class="resource-notice"><strong>Internal reference only</strong><span>Keep using the generic names with customers. Prices and availability vary by vehicle.</span></div>
+          <div class="resource-table-wrap"><table class="resource-table"><thead><tr><th>Website name</th><th>Original brochure</th></tr></thead><tbody>
+            <tr><td>Essential Powertrain</td><td>Powertrain Value Plan Protection</td></tr><tr><td>Enhanced Powertrain</td><td>Powertrain Protection</td></tr><tr><td>Everyday Mechanical</td><td>Drivers Shield</td></tr><tr><td>Flexible Comprehensive</td><td>Limited Superior Protection</td></tr><tr><td>Premier Comprehensive</td><td>Superior Protection</td></tr><tr><td>Complete Start + Long-Term Powertrain</td><td>Certified Powertrain Plus</td></tr><tr><td>MileageGuard</td><td>NTL Sierra</td></tr><tr><td>MileageGuard Premier</td><td>NTL Everest</td></tr><tr><td>EV Essential</td><td>EV Charged</td></tr><tr><td>EV Premier</td><td>EV Surge</td></tr>
+          </tbody></table></div>
         </section>
       </div>
     </main>
