@@ -234,7 +234,7 @@
 
     page.drawRectangle({x:6,y:782,width:206,height:59,color:PDFLib.rgb(1,1,1)});
     drawText(page,bold,"Mohaimen Ornob O/A M.O.Motors",10,821,{maxWidth:198,size:8.5});
-    drawText(page,font,"420 Des Meurons St",10,806,{maxWidth:198,size:8.5});
+    drawText(page,font,"Unit 104, 420 Des Meurons St",10,806,{maxWidth:198,size:8.5});
     drawText(page,font,"Winnipeg, MB R2H 2N9",10,791,{maxWidth:198,size:8.5});
 
     drawText(page,font,value("bosInvoice"),82,692,{maxWidth:112});
