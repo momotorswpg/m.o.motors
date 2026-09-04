@@ -67,6 +67,11 @@ $("loginForm").addEventListener("submit", async (event) => {
 
 const formValue = id => $(id)?.value?.trim() || "";
 const optionalNumber = id => formValue(id) === "" ? null : Number(formValue(id));
+const engineSizeValue = value => {
+  const cleaned = String(value || "").trim();
+  if (!cleaned) return null;
+  return /^\d+(?:\.\d+)?$/i.test(cleaned) ? `${cleaned}L` : cleaned;
+};
 const customSelectValue = (id, customId) => formValue(id) === "Other" ? (formValue(customId) || null) : (formValue(id) || null);
 
 [["transmission", "transmissionCustom"], ["exteriorColor", "exteriorColorCustom"], ["interiorColor", "interiorColorCustom"]].forEach(([selectId, customId]) => {
@@ -101,7 +106,7 @@ $("vehicleForm").addEventListener("submit", async (event) => {
     Transmission: customSelectValue("transmission", "transmissionCustom"),
     BodyStyle: formValue("bodyStyle") || null,
     EngineCylinders: optionalNumber("engineCylinders"),
-    EngineSize: optionalNumber("engineSize"),
+    EngineSize: engineSizeValue(formValue("engineSize")),
     Drivetrain: formValue("drivetrain") || null,
     ExteriorColor: customSelectValue("exteriorColor", "exteriorColorCustom"),
     InteriorColor: customSelectValue("interiorColor", "interiorColorCustom"),

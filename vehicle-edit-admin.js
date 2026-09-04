@@ -7,7 +7,7 @@
   const fields = [
     ["VIN","VIN","text"],["Year","Year","number"],["Make","Make","text"],["Model","Model","text"],["Trim","Trim","text"],
     ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
-    ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","number"],
+    ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
     ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
     ["Doors","Doors","number"],["FuelType","Fuel Type","text"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
   ];
@@ -24,6 +24,7 @@
       const known = options.includes(String(value));
       return `<label>${label}<select name="${field}"><option value="">Select ${label.toLowerCase()}</option>${options.map(x => `<option value="${x}" ${String(value)===x?"selected":""}>${x}</option>`).join("")}<option value="Other" ${value&&!known?"selected":""}>Other</option></select><input class="edit-custom-value ${value&&!known?"":"hidden"}" name="${field}Custom" value="${value&&!known?esc(value):""}" placeholder="Enter custom ${label.toLowerCase()}"></label>`;
     }
+    if (type === "engine") return `<label>${label}<input name="${field}" type="text" inputmode="decimal" placeholder="e.g. 1.4L" value="${esc(value ?? "")}"></label>`;
     return `<label>${label}<input name="${field}" type="${type}" value="${esc(value ?? "")}"></label>`;
   }
 
@@ -70,6 +71,7 @@
       let value = fd.get(f);
       if (t.startsWith("customselect:") && value === "Other") value = fd.get(f + "Custom")?.trim() || null;
       if (t === "number") value = value === "" ? null : Number(value);
+      if (t === "engine" && value !== "") value = /^\d+(?:\.\d+)?$/i.test(value.trim()) ? `${value.trim()}L` : value.trim();
       row[f] = value === "" ? null : value;
     });
     status.textContent = "Saving…";
