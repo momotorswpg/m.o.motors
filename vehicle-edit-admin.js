@@ -5,7 +5,7 @@
   if (!list) return;
 
   const fields = [
-    ["VIN","VIN","text"],["Year","Year","number"],["Make","Make","text"],["Model","Model","text"],["Trim","Trim","text"],
+    ["VIN","VIN","vin"],["Year","Year","number"],["Make","Make","text"],["Model","Model","text"],["Trim","Trim","text"],
     ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
     ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
     ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
@@ -14,6 +14,7 @@
 
   function esc(v="") { return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
   function input(field, label, type, value) {
+    if (type === "vin") return `<label class="edit-wide edit-vin-label">${label}<span class="edit-vin-row"><input name="${field}" type="text" minlength="17" maxlength="17" value="${esc(value ?? "")}"><button class="secondary-btn" type="button" data-edit-vin-lookup>Lookup VIN</button></span><small class="edit-vin-status" role="status"></small></label>`;
     if (type === "textarea") return `<label class="edit-wide">${label}<textarea name="${field}" rows="5" placeholder="Add features, options, condition notes or other vehicle details not covered above.">${esc(value || "")}</textarea></label>`;
     if (type.startsWith("select:")) {
       const options = type.slice(7).split(",").map(x => `<option value="${x}" ${String(value||"Available")===x?"selected":""}>${x}</option>`).join("");
@@ -42,6 +43,52 @@
       if (custom) custom.classList.toggle("hidden", event.target.value !== "Other");
     });
     document.getElementById("editVehicleForm").addEventListener("submit", save);
+    document.getElementById("editVehicleForm").addEventListener("click", event => {
+      if (event.target.closest("[data-edit-vin-lookup]")) lookupVin();
+    });
+    document.getElementById("editVehicleForm").addEventListener("keydown", event => {
+      if (event.target.name === "VIN" && event.key === "Enter") { event.preventDefault(); lookupVin(); }
+    });
+  }
+
+  function setDecodedField(form, name, value) {
+    if (value == null || !String(value).trim()) return;
+    const input = form.elements[name];
+    if (!input) return;
+    const cleaned = String(value).trim();
+    if (input.tagName === "SELECT") {
+      const matching = [...input.options].find(option => option.value.toLowerCase() === cleaned.toLowerCase());
+      if (matching) input.value = matching.value;
+      else if ([...input.options].some(option => option.value === "Other")) {
+        input.value = "Other";
+        const custom = form.elements[name + "Custom"];
+        if (custom) { custom.value = cleaned; custom.classList.remove("hidden"); }
+      }
+      return;
+    }
+    input.value = name === "EngineSize" && /^\d+(?:\.\d+)?$/.test(cleaned) ? `${cleaned}L` : cleaned;
+  }
+
+  async function lookupVin() {
+    const form = document.getElementById("editVehicleForm"),vin = form?.elements.VIN,button = form?.querySelector("[data-edit-vin-lookup]"),status = form?.querySelector(".edit-vin-status");
+    if (!vin || !button || !status) return;
+    const value = vin.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    vin.value = value;
+    if (value.length !== 17) { status.textContent = "Enter a valid 17-character VIN."; return; }
+    button.disabled = true;
+    status.textContent = "Looking up vehicle…";
+    try {
+      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${encodeURIComponent(value)}?format=json`);
+      if (!response.ok) throw new Error("VIN lookup service is unavailable.");
+      const vehicle = (await response.json()).Results?.[0];
+      if (!vehicle) throw new Error("No vehicle information was returned.");
+      const decoded = {Year:vehicle.ModelYear,Make:vehicle.Make,Model:vehicle.Model,Trim:vehicle.Trim,BodyStyle:vehicle.BodyClass,Transmission:vehicle.TransmissionStyle||vehicle.TransmissionSpeeds,Drivetrain:vehicle.DriveType,EngineCylinders:vehicle.EngineCylinders,EngineSize:vehicle.DisplacementL,FuelType:vehicle.FuelTypePrimary,Doors:vehicle.Doors,Passengers:vehicle.Seats};
+      Object.entries(decoded).forEach(([name,fieldValue]) => setDecodedField(form,name,fieldValue));
+      status.textContent = "Vehicle details filled in. Please verify the VIN data, then save your changes.";
+    } catch (error) {
+      console.error(error);
+      status.textContent = `Could not look up this VIN: ${error.message}`;
+    } finally { button.disabled = false; }
   }
 
   let currentId = null;
