@@ -5,6 +5,7 @@
 .site-header .topbar{display:none}
 .site-header .main-nav{min-height:104px;padding:0 3.1%;background:#030405}
 .site-header .brand-wordmark{display:flex;flex-direction:column;align-items:flex-start;gap:3px;line-height:1;text-decoration:none;white-space:nowrap}
+.site-logo-crop,.footer-logo-crop{position:relative;display:block;overflow:hidden}.site-logo-crop{width:220px;height:64px}.site-logo-crop img{position:absolute;left:0;top:-27px;width:220px!important;max-height:none!important;height:auto}.footer-logo-crop{width:290px;height:84px}.footer-logo-crop img{position:absolute;left:0;top:-35px;width:290px!important;max-height:none!important;height:auto}@media(max-width:560px){.site-logo-crop{width:175px;height:52px}.site-logo-crop img{top:-21px;width:175px!important}}
 .site-header .brand-name{display:flex;align-items:baseline;font-family:"DM Sans",Arial,sans-serif;font-size:42px;font-weight:800;letter-spacing:1.5px;line-height:.84}
 .site-header .brand-name-accent{color:#d71920;letter-spacing:0}
 .site-header .brand-name-main{color:#f4f4f5;font-weight:600;letter-spacing:1px}

@@ -20,7 +20,7 @@
     if(!id){$('applicationSheet').innerHTML='<div class="finance-admin-empty">No application was selected.</div>';return}
     const{data:row,error}=await db.from('finance_applications').select('*').eq('id',id).single();if(error||!row){$('applicationSheet').innerHTML=`<div class="finance-admin-empty">Application could not be loaded.${error?` ${esc(error.message)}`:''}</div>`;return}
     const name=`${row.first_name||''} ${row.last_name||''}`.trim()||'Unnamed applicant';document.title=`${name} Finance Application | M.O Motors`;
-    $('applicationSheet').innerHTML=`<header class="finance-application-sheet-head"><div><span class="eyebrow red">FINANCE APPLICATION</span><h1>${esc(name)}</h1><p>Submitted ${esc(datetime(row.created_at))} · Status: ${esc(row.status||'New')}</p></div><div class="finance-print-brand"><strong>M.O MOTORS</strong><span>Unit 104, 420 Des Meurons St<br>Winnipeg, MB R2H 2N9</span></div></header>${sections.map(s=>section(row,s)).join('')}<p class="finance-application-id">Application ID: ${esc(row.id)}</p>`;
+    $('applicationSheet').innerHTML=`<header class="finance-application-sheet-head"><div><span class="eyebrow red">FINANCE APPLICATION</span><h1>${esc(name)}</h1><p>Submitted ${esc(datetime(row.created_at))} · Status: ${esc(row.status||'New')}</p></div><div class="finance-print-brand"><span class="finance-print-logo"><img src="mo-motors-logo.png" alt="M.O Motors Certified Pre-Owned Vehicles"></span><span>Unit 104, 420 Des Meurons St<br>Winnipeg, MB R2H 2N9</span></div></header>${sections.map(s=>section(row,s)).join('')}<p class="finance-application-id">Application ID: ${esc(row.id)}</p>`;
   }
   $('printApplication').addEventListener('click',()=>window.print());init();
 })();
