@@ -31,12 +31,13 @@
 
     const calculate=()=>{
       const down=+$("poDown").value||0,trade=+$("poTrade").value||0,rate=+$("poRate").value||0,months=+$("poTerm").value||84,periods=+$("poFreq").value||26,withTax=$("poTax").value==="yes";
-      const gst=withTax?base*.05:0,pst=withTax?base*.07:0,fee=Number(settings.financing_fee)||0,principal=Math.max(0,base+gst+pst+fee-down-trade),periodicRate=rate/100/periods,payments=months/12*periods,payment=periodicRate?principal*periodicRate/(1-Math.pow(1+periodicRate,-payments)):principal/payments;
+      const cashMode=panel.querySelector('[data-mode="cash"]')?.classList.contains("active"),gst=withTax?base*.05:0,pst=withTax?base*.07:0,fee=cashMode?0:Number(settings.financing_fee)||0,principal=Math.max(0,base+gst+pst+fee-down-trade),periodicRate=rate/100/periods,payments=months/12*periods,payment=periodicRate?principal*periodicRate/(1-Math.pow(1+periodicRate,-payments)):principal/payments;
+      feeRow.hidden=cashMode;
       $("poGst").textContent=money(gst);$("poPst").textContent=money(pst);$("poFee").textContent=money(fee);$("poDownOut").textContent="− "+money(down);$("poTradeOut").textContent="− "+money(trade);$("poPayment").textContent=money(payment);$("poFrequencyLabel").textContent=periods===52?"weekly":periods===12?"monthly":"bi-weekly";$("poFinanced").textContent=money(principal);
       const topPayment=root.querySelector(".detail-price span");if(topPayment)topPayment.innerHTML=`or <b>${money(payment)}</b> ${periods===52?"weekly":periods===12?"monthly":"bi-weekly"}`;
-      $("poDisclaimer").textContent=`Price includes GST/PST when selected and a ${money(fee)} financing fee. Estimate uses ${months} months and is subject to lender approval. OAC.`;
+      if(!cashMode)$("poDisclaimer").textContent=`Price includes GST/PST when selected and a ${money(fee)} financing fee. Estimate uses ${months} months and is subject to lender approval. OAC.`;
     };
-    if(boundPanel!==panel){boundPanel=panel;observer.disconnect();["poDown","poTrade","poRate","poTerm","poFreq","poTax"].forEach(id=>$(id).addEventListener("input",()=>setTimeout(calculate)));}
+    if(boundPanel!==panel){boundPanel=panel;observer.disconnect();["poDown","poTrade","poRate","poTerm","poFreq","poTax"].forEach(id=>$(id).addEventListener("input",()=>setTimeout(calculate)));panel.querySelectorAll("[data-mode]").forEach(button=>button.addEventListener("click",()=>setTimeout(calculate)));}
     calculate();
   }
 
