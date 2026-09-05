@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Finance Applications | M.O Motors</title>
-  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="finance-admin.css?v=logo1">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="finance-admin.css?v=delete1">
 </head>
 <body class="finance-admin-page">
   <header class="finance-admin-header">
@@ -15,9 +15,9 @@
 
     <section id="app" class="finance-admin-workspace" hidden>
       <div class="finance-admin-toolbar"><div><span class="eyebrow red">APPLICATION WORKSPACE</span><strong id="account"></strong></div><div class="finance-admin-actions"><button class="btn" id="refresh" type="button">Refresh Applications</button><button class="btn finance-signout" id="signout" type="button">Sign Out</button></div></div>
-      <div id="list" class="finance-application-list"><div class="finance-admin-empty">Loading finance applications…</div></div>
+      <p id="adminMessage" class="finance-admin-success" role="status" aria-live="polite"></p><div id="list" class="finance-application-list"><div class="finance-admin-empty">Loading finance applications…</div></div>
     </section>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="finance-admin.js?v=applications2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="finance-admin.js?v=delete1"></script>
 </body>
 </html>

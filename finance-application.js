@@ -1,5 +1,6 @@
 (()=>{
   const db=supabase.createClient('https://dpsgtliddmdvfwjahkkq.supabase.co','sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0'),$=id=>document.getElementById(id),id=new URLSearchParams(location.search).get('id');
+  let applicantName='this applicant';
   const sections=[
     ['Applicant information',[['first_name','First name'],['last_name','Last name'],['date_of_birth','Date of birth','date'],['marital_status','Marital status'],['phone','Phone'],['email','Email']]],
     ['Current residence',[['address','Street address','wide'],['city','City'],['province','Province'],['postal_code','Postal code'],['address_duration','Time at address'],['housing_status','Housing status'],['housing_payment','Monthly housing payment','money']]],
@@ -19,8 +20,18 @@
     const{data:{user}}=await db.auth.getUser();if(!user){location.replace('finance-admin-login.html');return}$('account').textContent=`Signed in as ${user.email}`;
     if(!id){$('applicationSheet').innerHTML='<div class="finance-admin-empty">No application was selected.</div>';return}
     const{data:row,error}=await db.from('finance_applications').select('*').eq('id',id).single();if(error||!row){$('applicationSheet').innerHTML=`<div class="finance-admin-empty">Application could not be loaded.${error?` ${esc(error.message)}`:''}</div>`;return}
-    const name=`${row.first_name||''} ${row.last_name||''}`.trim()||'Unnamed applicant';document.title=`${name} Finance Application | M.O Motors`;
+    const name=`${row.first_name||''} ${row.last_name||''}`.trim()||'Unnamed applicant';applicantName=name;document.title=`${name} Finance Application | M.O Motors`;
     $('applicationSheet').innerHTML=`<header class="finance-application-sheet-head"><div><span class="eyebrow red">FINANCE APPLICATION</span><h1>${esc(name)}</h1><p>Submitted ${esc(datetime(row.created_at))} · Status: ${esc(row.status||'New')}</p></div><div class="finance-print-brand"><span class="finance-print-logo"><img src="mo-motors-logo.png" alt="M.O Motors Certified Pre-Owned Vehicles"></span><span>Unit 104, 420 Des Meurons St<br>Winnipeg, MB R2H 2N9</span></div></header>${sections.map(s=>section(row,s)).join('')}<p class="finance-application-id">Application ID: ${esc(row.id)}</p>`;
+    $('deleteApplication').disabled=false;
   }
-  $('printApplication').addEventListener('click',()=>window.print());init();
+  async function deleteApplication(){
+    const button=$('deleteApplication'),message=$('deleteMessage');
+    if(!id||button.disabled)return;
+    if(!confirm(`Permanently delete the entire finance application for ${applicantName}?\n\nThis removes all personal, employment, financial and consent information. This action cannot be undone.`))return;
+    button.disabled=true;button.textContent='Deleting…';message.textContent='';
+    const{data,error}=await db.from('finance_applications').delete().eq('id',id).select('id');
+    if(error||!data?.length){message.textContent=error?.message||'The application was not deleted. Please try again.';button.disabled=false;button.textContent='Delete Application';return}
+    location.replace('finance-admin.html?deleted=1');
+  }
+  $('printApplication').addEventListener('click',()=>window.print());$('deleteApplication').addEventListener('click',deleteApplication);init();
 })();
