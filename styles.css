@@ -29,3 +29,4 @@ footer .footer-wordmark{display:flex;flex-direction:column;gap:4px;line-height:1
 .footer-brand-tagline{color:#e9e9eb;font-family:"DM Sans",Arial,sans-serif;font-size:6px;font-weight:700;letter-spacing:3.2px}
 footer img{display:none}
 @media(max-width:800px){.vehicle-image[data-gallery],.detail-main-image,.fullscreen-photo-stage{touch-action:pan-y;-webkit-user-select:none;user-select:none}.detail-main-image .mobile-detail-arrow{display:flex;align-items:center;justify-content:center;opacity:.95;z-index:4}}
+.featured-payment,.inline-payment,.detail-price span{color:#52616c;font-weight:600}.featured-payment b,.inline-payment b,.detail-price span b{color:#3c6874}.inline-payment{font-size:15px;white-space:nowrap}.inline-payment b{font-size:20px}
