@@ -47,9 +47,74 @@
     button.setAttribute('aria-expanded',String(open));
   }));
 
+  const mobileActionBar=document.createElement('nav');
+  mobileActionBar.className='mobile-action-bar';
+  mobileActionBar.setAttribute('aria-label','Quick contact actions');
+  mobileActionBar.innerHTML=`
+    <a href="tel:+12049634462" aria-label="Call M.O Motors">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.6 3.7 9.1 3l2 4.1-2.1 1.7a15.3 15.3 0 0 0 6.2 6.2l1.7-2.1 4.1 2-.7 2.5a2.1 2.1 0 0 1-2.1 1.6C10.9 18.3 5.7 13.1 5 5.8a2.1 2.1 0 0 1 1.6-2.1Z"/></svg>
+      <span>Call</span>
+    </a>
+    <a href="${dealerMapUrl}" target="_blank" rel="noopener" aria-label="Get directions to M.O Motors">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11A7 7 0 1 0 5 10c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      <span>Directions</span>
+    </a>
+    <a class="mobile-action-primary" href="book-test-drive.html" aria-label="Book a test drive">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.5h14v14H5zM8 3v5M16 3v5M5 10h14"/></svg>
+      <span>Book Test Drive</span>
+    </a>`;
+  document.body.appendChild(mobileActionBar);
+
   const style=document.createElement('style');
   style.textContent=`
+    .mobile-action-bar{display:none}
     @media(max-width:560px){
+      body{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+      .mobile-action-bar{
+        position:fixed;
+        z-index:1000;
+        right:0;
+        bottom:0;
+        left:0;
+        display:grid;
+        grid-template-columns:.8fr 1fr 1.55fr;
+        min-height:64px;
+        padding-bottom:env(safe-area-inset-bottom);
+        border-top:1px solid #32343a;
+        background:#111216;
+        box-shadow:0 -8px 24px rgba(0,0,0,.2);
+      }
+      .mobile-action-bar a{
+        display:flex;
+        min-width:0;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        padding:12px 6px;
+        color:#fff;
+        font-size:11px;
+        font-weight:800;
+        line-height:1.1;
+        text-align:center;
+        text-decoration:none;
+        text-transform:uppercase;
+        letter-spacing:.25px;
+      }
+      .mobile-action-bar a+a{border-left:1px solid #32343a}
+      .mobile-action-bar svg{
+        width:18px;
+        height:18px;
+        flex:0 0 auto;
+        fill:none;
+        stroke:currentColor;
+        stroke-width:1.9;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+      }
+      .mobile-action-bar .mobile-action-primary{
+        border-left:0;
+        background:#d71920;
+      }
       .site-header .main-nav{
         position:relative!important;
         z-index:50!important;
