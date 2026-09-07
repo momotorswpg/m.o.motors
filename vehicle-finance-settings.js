@@ -24,7 +24,6 @@
     let priceInput=$("poVehiclePrice");
     if(!priceInput){
       const label=document.createElement("label");
-      label.className="finance-only";
       label.innerHTML=`Vehicle price<input id="poVehiclePrice" type="number" min="0" step="100" value="${listedPrice}">`;
       panel.querySelector(".payment-grid")?.prepend(label);
       priceInput=$("poVehiclePrice");
@@ -43,7 +42,7 @@
 
     const calculate=()=>{
       const cashMode=panel.querySelector('[data-mode="cash"]')?.classList.contains("active");
-      const enteredPrice=Number(priceInput?.value),vehiclePrice=cashMode?listedPrice:(Number.isFinite(enteredPrice)&&enteredPrice>=0?enteredPrice:listedPrice);
+      const enteredPrice=Number(priceInput?.value),vehiclePrice=Number.isFinite(enteredPrice)&&enteredPrice>=0?enteredPrice:listedPrice;
       const down=+$("poDown").value||0,trade=+$("poTrade").value||0,rate=+$("poRate").value||0,months=+$("poTerm").value||84,periods=+$("poFreq").value||26,withTax=$("poTax").value==="yes";
       const gst=withTax?vehiclePrice*.05:0,pst=withTax?vehiclePrice*.07:0,fee=cashMode?0:Number(settings.financing_fee)||0,principal=Math.max(0,vehiclePrice+gst+pst+fee-down-trade),periodicRate=rate/100/periods,payments=months/12*periods,payment=periodicRate?principal*periodicRate/(1-Math.pow(1+periodicRate,-payments)):principal/payments;
       feeRow.hidden=cashMode;feeRow.style.display=cashMode?"none":"";
