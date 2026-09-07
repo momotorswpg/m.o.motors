@@ -25,7 +25,7 @@
     if(!priceInput){
       const label=document.createElement("label");
       label.className="finance-only";
-      label.innerHTML=`Negotiated vehicle price<input id="poVehiclePrice" type="number" min="0" step="100" value="${listedPrice}">`;
+      label.innerHTML=`Vehicle price<input id="poVehiclePrice" type="number" min="0" step="100" value="${listedPrice}">`;
       panel.querySelector(".payment-grid")?.prepend(label);
       priceInput=$("poVehiclePrice");
     }
