@@ -6,7 +6,7 @@
   <title>Get Pre-Approved | M.O Motors</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="finance-dropdown.css">
-  <link rel="stylesheet" href="pre-approval.css">
+  <link rel="stylesheet" href="pre-approval.css?v=document-checklist1">
 </head>
 <body>
   <header class="site-header"><div class="main-nav"><a class="brand brand-wordmark" href="index.html" aria-label="M.O Motors home"><span class="brand-name"><span class="brand-name-accent">M.O.</span><span class="brand-name-main">MOTORS</span></span><span class="brand-tagline">CERTIFIED PRE-OWNED VEHICLES</span></a><button class="menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false">☰</button><nav id="nav" class="page-nav"><a href="inventory.html">Inventory</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="trade-in.html">Trade-In</a><a href="index.html#about">About Us</a><a href="index.html#contact">Contact</a><a class="nav-cta" href="book-test-drive.html">Book a Test Drive</a></nav></div></header>
@@ -37,7 +37,24 @@
       </div>
       <button class="btn btn-primary" id="submitFinance" type="submit">Request Pre-Approval</button><p id="formMessage" class="muted-copy" role="status"></p>
     </form>
+    <button class="btn" id="reopenFinanceDocuments" type="button" hidden>View document checklist</button>
   </main>
-  <script src="pre-approval.js?v=cosigner-consent1"></script><script src="test-drive-modal.js"></script><script src="site-nav.js"></script>
+  <dialog id="financeDocumentsDialog" class="finance-documents-dialog" aria-labelledby="financeDocumentsTitle" aria-describedby="financeDocumentsIntro">
+    <p class="eyebrow red">APPLICATION RECEIVED</p>
+    <h2 id="financeDocumentsTitle">Your next step</h2>
+    <p id="financeDocumentsIntro">Thank you for submitting your pre-approval request. To help us review your application, please email clear pictures of:</p>
+    <ul>
+      <li>Your driver’s licence — front and back</li>
+      <li>A second piece of identification</li>
+      <li>A void cheque</li>
+    </ul>
+    <p>Send them to <a href="mailto:momotorswpg@gmail.com">momotorswpg@gmail.com</a>. Include your name so we can match the documents to your application.</p>
+    <p class="muted-copy">The email button opens your email app. Attach the pictures yourself before sending.</p>
+    <div class="finance-documents-actions">
+      <a class="btn btn-primary" id="emailFinanceDocuments" href="mailto:momotorswpg@gmail.com?subject=Pre-approval%20supporting%20documents&amp;body=Hello%20M.O%20Motors%2C%0A%0AI%20submitted%20a%20pre-approval%20request.%0A%0AMy%20name%3A%20%0A%0AI%20will%20attach%20clear%20pictures%20of%20my%20driver%27s%20licence%20%28front%20and%20back%29%2C%20a%20second%20piece%20of%20identification%2C%20and%20a%20void%20cheque.">Email documents</a>
+      <button class="btn" id="closeFinanceDocuments" type="button" autofocus>I’ll do this later</button>
+    </div>
+  </dialog>
+  <script src="pre-approval.js?v=document-checklist1"></script><script src="test-drive-modal.js"></script><script src="site-nav.js"></script>
 </body>
 </html>
