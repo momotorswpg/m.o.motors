@@ -4,6 +4,7 @@
   const SIGNATURE_URL = "/assets/images/mohaimen-ornob-signature.png";
   const $ = id => document.getElementById(id);
   const moneyIds = ["bosSalePrice","bosTradeValue","bosWarranty","bosDocumentFee","bosSubtotal","bosGst","bosRst","bosTotal","bosDeposit","bosBalance"];
+  let rstOverride = null;
   let vehicles = [];
   let loaded = false;
   let previewUrl = "";
@@ -34,11 +35,11 @@
     const subtotal = round(number("bosSalePrice") - number("bosTradeValue") + number("bosWarranty") + number("bosDocumentFee"));
     const treatySale = value("bosSaleType") === "treaty";
     const gst = treatySale ? 0 : round(subtotal * .05);
-    const rst = treatySale ? 0 : round(subtotal * .07);
+    const rst = treatySale ? 0 : (rstOverride ?? round(subtotal * .07));
     const total = round(subtotal + gst + rst);
     set("bosSubtotal", subtotal.toFixed(2));
     set("bosGst", gst.toFixed(2));
-    set("bosRst", rst.toFixed(2));
+    if (document.activeElement !== $("bosRst") || treatySale) set("bosRst", rst.toFixed(2));
     set("bosTotal", total.toFixed(2));
     set("bosBalance", round(total - number("bosDeposit")).toFixed(2));
   }
@@ -52,6 +53,7 @@
   }
 
   function resetForm() {
+    rstOverride = null;
     $("billOfSaleForm")?.reset();
     const today = new Date();
     const iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0,10);
@@ -338,6 +340,14 @@
     $("bosAddressSuggestions")?.addEventListener("click",event=>{ const option=event.target.closest("[data-bos-address]"); if(!option)return; set("bosBuyerAddress",option.dataset.bosAddress); closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); });
     document.addEventListener("click",event=>{ if(!event.target.closest(".bos-vehicle-select"))closeSuggestions("bosVehicleSearch","bosVehicleSuggestions"); if(!event.target.closest("#bosBuyerAddress")&&!event.target.closest("#bosAddressSuggestions"))closeSuggestions("bosBuyerAddress","bosAddressSuggestions"); });
     ["bosSalePrice","bosTradeValue","bosWarranty","bosDocumentFee","bosDeposit"].forEach(id => $(id)?.addEventListener("input",recalculate));
+    $("bosRst")?.addEventListener("input", () => {
+      if (value("bosSaleType") === "treaty") return;
+      rstOverride = round(number("bosRst"));
+      recalculate();
+    });
+    $("bosRst")?.addEventListener("change", () => {
+      set("bosRst", round(number("bosRst")).toFixed(2));
+    });
     $("bosRecalculate")?.addEventListener("click",recalculate);
     $("bosReset")?.addEventListener("click",resetForm);
     $("bosPreview")?.addEventListener("click",preview);
