@@ -6,7 +6,7 @@
   function ensureDetailArrows(){
     const surface=document.querySelector('.detail-main-image'),thumbs=document.querySelectorAll('.detail-thumb');
     if(!surface)return;
-    if(!mobile()||thumbs.length<2){surface.querySelectorAll('.mobile-detail-arrow').forEach(button=>button.remove());return}
+    if(thumbs.length<2){surface.querySelectorAll('.mobile-detail-arrow').forEach(button=>button.remove());return}
     if(surface.querySelector('.mobile-detail-arrow'))return;
     [['prev','gallery-prev','Previous photo',-1],['next','gallery-next','Next photo',1]].forEach(([side,position,label,direction])=>{
       const button=document.createElement('button');
