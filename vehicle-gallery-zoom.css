@@ -1,0 +1,13 @@
+.vehicle-fullscreen-viewer.actual-size .fullscreen-photo-stage{
+  display:block;
+  touch-action:none;
+  cursor:grab;
+}
+.vehicle-fullscreen-viewer.actual-size .fullscreen-photo-stage:active{cursor:grabbing}
+.vehicle-fullscreen-viewer.actual-size #lightboxImage{
+  max-width:none;
+  max-height:none;
+  cursor:inherit;
+  user-select:none;
+  -webkit-user-drag:none;
+}
