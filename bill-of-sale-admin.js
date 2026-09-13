@@ -62,6 +62,8 @@
     set("bosSalesperson", "Mohaimen Ornob");
     set("bosTerms", "N/A");
     set("bosSaleType", "standard");
+    const usedCondition = document.querySelector('input[name="bosVehicleCondition"][value="used"]');
+    if (usedCondition) usedCondition.checked = true;
     if ($("bosIncludeSignature")) $("bosIncludeSignature").checked = true;
     set("bosVehicleSelect", "");
     closeSuggestions("bosVehicleSearch","bosVehicleSuggestions");
@@ -220,6 +222,24 @@
     lines.forEach((line,index) => page.drawText(line, {x,y:y-index*(options.lineHeight || size+2),size,font,color:PDFLib.rgb(0,0,0)}));
   }
 
+  function drawVehicleConditionHeading(page,bold) {
+    // Replace only the template's heading band; leave the table borders and fields intact.
+    page.drawRectangle({x:13,y:577,width:570,height:12,color:PDFLib.rgb(.89,.90,.91)});
+    const selected = document.querySelector('input[name="bosVehicleCondition"]:checked')?.value || "used";
+    const drawBox = (x,checked) => {
+      page.drawRectangle({x,y:579,width:7,height:7,borderColor:PDFLib.rgb(0,0,0),borderWidth:.7});
+      if (checked) {
+        page.drawLine({start:{x:x+1.2,y:582.2},end:{x:x+3,y:580.4},thickness:1,color:PDFLib.rgb(0,0,0)});
+        page.drawLine({start:{x:x+3,y:580.4},end:{x:x+6.2,y:585.1},thickness:1,color:PDFLib.rgb(0,0,0)});
+      }
+    };
+    drawBox(174,selected === "new");
+    drawText(page,bold,"New Vehicle Purchased",185,579.5,{size:9});
+    drawText(page,bold,"|",293,579.5,{size:9});
+    drawBox(304,selected === "used");
+    drawText(page,bold,"Used Vehicle Purchased",315,579.5,{size:9});
+  }
+
   async function createPdf() {
     if (!window.PDFLib) throw new Error("The PDF generator did not load. Please refresh the page and try again.");
     if (!value("bosVehicleSelect")) throw new Error("Choose an available inventory vehicle from the suggestions first.");
@@ -233,6 +253,8 @@
     const page = pdf.getPages()[0];
     const font = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
     const bold = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+    drawVehicleConditionHeading(page,bold);
 
     page.drawRectangle({x:6,y:782,width:206,height:59,color:PDFLib.rgb(1,1,1)});
     drawText(page,bold,"Mohaimen Ornob O/A M.O.Motors",10,821,{maxWidth:198,size:8.5});

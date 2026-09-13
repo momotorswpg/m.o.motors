@@ -12,6 +12,9 @@
 .bos-form input:focus,.bos-form select:focus,.bos-form textarea:focus{border-color:#d71920;outline:2px solid rgba(215,25,32,.1)}
 .bos-form textarea{resize:vertical;line-height:1.45}
 .bos-vehicle-select{margin-bottom:16px}
+.bos-vehicle-condition{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 16px;color:#343840;font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase}
+.bos-vehicle-condition label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.bos-vehicle-condition input{width:auto;margin:0;padding:0;accent-color:#d71920}
 .bos-autocomplete{position:relative;display:block}
 .bos-suggestions{position:absolute;z-index:60;top:calc(100% + 4px);left:0;right:0;max-height:250px;overflow:auto;border:1px solid #cfd2d8;background:#fff;box-shadow:0 14px 34px rgba(20,24,32,.16)}
 .bos-suggestion{display:block;width:100%;padding:11px 12px;border:0;border-bottom:1px solid #eceef1;background:#fff;color:#20242a;font:inherit;font-size:12px;line-height:1.4;text-align:left;cursor:pointer}
