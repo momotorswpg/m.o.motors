@@ -1,4 +1,4 @@
-# M.O Motors staff workspace (test only)
+# M.O Motors staff workspace
 
 The private staff entry is `staff.html`; `admin.html` links to it. It reads the
 existing `public."Vehicles"` rows. It does not change vehicle publication or
@@ -30,9 +30,12 @@ ready. Owners and sales also have separate group chats.
    `owner_vehicle`/`owner_group` messages, and must not update `Vehicles` or
    finance settings. An owner must retain existing admin access.
 
-The SQL was checked inside a transaction that was rolled back; it has **not**
-been applied to the live database. The local staff page currently cannot sign
-in until the setup is applied.
+The staff schema, owner seed, admin hardening, notification rules, and private
+`staff-private` bucket were applied to the live Supabase project on 2026-09-13.
+The security test passed and rolled back its test data. No sales Auth accounts
+have been created yet; add real staff accounts only after confirming their
+email addresses and roles. Phone push remains disabled until the VAPID secrets,
+dispatcher, and device verification below are completed.
 
 Chat and the in-app alert inbox poll while the app is open. The installable
 shell does not cache private API responses. The notification migration queues
