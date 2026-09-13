@@ -1,3 +1,0 @@
-[functions.staff-push]
-verify_jwt = false
-entrypoint = './functions/staff-push/index.js'
