@@ -141,5 +141,7 @@ create policy "Staff upload allowed private photos" on storage.objects for inser
         (split_part(name,'/',1) = 'sales_group' or
           (split_part(name,'/',1) = 'sales_vehicle' and exists
             (select 1 from public.staff_vehicle_state s where s.vehicle_id::text = split_part(name,'/',2) and s.ready_for_sale)))))));
+create policy "Staff remove own private photos" on storage.objects for delete to authenticated
+  using (bucket_id = 'staff-private' and owner_id = (select auth.uid())::text);
 
 -- Before adding a sales Auth user, apply staff-workspace-admin-hardening.sql too.

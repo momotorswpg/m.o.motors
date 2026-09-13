@@ -19,9 +19,13 @@ ready. Owners and sales also have separate group chats.
    its object policies. Never use the
    existing public `vehicle-images` bucket for internal photos.
 5. Create staff users through Supabase Auth, then add their IDs and trusted
-   roles to `public.staff_members` from a trusted administrator/SQL context.
+   roles and unique lowercase `handle`s to `public.staff_members` from a
+   trusted administrator/SQL context.
    The browser has SELECT-only access to this table and cannot assign roles.
-6. Verify owner and sales accounts separately before publishing the page.
+6. Apply `staff-workspace-notifications.sql`, then run
+   `staff-workspace-security-test.sql` in a SQL session. It rolls back all test
+   data and asserts owner/sales separation. Verify owner and sales accounts
+   separately before publishing the page.
    Specifically, sales must receive zero rows from `staff_expenses` and
    `owner_vehicle`/`owner_group` messages, and must not update `Vehicles` or
    finance settings. An owner must retain existing admin access.
@@ -30,8 +34,26 @@ The SQL was checked inside a transaction that was rolled back; it has **not**
 been applied to the live database. The local staff page currently cannot sign
 in until the setup is applied.
 
-Chat updates poll while the app is open. The installable shell does not cache
-private API responses. System push notifications, @mentions, replies/follows,
-and cross-device mute preferences are **not implemented**; do not describe
-them as active. Those need a notification data model and a securely configured
-sender (including iOS/Android web-push testing) before staff onboarding.
+Chat and the in-app alert inbox poll while the app is open. The installable
+shell does not cache private API responses. The notification migration queues
+alerts for @handles, replies to followed conversations, and vehicles marked
+ready. A conversation can be followed or muted; sales staff can also turn off
+ready-for-sale alerts. Role changes are rechecked before push delivery.
+
+## To enable phone push
+
+1. Generate one VAPID key pair. Put only the **public** key in
+   `staff-config.js`. Keep the private key out of Git.
+2. Configure Edge Function secrets `STAFF_VAPID_PUBLIC_KEY`,
+   `STAFF_VAPID_PRIVATE_KEY`, `STAFF_VAPID_SUBJECT` (a valid `mailto:` or HTTPS
+   contact), and a long random `STAFF_PUSH_DISPATCH_SECRET`. Supabase provides
+   `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the function.
+3. Deploy `supabase/functions/staff-push` with `supabase/config.toml`.
+   Its endpoint requires the dispatch secret header and does not accept a
+   public browser call.
+4. Store the project URL and the same dispatch secret in Supabase Vault under
+   the names in `staff-push-cron.sql`, enable `pg_cron` and `pg_net`, then
+   schedule the function with that SQL. It sends queued alerts once a minute.
+5. On HTTPS, install the staff page to each phone's home screen and tap
+   **Enable phone alerts**. Test an actual iPhone and Android delivery before
+   calling push operational. No VAPID keys or cron job are configured yet.
