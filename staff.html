@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111317">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>M.O Motors | Staff Workspace</title>
+  <link rel="manifest" href="staff.webmanifest">
+  <link rel="icon" href="mo-motors-logo.png">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <header class="staff-header"><div class="staff-brand"><img src="mo-motors-logo.png" alt="M.O Motors"><span>Staff workspace</span></div><div class="staff-account"><span id="staffName"></span><button id="staffSignOut" type="button" hidden>Sign out</button></div></header>
+  <main>
+    <section id="staffLogin" class="staff-login"><h1>Team sign in</h1><p>Private owner and sales conversations connected to our vehicle inventory.</p><form id="staffLoginForm"><label>Email<input id="staffEmail" type="email" autocomplete="username" required></label><label>Password<input id="staffPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button></form><p id="staffLoginStatus" role="status"></p></section>
+    <section id="staffApp" class="staff-app" hidden>
+      <aside class="staff-sidebar"><div class="staff-side-title"><h1>Team spaces</h1><button id="staffRefresh" type="button" title="Refresh">↻</button></div><nav id="staffGroups" aria-label="Group chats"></nav><h2>Vehicles</h2><label class="staff-search">Search vehicles<input id="staffSearch" type="search" placeholder="Year, make, model or VIN"></label><div id="staffVehicles" class="staff-vehicle-list"></div></aside>
+      <section class="staff-content"><div id="staffEmpty" class="staff-empty">Choose a vehicle or team chat.</div><div id="staffDetail" hidden><div class="staff-detail-head"><div><p id="staffDetailEyebrow"></p><h2 id="staffDetailTitle"></h2><p id="staffDetailSub"></p></div><button id="staffReady" type="button" hidden>Mark ready for sale</button></div><div id="staffTabs" class="staff-tabs" role="tablist"></div><div id="staffPane" class="staff-pane"></div></div></section>
+    </section>
+  </main>
+  <div id="staffToast" class="staff-toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="staff.js"></script>
+</body>
+</html>
