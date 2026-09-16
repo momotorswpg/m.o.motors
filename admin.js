@@ -225,7 +225,11 @@ function renderInventory() {
     return `<details class="inventory-group" ${name === "Available" ? "open" : ""}><summary>${name} vehicles <span>${groupVehicles.length}</span></summary><div class="inventory-group-list">${groupVehicles.map(renderRow).join("")}</div></details>`;
   }).join("");
 
-  list.querySelectorAll("[data-select]").forEach(btn => btn.addEventListener("click", () => selectVehicle(btn.dataset.select)));
+  list.querySelectorAll("[data-select]").forEach(btn => btn.addEventListener("click", () => {
+    selectVehicle(btn.dataset.select);
+    const uploadPanel = $("photoUploadPanel");
+    uploadPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
 }
 
 function selectVehicle(id) {
