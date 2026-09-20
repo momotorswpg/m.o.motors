@@ -48,6 +48,16 @@
           body: JSON.stringify(values(form)),
         });
         if (!response.ok) throw new Error(await response.text());
+        const submitted = values(form),
+          notificationData = { ...submitted, ...submitted.details };
+        delete notificationData.details;
+        const notification = await fetch(`${U}/functions/v1/lead-notification`, {
+          method: "POST",
+          headers: H,
+          body: JSON.stringify({ type: "customer_request", data: notificationData }),
+        }).catch(() => null);
+        if (!notification?.ok)
+          console.warn("Customer request notification could not be sent");
         form.reset();
         status.textContent =
           "Thank you. Your request has been received and M.O. Motors will contact you shortly.";
