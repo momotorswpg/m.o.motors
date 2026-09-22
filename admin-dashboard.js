@@ -1,6 +1,8 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const pages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "requests", "billsale", "finance", "resources", "settings"];
+  const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "timesheet"];
+  const adminPages = ["requests", "finance", "resources", "payroll", "settings"];
+  let pages = salesPages;
   let initialized = false;
 
   function ensurePanel(className, html) {
@@ -29,7 +31,11 @@
     const billsale = document.querySelector(".bill-of-sale-panel");
     const finance = document.querySelector(".finance-panel");
     const resources = document.querySelector(".resources-panel");
+    const timesheet = document.querySelector(".timesheet-panel");
+    const payroll = document.querySelector(".payroll-panel");
     const settings = ensurePanel("settings-panel", '<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');
+    const isAdmin = ["owner", "admin"].includes(window.moStaff?.role);
+    pages = isAdmin ? [...salesPages, ...adminPages] : [...salesPages];
 
     const dashboard = document.createElement("section");
     dashboard.className = "admin-page dashboard-page";
@@ -38,10 +44,11 @@
 
     const nav = document.createElement("nav");
     nav.className = "admin-page-nav";
-    nav.innerHTML = pages.map(page => `<button type="button" data-page="${page}">${page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page[0].toUpperCase() + page.slice(1)}</button>`).join("");
+    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page[0].toUpperCase() + page.slice(1);
+    nav.innerHTML = `<div class="admin-nav-group"><span>SALES</span>${salesPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}</div>${isAdmin ? `<div class="admin-nav-group"><span>ADMIN</span>${adminPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}<a class="admin-nav-link" href="finance-admin-login.html">Finance Applications ↗</a></div>` : ""}`;
     top?.after(nav);
 
-    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],settings:[settings]};
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],timesheet:[timesheet],payroll:[payroll],settings:[settings]};
     function show(page) {
       if (!pages.includes(page)) page = "dashboard";
       dashboard.style.display = page === "dashboard" ? "block" : "none";
@@ -58,6 +65,8 @@
       if (page === "requests") window.loadCustomerRequests?.();
       if (page === "billsale") window.loadBillOfSaleVehicles?.();
       if (page === "finance") window.loadFinanceSettings?.();
+      if (page === "timesheet") window.loadEmployeeTimesheet?.();
+      if (page === "payroll") window.loadPayrollAdmin?.();
       if (page === "dashboard") loadDashboard();
       if (location.hash.slice(1) !== page) location.hash = page;
     }

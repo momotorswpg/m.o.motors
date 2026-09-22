@@ -23,29 +23,50 @@ let vehicles = [];
 let selectedVehicleId = null;
 let selectedImages = [];
 let activeAdminUserId = null;
+let activeStaffMember = null;
 let loadAllPromise = null;
 
 async function requireSession() {
   const { data: { session } } = await db.auth.getSession();
-  if (session) showAdmin(session);
+  if (session) await showAdmin(session);
   else showAuth();
 }
 
 function showAuth() {
   activeAdminUserId = null;
+  activeStaffMember = null;
+  window.moStaff = null;
+  delete document.body.dataset.staffRole;
   $("authView").classList.remove("hidden");
   $("adminView").classList.add("hidden");
   $("sessionEmail").textContent = "";
 }
 
-function showAdmin(session) {
+async function showAdmin(session) {
   const userId = session?.user?.id;
   const alreadyVisible = !$("adminView").classList.contains("hidden");
+  if (alreadyVisible && activeAdminUserId === userId && activeStaffMember) return;
+  const { data: member, error } = await db.from("staff_members").select("*").eq("user_id", userId).maybeSingle();
+  if (error || !member || member.active === false) {
+    console.error(error || new Error("No active staff membership"));
+    await db.auth.signOut();
+    showAuth();
+    $("loginStatus").textContent = "This account does not have active staff access.";
+    return;
+  }
+  activeStaffMember = member;
+  window.moStaff = member;
+  const isSales = member.role === "sales";
+  document.body.dataset.staffRole = isSales ? "sales" : "admin";
+  const snapshot = document.querySelector(".sidebar-snapshot");
+  if (snapshot) snapshot.innerHTML = isSales
+    ? '<span class="eyebrow">SALES WORKSPACE</span><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>My timesheet</div>'
+    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Website requests</div><div>Finance applications</div><div>Payroll and timesheets</div><div>Finance settings</div><div>Resources</div>';
   $("authView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
-  $("sessionEmail").textContent = session.user.email || "Signed in";
-  if (alreadyVisible && activeAdminUserId === userId) return;
+  $("sessionEmail").textContent = `${member.display_name} · ${member.role === "sales" ? "Sales" : "Admin"}`;
   activeAdminUserId = userId;
+  window.dispatchEvent(new CustomEvent("mostaffready", { detail: member }));
   loadAll();
 }
 
@@ -62,7 +83,7 @@ $("loginForm").addEventListener("submit", async (event) => {
     return;
   }
   status.textContent = "";
-  showAdmin(data.session);
+  await showAdmin(data.session);
 });
 
 const formValue = id => $(id)?.value?.trim() || "";
@@ -81,11 +102,11 @@ const customSelectValue = (id, customId) => formValue(id) === "Other" ? (formVal
 $("signOutBtn").addEventListener("click", async () => {
   await db.auth.signOut();
   selectedVehicleId = null;
-  showAuth();
+  location.reload();
 });
 
 db.auth.onAuthStateChange((_event, session) => {
-  if (session) showAdmin(session);
+  if (session) setTimeout(() => showAdmin(session), 0);
   else showAuth();
 });
 
