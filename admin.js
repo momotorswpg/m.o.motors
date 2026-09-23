@@ -86,6 +86,19 @@ $("loginForm").addEventListener("submit", async (event) => {
   await showAdmin(data.session);
 });
 
+$("forgotPasswordBtn").addEventListener("click", async () => {
+  const status = $("loginStatus"), email = $("email").value.trim();
+  if (!email) {
+    status.textContent = "Enter your email address first.";
+    $("email").focus();
+    return;
+  }
+  status.textContent = "Sending password reset…";
+  const redirectTo = `${location.origin}/admin-reset-password.html`;
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
+  status.textContent = error ? error.message : "Check your email for a secure password-reset link.";
+});
+
 const formValue = id => $(id)?.value?.trim() || "";
 const optionalNumber = id => formValue(id) === "" ? null : Number(formValue(id));
 const engineSizeValue = value => {
