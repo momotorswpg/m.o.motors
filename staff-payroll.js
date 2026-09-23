@@ -38,6 +38,8 @@
         <section class="payroll-card"><h4>Add commission</h4><label>Date earned<input id="commissionDate" type="date"></label><label>Description<input id="commissionDescription" placeholder="Vehicle sale or bonus"></label><label>Amount (CAD)<input id="commissionAmount" type="number" min="0" step="0.01"></label><button id="addCommission" class="secondary-btn" type="button">Add Commission</button><p id="commissionStatus" class="status"></p></section>
       </div>
       <section class="payroll-period"><div class="panel-head compact"><div><span class="eyebrow">BIWEEKLY PERIOD</span><h4>Pay stub builder</h4></div></div><div class="payroll-period-fields"><label>Period start<input id="payPeriodStart" type="date"></label><label>Period end<input id="payPeriodEnd" type="date"></label><label>Other earnings<input id="payOtherEarnings" type="number" min="0" step="0.01" value="0"></label><label>Deductions<input id="payDeductions" type="number" min="0" step="0.01" value="0"></label></div><div class="form-actions"><button id="calculatePayroll" class="secondary-btn" type="button">Calculate</button><button id="savePayStub" class="primary-btn" type="button">Save Pay Stub</button><button id="printPayStub" class="secondary-btn" type="button">Print / Save PDF</button></div><p class="finance-note">Deductions are entered manually. This tool does not calculate CRA payroll deductions.</p><div id="payStubPreview" class="pay-stub-preview"><div class="muted">Choose an employee and period, then calculate.</div></div></section>
+      <div class="panel-head compact"><div><span class="eyebrow">TIME CORRECTIONS</span><h4>Add or amend a shift</h4><p class="muted">Use this when an employee misses a clock-in or clock-out. Every correction records the administrator and reason.</p></div></div>
+      <form id="shiftCorrectionForm" class="shift-correction-form"><input id="shiftCorrectionId" type="hidden"><label>Employee<select id="shiftCorrectionEmployee" required></select></label><label>Clock in<input id="shiftCorrectionIn" type="datetime-local" required></label><label>Clock out<input id="shiftCorrectionOut" type="datetime-local" required></label><label>Break (minutes)<input id="shiftCorrectionBreak" type="number" min="0" max="1440" step="1" value="0" required></label><label class="shift-correction-note">Correction reason<input id="shiftCorrectionNote" placeholder="Example: Employee forgot to clock out" required></label><div class="shift-correction-actions"><button id="saveShiftCorrection" class="primary-btn" type="submit">Add Shift</button><button id="cancelShiftCorrection" class="secondary-btn hidden" type="button">Cancel Edit</button></div><p id="shiftCorrectionStatus" class="status"></p></form>
       <div class="panel-head compact"><div><span class="eyebrow">EMPLOYEE TIME</span><h4>Recorded shifts</h4></div></div><div id="adminTimesheetRows" class="payroll-table-wrap"></div>
       <div class="panel-head compact"><div><span class="eyebrow">SAVED RECORDS</span><h4>Pay stubs</h4></div></div><div id="savedPayStubs" class="payroll-table-wrap"></div>`;
     admin.appendChild(payroll);
@@ -45,7 +47,53 @@
 
   function table(rows, admin = false) {
     if (!rows.length) return '<div class="muted payroll-empty">No time entries found.</div>';
-    return `<table class="payroll-table"><thead><tr>${admin ? "<th>Employee</th>" : ""}<th>Clock in</th><th>Clock out</th><th>Break</th><th>Hours</th></tr></thead><tbody>${rows.map(row => `<tr>${admin ? `<td>${esc(row.staff_members?.display_name || "Employee")}</td>` : ""}<td>${esc(stamp(row.clock_in))}</td><td>${esc(stamp(row.clock_out))}</td><td>${Number(row.break_minutes)||0} min</td><td>${hoursBetween(row).toFixed(2)}</td></tr>`).join("")}</tbody></table>`;
+    return `<table class="payroll-table"><thead><tr>${admin ? "<th>Employee</th>" : ""}<th>Clock in</th><th>Clock out</th><th>Break</th><th>Hours</th>${admin ? "<th>Correction</th><th></th>" : ""}</tr></thead><tbody>${rows.map(row => `<tr>${admin ? `<td>${esc(row.staff_members?.display_name || "Employee")}</td>` : ""}<td>${esc(stamp(row.clock_in))}</td><td>${esc(stamp(row.clock_out))}</td><td>${Number(row.break_minutes)||0} min</td><td>${hoursBetween(row).toFixed(2)}</td>${admin ? `<td>${row.adjusted_by ? esc(row.notes || "Adjusted by administrator") : "—"}</td><td><button class="mini-btn" type="button" data-shift-edit="${esc(row.id)}">Edit</button></td>` : ""}</tr>`).join("")}</tbody></table>`;
+  }
+
+  const localDateTime = value => {
+    if (!value) return "";
+    const date = new Date(value), pad = number => String(number).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+
+  function resetShiftCorrection() {
+    $("shiftCorrectionForm")?.reset();
+    $("shiftCorrectionId").value = "";
+    $("shiftCorrectionBreak").value = "0";
+    $("saveShiftCorrection").textContent = "Add Shift";
+    $("cancelShiftCorrection").classList.add("hidden");
+    $("shiftCorrectionStatus").textContent = "";
+  }
+
+  function editShift(shiftId) {
+    const row = payrollShifts.find(shift => shift.id === shiftId);
+    if (!row) return;
+    $("shiftCorrectionId").value = row.id;
+    $("shiftCorrectionEmployee").value = row.employee_id;
+    $("shiftCorrectionIn").value = localDateTime(row.clock_in);
+    $("shiftCorrectionOut").value = localDateTime(row.clock_out);
+    $("shiftCorrectionBreak").value = Number(row.break_minutes) || 0;
+    $("shiftCorrectionNote").value = row.notes || "";
+    $("saveShiftCorrection").textContent = "Save Correction";
+    $("cancelShiftCorrection").classList.remove("hidden");
+    $("shiftCorrectionForm").scrollIntoView({ behavior:"smooth", block:"center" });
+  }
+
+  async function saveShiftCorrection(event) {
+    event.preventDefault();
+    const status = $("shiftCorrectionStatus"), button = $("saveShiftCorrection");
+    const id = $("shiftCorrectionId").value;
+    const clockIn = new Date($("shiftCorrectionIn").value), clockOut = new Date($("shiftCorrectionOut").value);
+    if (!(clockOut > clockIn)) { status.textContent = "Clock-out must be later than clock-in."; return; }
+    const row = { employee_id:$("shiftCorrectionEmployee").value, clock_in:clockIn.toISOString(), clock_out:clockOut.toISOString(), break_minutes:Number($("shiftCorrectionBreak").value || 0), notes:$("shiftCorrectionNote").value.trim(), adjusted_by:currentUser.id, updated_at:new Date().toISOString() };
+    if (!row.notes) { status.textContent = "Enter a reason for the correction."; return; }
+    button.disabled = true; status.textContent = id ? "Saving correction…" : "Adding shift…";
+    const { error } = id
+      ? await db.from("employee_timesheets").update(row).eq("id", id)
+      : await db.from("employee_timesheets").insert(row);
+    if (error) status.textContent = error.message;
+    else { toast(id ? "Shift correction saved." : "Missed shift added."); resetShiftCorrection(); await loadPayrollAdmin(); }
+    button.disabled = false;
   }
 
   async function loadMyTimesheet() {
@@ -98,6 +146,9 @@
     const select = $("payrollEmployee"), selected = select.value;
     select.innerHTML = staff.map(member => `<option value="${esc(member.user_id)}">${esc(member.display_name)} · ${member.role === "sales" ? "Sales" : "Admin"}</option>`).join("");
     if (staff.some(member => member.user_id === selected)) select.value = selected;
+    const correctionSelect = $("shiftCorrectionEmployee"), correctionSelected = correctionSelect.value;
+    correctionSelect.innerHTML = staff.map(member => `<option value="${esc(member.user_id)}">${esc(member.display_name)} · ${member.role === "sales" ? "Sales" : "Admin"}</option>`).join("");
+    if (staff.some(member => member.user_id === correctionSelected)) correctionSelect.value = correctionSelected;
     syncEmployee();
     $("adminTimesheetRows").innerHTML = table(payrollShifts, true);
     $("savedPayStubs").innerHTML = stubs?.length ? `<table class="payroll-table"><thead><tr><th>Employee</th><th>Period</th><th>Hours</th><th>Gross</th><th>Net</th></tr></thead><tbody>${stubs.map(stub => `<tr><td>${esc(stub.staff_members?.display_name)}</td><td>${esc(stub.period_start)} – ${esc(stub.period_end)}</td><td>${Number(stub.regular_hours).toFixed(2)}</td><td>${cash(stub.gross_pay)}</td><td>${cash(stub.net_pay)}</td></tr>`).join("")}</tbody></table>` : '<div class="muted payroll-empty">No saved pay stubs yet.</div>';
@@ -235,6 +286,12 @@
     $("calculatePayroll")?.addEventListener("click", calculatePayroll);
     $("savePayStub")?.addEventListener("click", saveStub);
     $("printPayStub")?.addEventListener("click", printStub);
+    $("shiftCorrectionForm")?.addEventListener("submit", saveShiftCorrection);
+    $("cancelShiftCorrection")?.addEventListener("click", resetShiftCorrection);
+    $("adminTimesheetRows")?.addEventListener("click", event => {
+      const button = event.target.closest("[data-shift-edit]");
+      if (button) editShift(button.dataset.shiftEdit);
+    });
     window.loadEmployeeTimesheet = loadMyTimesheet;
     window.loadPayrollAdmin = loadPayrollAdmin;
     window.loadEmployeeAdmin = loadEmployeeAdmin;

@@ -42,14 +42,17 @@
     const list = document.getElementById("requestsList");
     if (!list) return;
     initialized = true;
-    let rows = [],
-      filter = "all",
-      loading = false;
+    let rows = [], loading = false;
     function render() {
-      const visible =
-        filter === "all"
-          ? rows
-          : rows.filter((row) => row.request_type === filter);
+      const typeFilter = document.getElementById("requestTypeFilter")?.value || "all";
+      const statusFilter = document.getElementById("requestStatusFilter")?.value || "active";
+      const visible = rows.filter((row) => {
+        if (typeFilter !== "all" && row.request_type !== typeFilter) return false;
+        const status = String(row.status || "New").toLowerCase();
+        if (statusFilter === "active") return !["completed", "cancelled"].includes(status);
+        if (statusFilter !== "all") return status === statusFilter;
+        return true;
+      });
       if (!visible.length) {
         list.innerHTML =
           '<div class="request-empty">No customer requests in this category.</div>';
@@ -63,7 +66,7 @@
               value !== null &&
               !(Array.isArray(value) && !value.length),
           );
-          return `<article class="request-card"><div class="request-main"><div class="request-title-row"><div><span class="request-type">${esc(labels[row.request_type] || row.request_type)}</span><h4>${esc(row.first_name)} ${esc(row.last_name)}</h4></div><span class="request-submitted">Submitted ${esc(fmt(row.created_at))}</span></div><div class="request-contact"><div><span>Phone</span><a href="tel:${esc(row.phone)}">${esc(row.phone)}</a></div><div><span>Email</span><a href="mailto:${esc(row.email)}">${esc(row.email)}</a></div></div><div class="request-detail-grid">${details.map(([key, value]) => `<div><span>${esc(title(key))}</span><strong>${esc(detailValue(value))}</strong></div>`).join("") || "<div><span>Details</span><strong>No additional details</strong></div>"}</div></div><div class="request-actions"><label>Status<select data-request-status="${esc(row.id)}"><option ${row.status === "New" ? "selected" : ""}>New</option><option ${row.status === "Contacted" ? "selected" : ""}>Contacted</option><option ${row.status === "In Progress" ? "selected" : ""}>In Progress</option><option ${row.status === "Completed" ? "selected" : ""}>Completed</option><option ${row.status === "Cancelled" ? "selected" : ""}>Cancelled</option></select></label><button class="mini-btn" data-save-request="${esc(row.id)}" type="button">Save</button></div></article>`;
+          return `<article class="request-card"><div class="request-main"><div class="request-title-row"><div><span class="request-type">${esc(labels[row.request_type] || row.request_type)}</span><h4>${esc(row.first_name)} ${esc(row.last_name)}</h4></div><span class="request-submitted">Submitted ${esc(fmt(row.created_at))}</span></div><div class="request-contact"><div><span>Phone</span><a href="tel:${esc(row.phone)}">${esc(row.phone)}</a></div><div><span>Email</span><a href="mailto:${esc(row.email)}">${esc(row.email)}</a></div></div><div class="request-detail-grid">${details.map(([key, value]) => `<div><span>${esc(title(key))}</span><strong>${esc(detailValue(value))}</strong></div>`).join("") || "<div><span>Details</span><strong>No additional details</strong></div>"}</div></div><div class="request-actions"><label>Status<select data-request-status="${esc(row.id)}"><option ${row.status === "New" ? "selected" : ""}>New</option><option ${row.status === "Contacted" ? "selected" : ""}>Contacted</option><option ${row.status === "In Progress" ? "selected" : ""}>In Progress</option><option ${row.status === "Completed" ? "selected" : ""}>Completed</option><option ${row.status === "Cancelled" ? "selected" : ""}>Cancelled</option></select></label><button class="mini-btn" data-save-request="${esc(row.id)}" type="button">Save</button><button class="mini-btn request-delete" data-delete-request="${esc(row.id)}" type="button">Delete request</button></div></article>`;
         })
         .join("");
       list.querySelectorAll("[data-save-request]").forEach((button) =>
@@ -86,6 +89,25 @@
           } catch (error) {
             toast("Could not update request: " + error.message);
           } finally {
+            button.disabled = false;
+          }
+        }),
+      );
+      list.querySelectorAll("[data-delete-request]").forEach((button) =>
+        button.addEventListener("click", async () => {
+          const id = button.dataset.deleteRequest;
+          const item = rows.find((row) => String(row.id) === String(id));
+          const customer = `${item?.first_name || ""} ${item?.last_name || ""}`.trim() || "this customer";
+          if (!window.confirm(`Permanently delete the request from ${customer}? This cannot be undone.`)) return;
+          button.disabled = true;
+          try {
+            const { error } = await db.from("customer_requests").delete().eq("id", id);
+            if (error) throw error;
+            rows = rows.filter((row) => String(row.id) !== String(id));
+            toast("Customer request deleted.");
+            render();
+          } catch (error) {
+            toast("Could not delete request: " + error.message);
             button.disabled = false;
           }
         }),
@@ -117,17 +139,8 @@
     document
       .getElementById("refreshRequestsBtn")
       ?.addEventListener("click", load);
-    document
-      .getElementById("requestFilters")
-      ?.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-request-filter]");
-        if (!button) return;
-        filter = button.dataset.requestFilter;
-        document
-          .querySelectorAll("[data-request-filter]")
-          .forEach((item) => item.classList.toggle("active", item === button));
-        render();
-      });
+    document.getElementById("requestTypeFilter")?.addEventListener("change", render);
+    document.getElementById("requestStatusFilter")?.addEventListener("change", render);
     window.loadCustomerRequests = load;
     if (location.hash.slice(1) === "requests") load();
   }

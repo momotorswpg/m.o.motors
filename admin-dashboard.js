@@ -1,7 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "timesheet"];
-  const adminPages = ["employees", "requests", "finance", "resources", "payroll", "settings"];
+  const adminPages = ["requests", "employees", "payroll", "finance"];
   let pages = salesPages;
   let initialized = false;
 
@@ -27,14 +27,12 @@
     const bookings = document.querySelector(".bookings-panel");
     const consents = document.querySelector(".test-drive-consent-panel");
     const tradeins = document.querySelector(".tradeins-panel");
-    const requests = ensurePanel("requests-panel", '<div class="panel-head"><div><span class="eyebrow">CUSTOMER REQUESTS</span><h3>Website leads</h3><p class="muted">Warranty, vehicle sourcing, service, vehicle sale and referral requests.</p></div><button id="refreshRequestsBtn" class="secondary-btn" type="button">Refresh Requests</button></div><div id="requestFilters" class="request-filters"><button type="button" data-request-filter="all" class="mini-btn active">All</button><button type="button" data-request-filter="warranty" class="mini-btn">Warranty</button><button type="button" data-request-filter="vehicle_sourcing" class="mini-btn">Sourcing</button><button type="button" data-request-filter="service_repair" class="mini-btn">Service</button><button type="button" data-request-filter="vehicle_disposition" class="mini-btn">Sell / Trade</button><button type="button" data-request-filter="referral" class="mini-btn">Referrals</button></div><div id="requestsList" class="requests-list"><div class="muted">Loading customer requests…</div></div>');
+    const requests = ensurePanel("requests-panel", '<div class="panel-head"><div><span class="eyebrow">CUSTOMER REQUESTS</span><h3>Website leads</h3><p class="muted">Active requests appear first. Completed and cancelled requests stay out of the way until you choose to view them.</p></div><button id="refreshRequestsBtn" class="secondary-btn" type="button">Refresh Requests</button></div><div id="requestFilters" class="request-toolbar"><label><span>Request type</span><select id="requestTypeFilter"><option value="all">All request types</option><option value="warranty">Warranty</option><option value="vehicle_sourcing">Vehicle Sourcing</option><option value="service_repair">Service & Repair</option><option value="vehicle_disposition">Sell / Trade / Consign</option><option value="referral">Referral</option></select></label><label><span>Show</span><select id="requestStatusFilter"><option value="active">Active requests</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="all">All requests</option></select></label></div><div id="requestsList" class="requests-list"><div class="muted">Loading customer requests…</div></div>');
     const billsale = document.querySelector(".bill-of-sale-panel");
     const finance = document.querySelector(".finance-panel");
-    const resources = document.querySelector(".resources-panel");
     const employees = document.querySelector(".employees-panel");
     const timesheet = document.querySelector(".timesheet-panel");
     const payroll = document.querySelector(".payroll-panel");
-    const settings = ensurePanel("settings-panel", '<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');
     const isAdmin = ["owner", "admin"].includes(window.moStaff?.role);
     pages = isAdmin ? [...salesPages, ...adminPages] : [...salesPages];
 
@@ -45,11 +43,11 @@
 
     const nav = document.createElement("nav");
     nav.className = "admin-page-nav";
-    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page[0].toUpperCase() + page.slice(1);
+    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page === "requests" ? "Website Leads" : page === "finance" ? "Payment Defaults" : page[0].toUpperCase() + page.slice(1);
     nav.innerHTML = `<div class="admin-nav-group"><span>SALES</span>${salesPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}</div>${isAdmin ? `<div class="admin-nav-group"><span>ADMIN</span>${adminPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}<a class="admin-nav-link" href="finance-admin-login.html">Finance Applications ↗</a></div>` : ""}`;
     top?.after(nav);
 
-    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],employees:[employees],timesheet:[timesheet],payroll:[payroll],settings:[settings]};
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],employees:[employees],timesheet:[timesheet],payroll:[payroll]};
     function show(page) {
       if (!pages.includes(page)) page = "dashboard";
       dashboard.style.display = page === "dashboard" ? "block" : "none";

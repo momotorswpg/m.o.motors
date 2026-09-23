@@ -231,6 +231,9 @@ drop policy if exists "Owner can read customer requests" on public.customer_requ
 drop policy if exists "Owner can update customer requests" on public.customer_requests;
 create policy "Admins can read customer requests" on public.customer_requests for select to authenticated using ((select private.is_admin()));
 create policy "Admins can update customer requests" on public.customer_requests for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+grant delete on table public.customer_requests to authenticated;
+drop policy if exists "Admins can delete customer requests" on public.customer_requests;
+create policy "Admins can delete customer requests" on public.customer_requests for delete to authenticated using ((select private.is_admin()));
 
 drop policy if exists "Authenticated users can update finance settings" on public.finance_settings;
 create policy "Admins can update finance settings" on public.finance_settings for update to authenticated

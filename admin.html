@@ -4,26 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>M.O Motors | Admin</title>
-  <link rel="stylesheet" href="admin.css?v=adminrestore1">
+  <link rel="stylesheet" href="admin.css?v=inventorymodal1">
   <link rel="stylesheet" href="featured-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="finance-settings.css?v=adminrestore1">
-  <link rel="stylesheet" href="bookings-admin.css?v=adminrestore2">
+  <link rel="stylesheet" href="bookings-admin.css?v=bookingsclean1">
   <link rel="stylesheet" href="test-drive-consent-admin.css?v=consent1">
   <link rel="stylesheet" href="tradeins-admin.css?v=adminrestore1">
-  <link rel="stylesheet" href="requests-admin.css?v=requests1">
+  <link rel="stylesheet" href="requests-admin.css?v=requestsclean1">
   <link rel="stylesheet" href="admin-dashboard.css?v=adminrestore1">
-  <link rel="stylesheet" href="resources-admin.css?v=resources1">
   <link rel="stylesheet" href="vehicle-edit-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="vehicle-edit-vin.css?v=editvin1">
   <link rel="stylesheet" href="bill-of-sale-admin.css?v=bill2">
-  <link rel="stylesheet" href="staff-payroll.css?v=staff1">
+  <link rel="stylesheet" href="staff-payroll.css?v=timeedit1">
 </head>
 <body>
   <div class="shell">
     <aside class="sidebar">
       <div class="brand admin-logo"><span class="admin-logo-crop"><img src="mo-motors-logo.png" alt="M.O Motors Certified Pre-Owned Vehicles"></span><small>ADMIN</small></div>
       <div class="sidebar-copy"><span class="eyebrow">DEALERSHIP CONTROL CENTER</span><h1>Manage your dealership.</h1><p>Inventory, customer bookings, trade-ins and finance tools in one place.</p></div>
-      <div class="sidebar-snapshot"><span class="eyebrow">WORKSPACE</span><div>Dashboard overview</div><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>Finance settings</div><div>Resources</div></div>
+      <div class="sidebar-snapshot"><span class="eyebrow">WORKSPACE</span><div>Dashboard overview</div><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>Employee and payroll tools</div></div>
       <div class="sidebar-foot"><span id="sessionEmail"></span><button id="signOutBtn" class="ghost-btn" type="button">Sign out</button></div>
     </aside>
 
@@ -43,7 +42,13 @@
 
         <section class="panel bookings-panel">
           <div class="panel-head"><div><span class="eyebrow">TEST DRIVE BOOKINGS</span><h3>Customer requests</h3><p class="muted">Review requests, appointment details and status.</p></div><button id="refreshBookingsBtn" class="secondary-btn" type="button">Refresh Bookings</button></div>
-          <div id="bookingStatusFilter" class="booking-filters"><button type="button" data-booking-filter="all" class="mini-btn active">All</button><button type="button" data-booking-filter="New" class="mini-btn">New</button><button type="button" data-booking-filter="Confirmed" class="mini-btn">Confirmed</button><button type="button" data-booking-filter="Completed" class="mini-btn">Completed</button><button type="button" data-booking-filter="Cancelled" class="mini-btn">Cancelled</button></div>
+          <div class="booking-toolbar">
+            <label class="booking-control booking-search-control"><span>Search vehicle or customer</span><input id="bookingSearch" type="search" placeholder="Name, vehicle, phone or email"></label>
+            <label class="booking-control"><span>Status</span><select id="bookingStatusSelect"><option value="all">All statuses</option><option value="New">New</option><option value="Confirmed">Confirmed</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></label>
+            <label class="booking-control"><span>Appointment</span><select id="bookingDateSelect"><option value="all">All dates</option><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="upcoming">Future</option><option value="past">Past</option></select></label>
+            <button id="clearBookingFilters" class="secondary-btn booking-clear-btn" type="button">Clear</button>
+          </div>
+          <details class="booking-more-filters"><summary>Custom date range</summary><div class="booking-date-range"><label class="booking-control"><span>From</span><input id="bookingDateFrom" type="date"></label><label class="booking-control"><span>To</span><input id="bookingDateTo" type="date"></label></div></details>
           <div id="bookingsList" class="bookings-list"><div class="muted">Loading bookings…</div></div>
         </section>
 
@@ -65,7 +70,10 @@
           <div id="tradeinsList" class="tradeins-list"><div class="muted">Loading trade-in requests…</div></div>
         </section>
 
-        <div class="layout-grid">
+        <div id="vehicleWorkflowModal" class="inventory-modal hidden" role="dialog" aria-modal="true" aria-labelledby="vehicleWorkflowTitle">
+          <div class="inventory-modal-card">
+            <div class="inventory-modal-head"><div><span class="eyebrow">INVENTORY WORKFLOW</span><h2 id="vehicleWorkflowTitle">Add vehicle and photos</h2><p class="muted">Enter the vehicle details first. Once saved, upload and arrange its photos without leaving this window.</p></div><button id="closeVehicleModalBtn" class="inventory-modal-close" type="button" aria-label="Close add vehicle form">×</button></div>
+        <div class="layout-grid inventory-workflow-grid">
           <section class="panel">
             <div class="panel-head"><div><span class="eyebrow">ADD VEHICLE</span><h3>Add a vehicle</h3></div><button id="resetFormBtn" class="link-btn" type="button">Clear</button></div>
             <form id="vehicleForm" class="form-grid">
@@ -98,8 +106,10 @@
             <div class="photo-section-head"><h4>Current photos</h4><span id="photoHelp" class="muted">No vehicle selected</span></div><div id="photoGrid" class="photo-grid empty-grid">Select a vehicle to manage its photos.</div>
           </section>
         </div>
+          </div>
+        </div>
 
-        <section class="panel inventory-panel"><div class="panel-head"><div><span class="eyebrow">INVENTORY</span><h3>Your vehicles</h3><p class="muted">Edit vehicle details, featured status, CARFAX and website information.</p></div><input id="inventorySearch" class="search-input" type="search" placeholder="Search VIN, make or model"></div><div id="inventoryList" class="inventory-list"></div></section>
+        <section class="panel inventory-panel"><div class="panel-head"><div><span class="eyebrow">INVENTORY</span><h3>Your vehicles</h3><p class="muted">Edit vehicle details, featured status, CARFAX and website information.</p></div><div class="inventory-panel-actions"><button id="openVehicleModalBtn" class="primary-btn" type="button">Add Vehicle</button><input id="inventorySearch" class="search-input" type="search" placeholder="Search VIN, make or model"></div></div><div id="inventoryList" class="inventory-list"></div></section>
 
         <section class="panel bill-of-sale-panel">
           <div class="panel-head"><div><span class="eyebrow">SALES DOCUMENTS</span><h3>Bill of sale</h3><p class="muted">Select an inventory vehicle, complete the sale details, then open the original M.O. Motors bill of sale for printing.</p></div><button id="bosReset" class="secondary-btn" type="button">Clear Form</button></div>
@@ -117,19 +127,12 @@
           <div id="bosPreviewWrap" class="bos-preview-wrap" hidden><iframe id="bosPreviewFrame" title="Bill of sale PDF preview"></iframe></div>
         </section>
 
-        <section class="panel resources-panel">
-          <div class="panel-head"><div><span class="eyebrow">TEAM RESOURCES</span><h3>Warranty plan reference</h3><p class="muted">Internal guide matching the customer-facing plan names to the original warranty brochures.</p></div></div>
-          <div class="resource-notice"><strong>Internal reference only</strong><span>Keep using the generic names with customers. Prices and availability vary by vehicle.</span></div>
-          <div class="resource-table-wrap"><table class="resource-table"><thead><tr><th>Website name</th><th>Original brochure</th></tr></thead><tbody>
-            <tr><td>Essential Powertrain</td><td>Powertrain Value Plan Protection</td></tr><tr><td>Enhanced Powertrain</td><td>Powertrain Protection</td></tr><tr><td>Everyday Mechanical</td><td>Drivers Shield</td></tr><tr><td>Flexible Comprehensive</td><td>Limited Superior Protection</td></tr><tr><td>Premier Comprehensive</td><td>Superior Protection</td></tr><tr><td>Complete Start + Long-Term Powertrain</td><td>Certified Powertrain Plus</td></tr><tr><td>MileageGuard</td><td>NTL Sierra</td></tr><tr><td>MileageGuard Premier</td><td>NTL Everest</td></tr><tr><td>EV Essential</td><td>EV Charged</td></tr><tr><td>EV Premier</td><td>EV Surge</td></tr>
-          </tbody></table></div>
-        </section>
       </div>
     </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="vendor/pdf-lib.min.js"></script>
-  <script src="admin.js?v=staff2"></script><script src="vin-lookup.js?v=adminrestore1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-settings.js?v=finance1"></script><script src="bookings-admin.js?v=adminrestore1"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requests2"></script><script src="staff-payroll.js?v=staff1"></script><script src="admin-dashboard.js?v=staff1"></script><script src="vehicle-edit-admin.js?v=editvin1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
+  <script src="admin.js?v=inventorymodal1"></script><script src="vin-lookup.js?v=adminrestore1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-settings.js?v=finance1"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=timeedit1"></script><script src="admin-dashboard.js?v=requestsclean1"></script><script src="vehicle-edit-admin.js?v=editvin1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
 </body>
 </html>

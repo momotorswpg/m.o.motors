@@ -61,7 +61,7 @@ async function showAdmin(session) {
   const snapshot = document.querySelector(".sidebar-snapshot");
   if (snapshot) snapshot.innerHTML = isSales
     ? '<span class="eyebrow">SALES WORKSPACE</span><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>My timesheet</div>'
-    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Employee accounts</div><div>Website requests</div><div>Finance applications</div><div>Payroll and timesheets</div><div>Finance settings</div><div>Resources</div>';
+    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Website requests</div><div>Employee accounts</div><div>Payroll and timesheets</div><div>Finance applications</div><div>Payment defaults</div>';
   $("authView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
   $("sessionEmail").textContent = `${member.display_name} · ${member.role === "sales" ? "Sales" : "Admin"}`;
@@ -167,6 +167,7 @@ $("vehicleForm").addEventListener("submit", async (event) => {
   selectedVehicleId = data.id;
   await loadAll();
   selectVehicle(data.id);
+  requestAnimationFrame(() => $("photoUploadPanel").scrollIntoView({ behavior: "smooth", block: "start" }));
 });
 
 $("resetFormBtn").addEventListener("click", () => {
@@ -175,6 +176,47 @@ $("resetFormBtn").addEventListener("click", () => {
   $("vehicleStatus").textContent = "";
   $("vinLookupStatus").textContent = "";
   ["transmissionCustom", "exteriorColorCustom", "interiorColorCustom"].forEach(id => $(id)?.classList.add("hidden"));
+});
+
+const vehicleWorkflowModal = $("vehicleWorkflowModal");
+
+function clearVehiclePhotoSelection() {
+  selectedVehicleId = null;
+  $("selectedVehicleLabel").textContent = "None";
+  $("uploadHint").textContent = "Add the vehicle first, then its photo uploader will become available here.";
+  $("photoInput").disabled = true;
+  $("photoInput").value = "";
+  $("photoHelp").textContent = "No vehicle selected";
+  $("photoGrid").className = "photo-grid empty-grid";
+  $("photoGrid").textContent = "Save the vehicle details to enable photo uploads.";
+}
+
+function openVehicleWorkflow(mode = "add") {
+  if (mode === "add") {
+    $("resetFormBtn").click();
+    clearVehiclePhotoSelection();
+  }
+  vehicleWorkflowModal.classList.remove("hidden");
+  document.body.classList.add("inventory-modal-open");
+  requestAnimationFrame(() => {
+    if (mode === "photos") $("photoUploadPanel").scrollIntoView({ block: "start" });
+    else $("vin").focus();
+  });
+}
+
+function closeVehicleWorkflow() {
+  vehicleWorkflowModal.classList.add("hidden");
+  document.body.classList.remove("inventory-modal-open");
+  $("openVehicleModalBtn").focus();
+}
+
+$("openVehicleModalBtn").addEventListener("click", () => openVehicleWorkflow("add"));
+$("closeVehicleModalBtn").addEventListener("click", closeVehicleWorkflow);
+vehicleWorkflowModal.addEventListener("click", event => {
+  if (event.target === vehicleWorkflowModal) closeVehicleWorkflow();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !vehicleWorkflowModal.classList.contains("hidden")) closeVehicleWorkflow();
 });
 
 $("refreshBtn").addEventListener("click", loadAll);
@@ -261,8 +303,7 @@ function renderInventory() {
 
   list.querySelectorAll("[data-select]").forEach(btn => btn.addEventListener("click", () => {
     selectVehicle(btn.dataset.select);
-    const uploadPanel = $("photoUploadPanel");
-    uploadPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    openVehicleWorkflow("photos");
   }));
 }
 
