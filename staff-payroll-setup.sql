@@ -9,6 +9,9 @@ alter table public.staff_members
   add column if not exists hourly_wage numeric(10,2) not null default 0 check (hourly_wage >= 0),
   add column if not exists updated_at timestamptz not null default now();
 
+alter table public.staff_members drop constraint if exists staff_members_role_check;
+alter table public.staff_members add constraint staff_members_role_check check (role in ('owner', 'admin', 'sales'));
+
 update public.staff_members sm
 set email = u.email
 from auth.users u

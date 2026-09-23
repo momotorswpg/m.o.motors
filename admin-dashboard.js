@@ -1,7 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "timesheet"];
-  const adminPages = ["requests", "finance", "resources", "payroll", "settings"];
+  const adminPages = ["employees", "requests", "finance", "resources", "payroll", "settings"];
   let pages = salesPages;
   let initialized = false;
 
@@ -31,6 +31,7 @@
     const billsale = document.querySelector(".bill-of-sale-panel");
     const finance = document.querySelector(".finance-panel");
     const resources = document.querySelector(".resources-panel");
+    const employees = document.querySelector(".employees-panel");
     const timesheet = document.querySelector(".timesheet-panel");
     const payroll = document.querySelector(".payroll-panel");
     const settings = ensurePanel("settings-panel", '<div class="panel-head"><div><span class="eyebrow">SETTINGS</span><h3>Dealership settings</h3><p class="muted">Manage dealership administration and website defaults.</p></div></div>');
@@ -48,7 +49,7 @@
     nav.innerHTML = `<div class="admin-nav-group"><span>SALES</span>${salesPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}</div>${isAdmin ? `<div class="admin-nav-group"><span>ADMIN</span>${adminPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}<a class="admin-nav-link" href="finance-admin-login.html">Finance Applications ↗</a></div>` : ""}`;
     top?.after(nav);
 
-    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],timesheet:[timesheet],payroll:[payroll],settings:[settings]};
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],resources:[resources],employees:[employees],timesheet:[timesheet],payroll:[payroll],settings:[settings]};
     function show(page) {
       if (!pages.includes(page)) page = "dashboard";
       dashboard.style.display = page === "dashboard" ? "block" : "none";
@@ -65,6 +66,7 @@
       if (page === "requests") window.loadCustomerRequests?.();
       if (page === "billsale") window.loadBillOfSaleVehicles?.();
       if (page === "finance") window.loadFinanceSettings?.();
+      if (page === "employees") window.loadEmployeeAdmin?.();
       if (page === "timesheet") window.loadEmployeeTimesheet?.();
       if (page === "payroll") window.loadPayrollAdmin?.();
       if (page === "dashboard") loadDashboard();

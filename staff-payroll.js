@@ -9,6 +9,7 @@
   };
   let currentUser = null;
   let staff = [];
+  let employeeDirectory = [];
   let payrollShifts = [];
   let commissions = [];
 
@@ -21,6 +22,13 @@
       <div class="clock-card"><div><span id="clockStateLabel" class="eyebrow">CURRENT STATUS</span><strong id="clockState">Checking…</strong><small id="clockStarted"></small></div><button id="clockAction" class="primary-btn" type="button" disabled>Clock In</button></div>
       <div class="panel-head compact"><div><span class="eyebrow">RECENT SHIFTS</span><h4>Your recorded time</h4></div></div><div id="myTimesheetRows" class="payroll-table-wrap"><div class="muted">Loading timesheet…</div></div>`;
     admin.appendChild(timesheet);
+
+    const employees = document.createElement("section");
+    employees.className = "panel employees-panel";
+    employees.innerHTML = `<div class="panel-head"><div><span class="eyebrow">ADMIN · EMPLOYEES</span><h3>Employee accounts</h3><p class="muted">Invite staff, control access, update email addresses and send secure password-reset links.</p></div><button id="refreshEmployees" class="secondary-btn" type="button">Refresh</button></div>
+      <form id="employeeInviteForm"><div class="employee-invite-grid"><label>Employee name<input id="inviteEmployeeName" autocomplete="name" required></label><label>Email address<input id="inviteEmployeeEmail" type="email" autocomplete="email" required></label><label>Access level<select id="inviteEmployeeRole"><option value="sales">Sales</option><option value="admin">Admin</option></select></label><label>Hourly wage<input id="inviteEmployeeWage" type="number" min="0" step="0.01" value="0"></label><button class="primary-btn" type="submit">Send Invitation</button></div><p id="employeeInviteStatus" class="status"></p></form>
+      <div class="panel-head compact"><div><span class="eyebrow">TEAM ACCESS</span><h4>Current employees</h4></div></div><div id="employeeAdminList" class="payroll-table-wrap"><div class="muted payroll-empty">Loading employees…</div></div>`;
+    admin.appendChild(employees);
 
     const payroll = document.createElement("section");
     payroll.className = "panel payroll-panel";
@@ -96,6 +104,62 @@
     calculatePayroll();
   }
 
+  async function invokeEmployeeAction(action, payload = {}) {
+    const { data, error } = await db.functions.invoke("staff-user-admin", { body:{ action, ...payload } });
+    if (error) {
+      let message = data?.error || error.message;
+      try { message = (await error.context?.json())?.error || message; } catch {}
+      throw new Error(message);
+    }
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
+  function renderEmployees(rows) {
+    const currentId = currentUser?.id;
+    $("employeeAdminList").innerHTML = rows.length ? rows.map(member => {
+      const self = member.user_id === currentId, owner = member.role === "owner";
+      return `<article class="employee-editor" data-employee="${esc(member.user_id)}"><label>Name<input data-field="display_name" value="${esc(member.display_name)}"></label><label>Email<input data-field="email" type="email" value="${esc(member.email || "")}"></label><label>Access<select data-field="role" ${owner ? "disabled" : ""}><option value="sales" ${member.role === "sales" ? "selected" : ""}>Sales</option><option value="admin" ${member.role !== "sales" ? "selected" : ""}>Admin</option></select></label><label>Hourly wage<input data-field="hourly_wage" type="number" min="0" step="0.01" value="${Number(member.hourly_wage || 0).toFixed(2)}"></label><div class="employee-actions"><span class="employee-state ${member.active ? "" : "inactive"}">${member.active ? "Active" : "Inactive"}</span><button class="mini-btn" type="button" data-employee-save>Save</button><button class="mini-btn" type="button" data-employee-reset>Reset Password</button><button class="mini-btn ${member.active ? "danger" : ""}" type="button" data-employee-toggle ${self ? "disabled title=\"You cannot deactivate your own account\"" : ""}>${member.active ? "Deactivate" : "Reactivate"}</button></div></article>`;
+    }).join("") : '<div class="muted payroll-empty">No employee accounts found.</div>';
+  }
+
+  async function loadEmployeeAdmin() {
+    if (!["owner","admin"].includes(window.moStaff?.role)) return;
+    const { data, error } = await db.from("staff_members").select("user_id,display_name,email,role,active,hourly_wage").order("display_name");
+    if (error) { $("employeeAdminList").innerHTML = `<div class="muted payroll-empty">${esc(error.message)}</div>`; return; }
+    employeeDirectory = data || [];
+    renderEmployees(employeeDirectory);
+  }
+
+  async function inviteEmployee(event) {
+    event.preventDefault();
+    const status = $("employeeInviteStatus"), button = event.currentTarget.querySelector("button[type=submit]");
+    status.textContent = "Sending secure invitation…"; button.disabled = true;
+    try {
+      const result = await invokeEmployeeAction("invite", { display_name:$("inviteEmployeeName").value.trim(), email:$("inviteEmployeeEmail").value.trim(), role:$("inviteEmployeeRole").value, hourly_wage:Number($("inviteEmployeeWage").value || 0) });
+      status.textContent = result.message; event.currentTarget.reset(); $("inviteEmployeeRole").value = "sales"; $("inviteEmployeeWage").value = "0"; await loadEmployeeAdmin(); await loadPayrollAdmin();
+    } catch (error) { status.textContent = error.message; } finally { button.disabled = false; }
+  }
+
+  async function employeeListAction(event) {
+    const button = event.target.closest("button"), card = event.target.closest("[data-employee]");
+    if (!button || !card) return;
+    const member = employeeDirectory.find(item => item.user_id === card.dataset.employee);
+    if (!member) return;
+    button.disabled = true;
+    try {
+      if (button.hasAttribute("data-employee-reset")) {
+        const result = await invokeEmployeeAction("reset_password", { user_id:member.user_id });
+        toast(result.message);
+      } else {
+        const active = button.hasAttribute("data-employee-toggle") ? !member.active : member.active;
+        if (button.hasAttribute("data-employee-toggle") && member.active && !confirm(`Deactivate ${member.display_name}? They will no longer be able to sign in.`)) return;
+        const result = await invokeEmployeeAction("update", { user_id:member.user_id, display_name:card.querySelector('[data-field="display_name"]').value.trim(), email:card.querySelector('[data-field="email"]').value.trim(), role:card.querySelector('[data-field="role"]').value, hourly_wage:Number(card.querySelector('[data-field="hourly_wage"]').value || 0), active });
+        toast(result.message); await loadEmployeeAdmin(); await loadPayrollAdmin();
+      }
+    } catch (error) { toast("Employee update failed: " + error.message); } finally { button.disabled = false; }
+  }
+
   function syncEmployee() {
     const member = staff.find(item => item.user_id === $("payrollEmployee").value);
     $("payrollWage").value = member?.hourly_wage ?? 0;
@@ -161,6 +225,9 @@
     $("clockAction")?.addEventListener("click", clockAction);
     $("refreshTimesheet")?.addEventListener("click", loadMyTimesheet);
     $("refreshPayroll")?.addEventListener("click", loadPayrollAdmin);
+    $("refreshEmployees")?.addEventListener("click", loadEmployeeAdmin);
+    $("employeeInviteForm")?.addEventListener("submit", inviteEmployee);
+    $("employeeAdminList")?.addEventListener("click", employeeListAction);
     $("payrollEmployee")?.addEventListener("change", () => { syncEmployee(); calculatePayroll(); });
     ["payPeriodStart","payPeriodEnd","payOtherEarnings","payDeductions"].forEach(id => $(id)?.addEventListener("input", calculatePayroll));
     $("savePayrollWage")?.addEventListener("click", saveWage);
@@ -170,6 +237,7 @@
     $("printPayStub")?.addEventListener("click", printStub);
     window.loadEmployeeTimesheet = loadMyTimesheet;
     window.loadPayrollAdmin = loadPayrollAdmin;
+    window.loadEmployeeAdmin = loadEmployeeAdmin;
   }
 
   window.addEventListener("mostaffready", init, { once:true });

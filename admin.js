@@ -61,7 +61,7 @@ async function showAdmin(session) {
   const snapshot = document.querySelector(".sidebar-snapshot");
   if (snapshot) snapshot.innerHTML = isSales
     ? '<span class="eyebrow">SALES WORKSPACE</span><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>My timesheet</div>'
-    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Website requests</div><div>Finance applications</div><div>Payroll and timesheets</div><div>Finance settings</div><div>Resources</div>';
+    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Employee accounts</div><div>Website requests</div><div>Finance applications</div><div>Payroll and timesheets</div><div>Finance settings</div><div>Resources</div>';
   $("authView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
   $("sessionEmail").textContent = `${member.display_name} · ${member.role === "sales" ? "Sales" : "Admin"}`;
