@@ -1,7 +1,7 @@
 (()=>{
   let bound=false;
   const $=id=>document.getElementById(id);
-  const defaults={apr:8.99,term_months:84,down_payment:0,financing_fee:1000,payment_frequency:'biweekly'};
+  const defaults=MOMotorsFinance.DEFAULTS;
   const getForm=()=>$('financeSettingsForm');
   const getStatus=()=>$('financeSettingsStatus');
 
@@ -9,15 +9,13 @@
     if(!getForm()||typeof db==='undefined')return;
     const status=getStatus();
     if(status)status.textContent='Loading current settings…';
-    const {data,error}=await db.from('finance_settings').select('*').eq('id',1).maybeSingle();
-    if(error){console.error(error);if(status)status.textContent='Could not load finance settings: '+error.message;return}
-    const settings={...defaults,...(data||{})};
+    const settings=await MOMotorsFinance.load({fresh:true});
     $('financeApr').value=settings.apr;
     $('financeTerm').value=settings.term_months;
     $('financeDown').value=settings.down_payment;
     $('financeFee').value=settings.financing_fee;
     $('financeFrequency').value=settings.payment_frequency;
-    if(status)status.textContent=data?'':'Using defaults. Save to create the finance settings row.';
+    if(status)status.textContent='';
   }
 
   function bind(){

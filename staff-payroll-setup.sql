@@ -75,28 +75,11 @@ language plpgsql
 set search_path = ''
 as $$
 begin
-  if (select private.is_admin()) then
+  if current_user = 'service_role' or (select private.is_admin()) then
     new.updated_at := now();
     return new;
   end if;
-  if tg_op = 'INSERT' then
-    new.employee_id := (select auth.uid());
-    new.clock_in := now();
-    new.clock_out := null;
-    new.break_minutes := 0;
-    new.adjusted_by := null;
-  elsif old.employee_id <> (select auth.uid()) or old.clock_out is not null or new.clock_out is null then
-    raise exception 'Employees may only clock out their own open shift';
-  else
-    new.employee_id := old.employee_id;
-    new.clock_in := old.clock_in;
-    new.clock_out := now();
-    new.break_minutes := old.break_minutes;
-    new.notes := old.notes;
-    new.adjusted_by := null;
-  end if;
-  new.updated_at := now();
-  return new;
+  raise exception 'Clock actions must use an approved office device';
 end;
 $$;
 
@@ -161,16 +144,19 @@ create policy "Admins insert staff memberships" on public.staff_members for inse
 create policy "Admins update staff memberships" on public.staff_members for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
 create policy "Admins delete staff memberships" on public.staff_members for delete to authenticated using ((select private.is_admin()));
 
+drop policy if exists "Employees read own timesheets" on public.employee_timesheets;
+drop policy if exists "Employees clock themselves in" on public.employee_timesheets;
+drop policy if exists "Employees clock themselves out" on public.employee_timesheets;
+drop policy if exists "Admins insert timesheets" on public.employee_timesheets;
+drop policy if exists "Admins update timesheets" on public.employee_timesheets;
+drop policy if exists "Admins delete timesheets" on public.employee_timesheets;
 create policy "Employees read own timesheets" on public.employee_timesheets
 for select to authenticated
 using (employee_id = (select auth.uid()) or (select private.is_admin()));
-create policy "Employees clock themselves in" on public.employee_timesheets
-for insert to authenticated
-with check (employee_id = (select auth.uid()) or (select private.is_admin()));
-create policy "Employees clock themselves out" on public.employee_timesheets
-for update to authenticated
-using (employee_id = (select auth.uid()) or (select private.is_admin()))
-with check (employee_id = (select auth.uid()) or (select private.is_admin()));
+create policy "Admins insert timesheets" on public.employee_timesheets
+for insert to authenticated with check ((select private.is_admin()));
+create policy "Admins update timesheets" on public.employee_timesheets
+for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
 create policy "Admins delete timesheets" on public.employee_timesheets
 for delete to authenticated using ((select private.is_admin()));
 

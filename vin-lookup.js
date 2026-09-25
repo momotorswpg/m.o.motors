@@ -4,7 +4,7 @@
   const button = $("vinLookupBtn");
   const status = $("vinLookupStatus");
   if (!vin || !button || !status) return;
-  const set = (id, value) => { const input = $(id); if (input && value != null && String(value).trim()) input.value = String(value).trim(); };
+  const set = (id, value) => { const input = $(id); if (!input || value == null || !String(value).trim()) return; const normalizers={make:MOMotorsVehicleData.make,model:MOMotorsVehicleData.model,bodyStyle:MOMotorsVehicleData.body,drivetrain:MOMotorsVehicleData.drivetrain,fuelType:MOMotorsVehicleData.fuel}; const normalized=String((normalizers[id]||String)(value)).trim(); if(input.tagName==="SELECT"&&!([...input.options].some(option=>option.value===normalized)))return; input.value=normalized; };
   async function lookup() {
     const value = vin.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     vin.value = value;

@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="vehicle-edit-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="vehicle-edit-vin.css?v=editvin1">
   <link rel="stylesheet" href="bill-of-sale-admin.css?v=bill2">
-  <link rel="stylesheet" href="staff-payroll.css?v=timeedit1">
+  <link rel="stylesheet" href="staff-payroll.css?v=deviceclock2">
 </head>
 <body>
   <div class="shell">
@@ -37,7 +37,7 @@
 
         <section class="panel finance-panel">
           <div class="panel-head"><div><span class="eyebrow">CENTRAL FINANCE SETTINGS</span><h3>Estimated payment defaults</h3></div></div>
-          <form id="financeSettingsForm"><div class="finance-settings-grid"><label>APR (%)<input id="financeApr" type="number" min="0" max="99.99" step="0.01" required value="8.99"></label><label>Term (months)<input id="financeTerm" type="number" min="1" max="120" step="1" required value="84"></label><label>Down payment (CAD)<input id="financeDown" type="number" min="0" step="1" required value="0"></label><label>Financing fee (CAD)<input id="financeFee" type="number" min="0" step="1" required value="1000"></label><label>Payment frequency<select id="financeFrequency" required><option value="weekly">Weekly</option><option value="biweekly" selected>Bi-weekly</option><option value="monthly">Monthly</option></select></label></div><p class="finance-note">These defaults are used to calculate estimated payments across M.O Motors. Financing fees are included in the estimated amount financed.</p><div class="form-actions"><button class="primary-btn" type="submit">Save Finance Settings</button><p id="financeSettingsStatus" class="status"></p></div></form>
+          <form id="financeSettingsForm"><div class="finance-settings-grid"><label>APR (%)<input id="financeApr" type="number" min="0" max="99.99" step="0.01" required value="8.99"></label><label>Term (months)<input id="financeTerm" type="number" min="1" max="120" step="1" required value="84"></label><label>Down payment (CAD)<input id="financeDown" type="number" min="0" step="1" required value="0"></label><label>Financing fee (CAD)<input id="financeFee" type="number" min="0" step="1" required value="699"></label><label>Payment frequency<select id="financeFrequency" required><option value="weekly">Weekly</option><option value="biweekly" selected>Bi-weekly</option><option value="monthly">Monthly</option></select></label></div><p class="finance-note">These defaults are used to calculate estimated payments across M.O Motors. Financing fees are included in the estimated amount financed.</p><div class="form-actions"><button class="primary-btn" type="submit">Save Finance Settings</button><p id="financeSettingsStatus" class="status"></p></div></form>
         </section>
 
         <section class="panel bookings-panel">
@@ -81,11 +81,11 @@
               <p id="vinLookupStatus" class="status wide"></p>
               <label>Status<select id="status" name="status"><option>Available</option><option>Sold</option><option>Pending</option><option>Hold</option></select></label>
               <label>Year<input id="year" name="year" type="number" min="1980" max="2100" required></label>
-              <label>Make<input id="make" name="make" required></label><label>Model<input id="model" name="model" required></label>
-              <label>Trim<input id="trim" name="trim"></label><label>Body Style<input id="bodyStyle" name="bodyStyle"></label>
+              <label>Make<input id="make" name="make" list="vehicleMakes" required><datalist id="vehicleMakes"><option value="Chevrolet"><option value="Dodge"><option value="Ford"><option value="GMC"><option value="Honda"><option value="Hyundai"><option value="Jeep"><option value="Kia"><option value="Mazda"><option value="Mitsubishi"><option value="Nissan"><option value="Subaru"><option value="Toyota"><option value="Volkswagen"></datalist></label><label>Model<input id="model" name="model" required></label>
+              <label>Trim<input id="trim" name="trim"></label><label>Body Style<select id="bodyStyle" name="bodyStyle"><option value="">Select body style</option><option>Sedan</option><option>SUV</option><option>Hatchback</option><option>Minivan</option><option>Truck</option><option>Coupe</option><option>Convertible</option><option>Wagon</option></select></label>
               <label>Transmission<select id="transmission" name="transmission"><option value="">Select transmission</option><option>Automatic</option><option>Manual</option><option>CVT</option><option>Automated Manual</option><option>Other</option></select><input id="transmissionCustom" name="transmissionCustom" type="text" placeholder="Enter custom transmission" class="hidden"></label>
-              <label>Drivetrain<input id="drivetrain" name="drivetrain"></label><label>Engine Cylinders<input id="engineCylinders" name="engineCylinders" type="number" min="1"></label>
-              <label>Engine Size<input id="engineSize" name="engineSize" type="text" inputmode="decimal" placeholder="e.g. 1.4L"></label><label>Fuel Type<input id="fuelType" name="fuelType"></label>
+              <label>Drivetrain<select id="drivetrain" name="drivetrain"><option value="">Select drivetrain</option><option>FWD</option><option>RWD</option><option>AWD</option><option>4x4</option></select></label><label>Engine Cylinders<input id="engineCylinders" name="engineCylinders" type="number" min="1"></label>
+              <label>Engine Size<input id="engineSize" name="engineSize" type="text" inputmode="decimal" placeholder="e.g. 1.4L"></label><label>Fuel Type<select id="fuelType" name="fuelType"><option value="">Select fuel type</option><option>Gasoline</option><option>Diesel</option><option>Hybrid</option><option>Plug-in Hybrid</option><option>Electric</option></select></label>
               <label>Doors<input id="doors" name="doors" type="number" min="1"></label><label>Passengers<input id="passengers" name="passengers" type="number" min="1"></label>
               <label>Mileage (km)<input id="mileage" name="mileage" type="number" min="0" required></label>
               <label>Exterior Colour<select id="exteriorColor" name="exteriorColor"><option value="">Select colour</option><option>Black</option><option>White</option><option>Silver</option><option>Grey</option><option>Red</option><option>Blue</option><option>Brown</option><option>Beige</option><option>Tan</option><option>Green</option><option>Orange</option><option>Yellow</option><option>Gold</option><option>Maroon</option><option>Purple</option><option>Bronze</option><option>Other</option></select><input id="exteriorColorCustom" name="exteriorColorCustom" type="text" placeholder="Enter custom exterior colour" class="hidden"></label>
@@ -133,6 +133,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="vendor/pdf-lib.min.js"></script>
-  <script src="admin.js?v=inventorymodal1"></script><script src="vin-lookup.js?v=adminrestore1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-settings.js?v=finance1"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=timeedit1"></script><script src="admin-dashboard.js?v=requestsclean1"></script><script src="vehicle-edit-admin.js?v=editvin1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
+  <script src="vehicle-normalize.js?v=1"></script><script src="admin.js?v=inventorymodal2"></script><script src="vin-lookup.js?v=standardize1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-config.js?v=1"></script><script src="finance-settings.js?v=finance2"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=deviceclock2"></script><script src="admin-dashboard.js?v=requestsclean1"></script><script src="vehicle-edit-admin.js?v=standardize1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
 </body>
 </html>

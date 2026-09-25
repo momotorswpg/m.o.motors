@@ -1,4 +1,9 @@
 (()=>{
+  if (!document.querySelector('script[src^="seo.js"]')) {
+    const seo = document.createElement('script');
+    seo.src = 'seo.js?v=1';
+    document.head.appendChild(seo);
+  }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
   const dealerMapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(dealerAddress);
   function syncDealerAddress(root=document){

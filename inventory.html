@@ -1,9 +1,51 @@
 <!doctype html>
 <html lang="en">
-<head><link rel="icon" type="image/png" href="mo-motors-logo.png"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Inventory | M.O Motors</title><link rel="stylesheet" href="styles.css?v=payment-color1"><link rel="stylesheet" href="finance-dropdown.css"></head>
+<head>
+  <link rel="icon" type="image/png" href="mo-motors-logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Inventory | M.O Motors</title>
+  <link rel="stylesheet" href="styles.css?v=inventory5">
+  <link rel="stylesheet" href="finance-dropdown.css">
+</head>
 <body>
   <header class="site-header"><div class="main-nav"><a class="brand brand-wordmark" href="index.html" aria-label="M.O Motors home"><span class="brand-name"><span class="brand-name-accent">M.O.</span><span class="brand-name-main">MOTORS</span></span><span class="brand-tagline">QUALITY PRE-OWNED VEHICLES</span></a><button class="menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false">☰</button><nav id="nav" class="page-nav"></nav></div></header>
-  <main><section class="section inventory-page"><p class="eyebrow red">M.O MOTORS INVENTORY</p><h1 class="page-title">Find your next vehicle.</h1><div class="inventory-toolbar"><input id="inventorySearch" type="search" placeholder="Search make or model"><select id="makeFilter"><option value="">All Makes</option></select><select id="sortInventory"><option value="newest">Newest</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="year-new">Year: Newest</option></select></div><p id="inventoryCount" class="muted-copy"></p><div id="inventoryGrid" class="inventory-grid"><div class="inventory-loading">Loading inventory…</div></div></section></main>
-  <script src="inventory.js?v=finance1"></script><script src="mobile-vehicle-swipe.js?v=swipe3"></script><script src="test-drive-modal.js"></script><script src="site-nav.js"></script>
+  <main>
+    <section class="section inventory-page">
+      <p class="eyebrow red">M.O MOTORS INVENTORY</p>
+      <h1 class="page-title">Find your next vehicle.</h1>
+
+      <div class="inventory-results-bar">
+        <div><strong id="inventoryCount">Loading inventory…</strong><span>for your search</span></div>
+        <button id="openInventoryFilters" class="mobile-filter-button" type="button" aria-controls="inventoryFilterPanel" aria-expanded="false"><span class="filter-sliders">☷</span> Filters <b id="activeFilterCount" hidden>0</b></button>
+        <label class="inventory-sort"><span>Sort</span><select id="sortInventory"><option value="newest">Newest arrivals</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="year-new">Year: Newest</option><option value="mileage-low">Mileage: Low to High</option></select></label>
+      </div>
+      <div id="activeFilterChips" class="active-filter-chips" aria-live="polite"></div>
+
+      <div class="inventory-content-layout">
+        <aside id="inventoryFilterPanel" class="inventory-filter-panel" aria-label="Inventory filters">
+          <div class="inventory-filter-head"><strong>Filters</strong><button id="closeInventoryFilters" type="button" aria-label="Close filters">×</button></div>
+          <button id="clearInventoryFilters" class="inventory-clear" type="button">Clear all</button>
+          <label class="inventory-search-field"><span>Search</span><input id="inventorySearch" type="search" placeholder="Make, model or year"></label>
+          <details open><summary>Make and model</summary><div class="filter-group"><label><span>Make</span><select id="makeFilter"><option value="">All makes</option></select></label><label><span>Model</span><select id="modelFilter"><option value="">All models</option></select></label></div></details>
+          <details><summary>Price and year</summary><div class="filter-group"><label><span>Price</span><select id="priceFilter"><option value="">Any price</option><option value="under-10000">Under $10,000</option><option value="10000-15000">$10,000–$14,999</option><option value="15000-25000">$15,000–$24,999</option><option value="25000-plus">$25,000+</option></select></label><label><span>Year from</span><select id="yearMinFilter"><option value="">Any year</option></select></label><label><span>Year to</span><select id="yearMaxFilter"><option value="">Any year</option></select></label></div></details>
+          <details><summary>Vehicle details</summary><div class="filter-group"><label><span>Max mileage</span><select id="mileageFilter"><option value="">Any mileage</option><option value="100000">100,000 km</option><option value="150000">150,000 km</option><option value="200000">200,000 km</option><option value="250000">250,000 km</option></select></label><label><span>Body style</span><select id="bodyFilter"><option value="">All body styles</option></select></label><label><span>Drivetrain</span><select id="driveFilter"><option value="">All drivetrains</option></select></label><label><span>Fuel type</span><select id="fuelFilter"><option value="">All fuel types</option></select></label></div></details>
+          <details><summary>Availability</summary><div class="filter-group"><label><span>Vehicle status</span><select id="stockFilter"><option value="available">Available only</option><option value="all">Available + sold</option></select></label></div></details>
+          <button id="applyInventoryFilters" class="btn btn-primary inventory-apply" type="button">Show vehicles</button>
+        </aside>
+        <button id="inventoryFilterBackdrop" class="inventory-filter-backdrop" type="button" aria-label="Close filters" tabindex="-1"></button>
+
+        <div class="inventory-results">
+          <div id="inventoryGrid" class="inventory-grid"><div class="inventory-loading">Loading available inventory…</div></div>
+          <details id="recentlySoldSection" class="recently-sold">
+            <summary><span><strong>Recently Sold</strong><small id="soldCount">View our recently sold vehicles</small></span><span class="sold-toggle">Show</span></summary>
+            <div id="soldInventoryGrid" class="inventory-grid sold-inventory-grid"></div>
+            <div class="sold-load-wrap"><button id="loadMoreSold" class="btn detail-outline" type="button" hidden>Load more sold vehicles</button></div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="seo.js?v=1"></script><script src="finance-config.js?v=1"></script><script src="vehicle-images.js?v=1"></script><script src="inventory.js?v=inventory3"></script><script src="mobile-vehicle-swipe.js?v=swipe3"></script><script src="test-drive-modal.js"></script><script src="site-nav.js"></script>
 </body>
 </html>

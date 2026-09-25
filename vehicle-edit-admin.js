@@ -5,11 +5,11 @@
   if (!list) return;
 
   const fields = [
-    ["VIN","VIN","vin"],["Year","Year","number"],["Make","Make","text"],["Model","Model","text"],["Trim","Trim","text"],
+    ["VIN","VIN","vin"],["Year","Year","number"],["Make","Make","customselect:Chevrolet,Dodge,Ford,GMC,Honda,Hyundai,Jeep,Kia,Mazda,Mitsubishi,Nissan,Subaru,Toyota,Volkswagen"],["Model","Model","text"],["Trim","Trim","text"],
     ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
-    ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","text"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
-    ["Drivetrain","Drivetrain","text"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
-    ["Doors","Doors","number"],["FuelType","Fuel Type","text"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
+    ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","customselect:Sedan,SUV,Hatchback,Minivan,Truck,Coupe,Convertible,Wagon"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
+    ["Drivetrain","Drivetrain","customselect:FWD,RWD,AWD,4x4"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
+    ["Doors","Doors","number"],["FuelType","Fuel Type","customselect:Gasoline,Diesel,Hybrid,Plug-in Hybrid,Electric"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
   ];
 
   function esc(v="") { return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
@@ -55,7 +55,8 @@
     if (value == null || !String(value).trim()) return;
     const input = form.elements[name];
     if (!input) return;
-    const cleaned = String(value).trim();
+    const normalizers={Make:MOMotorsVehicleData.make,Model:MOMotorsVehicleData.model,BodyStyle:MOMotorsVehicleData.body,Drivetrain:MOMotorsVehicleData.drivetrain,FuelType:MOMotorsVehicleData.fuel};
+    const cleaned=(normalizers[name]||String)(value).trim();
     if (input.tagName === "SELECT") {
       const matching = [...input.options].find(option => option.value.toLowerCase() === cleaned.toLowerCase());
       if (matching) input.value = matching.value;
@@ -121,6 +122,7 @@
       if (t === "engine" && value !== "") value = /^\d+(?:\.\d+)?$/i.test(value.trim()) ? `${value.trim()}L` : value.trim();
       row[f] = value === "" ? null : value;
     });
+    row.Make=MOMotorsVehicleData.make(row.Make);row.Model=MOMotorsVehicleData.model(row.Model);row.BodyStyle=MOMotorsVehicleData.body(row.BodyStyle)||null;row.Drivetrain=MOMotorsVehicleData.drivetrain(row.Drivetrain)||null;row.FuelType=MOMotorsVehicleData.fuel(row.FuelType)||null;
     status.textContent = "Saving…";
     const { error } = await db.from("Vehicles").update(row).eq("id", currentId);
     if (error) { status.textContent = error.message; return; }

@@ -1,22 +1,19 @@
 (()=>{
-  const URL="https://dpsgtliddmdvfwjahkkq.supabase.co",KEY="sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
-  const defaults={apr:8.99,term_months:84,down_payment:0,financing_fee:1000,payment_frequency:"biweekly"};
+  const defaults=MOMotorsFinance.DEFAULTS;
   const money=n=>new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD",minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.max(0,Number(n)||0));
   const frequencyValue=value=>value==="weekly"?52:value==="monthly"?12:26;
   let settings=defaults,boundPanel=null;
 
   async function loadSettings(){
-    try{
-      const response=await fetch(`${URL}/rest/v1/finance_settings?select=*&id=eq.1`,{headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}});
-      if(!response.ok)throw new Error(await response.text());
-      settings={...defaults,...((await response.json())[0]||{})};
-    }catch(error){console.warn("Using default finance settings",error)}
+    settings=await MOMotorsFinance.load();
     apply();
   }
 
   function apply(){
     const root=document.getElementById("vehicleDetail"),panel=document.getElementById("purchaseOptions"),priceText=root?.querySelector(".detail-price strong")?.textContent;
     if(!root||!panel||!priceText)return;
+    const vehicleId=new URLSearchParams(location.search).get("id"),purchaseLink=panel.querySelector("#poCta");
+    if(vehicleId&&purchaseLink&&purchaseLink.getAttribute("href")?.startsWith("pre-approval.html"))purchaseLink.href=`pre-approval.html?vehicle=${encodeURIComponent(vehicleId)}`;
     const listedPrice=Number(priceText.replace(/[^0-9.]/g,""))||0;
     const $=id=>panel.querySelector("#"+id);
     if(!$("poDown")||!$("poRate")||!$("poTerm")||!$("poFreq"))return;
@@ -62,11 +59,12 @@
       const cashMode=panel.querySelector('[data-mode="cash"]')?.classList.contains("active");
       const enteredPrice=Number(priceInput?.value),vehiclePrice=Number.isFinite(enteredPrice)&&enteredPrice>=0?enteredPrice:listedPrice;
       const down=Math.max(0,+$("poDown").value||0),trade=Math.max(0,+$("poTrade").value||0),rate=Math.max(0,+$("poRate").value||0),months=+$("poTerm").value||84,periods=+$("poFreq").value||26,withTax=$("poTax").value==="yes",warranty=Math.max(0,+warrantyInput.value||0);
-      const gst=withTax?(vehiclePrice+warranty)*.05:0,pst=withTax?(vehiclePrice+warranty)*.07:0,fee=cashMode?0:Math.max(0,+feeInput.value||0),principal=Math.max(0,vehiclePrice+warranty+gst+pst+fee-down-trade),periodicRate=rate/100/periods,payments=months/12*periods,payment=periodicRate?principal*periodicRate/(1-Math.pow(1+periodicRate,-payments)):principal/payments;
+      const custom=MOMotorsFinance.normalize({...settings,apr:rate,term_months:months,financing_fee:Math.max(0,+feeInput.value||0),payment_frequency:periods===52?"weekly":periods===12?"monthly":"biweekly"}),result=MOMotorsFinance.calculate({price:vehiclePrice,warranty,down,trade,includeTax:withTax,includeFee:!cashMode,settings:custom}),gst=withTax?(vehiclePrice+warranty)*.05:0,pst=withTax?(vehiclePrice+warranty)*.07:0,fee=result.fee,principal=result.principal,payment=result.payment;
       feeRow.hidden=cashMode;feeRow.style.display=cashMode?"none":"";
       $("poPrice").textContent=money(vehiclePrice);$("poGst").textContent=money(gst);$("poPst").textContent=money(pst);$("poWarrantyOut").textContent=money(warranty);$("poFee").textContent=money(fee);$("poDownOut").textContent="− "+money(down);$("poTradeOut").textContent="− "+money(trade);$("poPayment").textContent=cashMode?money(principal):money(payment);$("poFrequencyLabel").textContent=cashMode?"before any applicable registration or third-party charges":periods===52?"weekly":periods===12?"monthly":"bi-weekly";$("poFinanced").textContent=money(principal);
       if(cashMode)$("poDisclaimer").textContent="Cash estimate includes the optional warranty and estimated GST/PST when selected. Actual warranty availability, taxes and final price require confirmation.";
       if(!cashMode){
+        if(vehicleId&&purchaseLink)purchaseLink.href=`pre-approval.html?vehicle=${encodeURIComponent(vehicleId)}`;
         const topPayment=root.querySelector(".detail-price span");
         if(topPayment)topPayment.innerHTML=`or <b>${money(payment)}</b> ${periods===52?"weekly":periods===12?"monthly":"bi-weekly"}`;
         $("poDisclaimer").textContent=`Estimate includes optional warranty, GST/PST when selected, and a ${money(fee)} financing fee. Actual warranty availability, taxes and financing terms require confirmation and lender approval. OAC.`;

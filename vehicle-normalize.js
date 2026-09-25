@@ -1,0 +1,9 @@
+(() => {
+  const clean=value=>String(value??"").trim().replace(/\s+/g," ");
+  const make=value=>{const raw=clean(value),key=raw.toLowerCase(),known={ford:"Ford",jeep:"Jeep",nissan:"Nissan",dodge:"Dodge",doge:"Dodge",kia:"Kia",hyundai:"Hyundai",toyota:"Toyota",chevrolet:"Chevrolet",mitsubishi:"Mitsubishi",gmc:"GMC",honda:"Honda",mazda:"Mazda",subaru:"Subaru",volkswagen:"Volkswagen",buick:"Buick",chrysler:"Chrysler"};return known[key]||raw.replace(/\b\w/g,letter=>letter.toUpperCase())};
+  const model=value=>clean(value).replace(/^Rouge\b/i,"Rogue").replace(/^Tuscon\b/i,"Tucson");
+  const body=value=>{const raw=clean(value),key=raw.toLowerCase();if(key.includes("sport utility")||key==="suv")return "SUV";if(key.includes("minivan"))return "Minivan";if(key.includes("pickup")||key.includes("truck"))return "Truck";if(key.includes("hatchback"))return "Hatchback";if(key.includes("wagon"))return "Wagon";if(key.includes("coupe"))return "Coupe";if(key.includes("convertible"))return "Convertible";if(key.includes("sedan")||key.includes("passenger car"))return "Sedan";return raw};
+  const drivetrain=value=>{const raw=clean(value),key=raw.toLowerCase();if(key.includes("4wd")||key.includes("4-wheel")||key==="4x4")return "4x4";if(key.includes("all-wheel")||key==="awd")return "AWD";if(key.includes("front-wheel")||key==="fwd")return "FWD";if(key.includes("rear-wheel")||key==="rwd")return "RWD";return raw};
+  const fuel=value=>{const raw=clean(value),key=raw.toLowerCase();if(key.includes("gas"))return "Gasoline";if(key.includes("diesel"))return "Diesel";if(key.includes("electric")&&key.includes("hybrid"))return "Plug-in Hybrid";if(key.includes("hybrid"))return "Hybrid";if(key.includes("electric"))return "Electric";return raw};
+  window.MOMotorsVehicleData={make,model,body,drivetrain,fuel};
+})();

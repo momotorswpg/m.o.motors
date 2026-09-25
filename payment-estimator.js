@@ -1,20 +1,19 @@
-(()=>{
-  const URL="https://dpsgtliddmdvfwjahkkq.supabase.co",KEY="sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
-  const defaults={apr:8.99,term_months:84,down_payment:0,financing_fee:1000,payment_frequency:"biweekly"};
+(() => {
   const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
-  let settings=defaults;
-  const frequencyValue=value=>value==="weekly"?52:value==="monthly"?12:26;
+  let settings=MOMotorsFinance.normalize();
+  const frequencyValue=value=>MOMotorsFinance.frequency(value).periods;
+  const frequencyName=periods=>periods===52?"weekly":periods===12?"monthly":"biweekly";
 
   function calculate(){
-    const price=Math.max(0,+$('price').value||0),down=Math.max(0,+$('down').value||0),trade=Math.max(0,+$('trade').value||0),rate=Math.max(0,+$('rate').value||0),months=+$('term').value||84,frequency=+$('frequency').value||26,taxRate=$('tax').value==='yes'?.12:0,fee=Math.max(0,+$('financingFee').value||0),warranty=Math.max(0,+$('warranty').value||0);
-    const principal=Math.max(0,(price+warranty)*(1+taxRate)+fee-down-trade),payments=months/12*frequency,periodicRate=rate/100/frequency,payment=periodicRate?principal*periodicRate/(1-Math.pow(1+periodicRate,-payments)):principal/payments,total=payment*payments;
-    $('financed').textContent=fmt(principal);$('payment').textContent=fmt(payment)+(frequency===26?' bi-weekly':frequency===52?' weekly':' monthly');$('interest').textContent=fmt(total-principal);$('total').textContent=fmt(total);$('fee').textContent=fmt(fee);$('warrantyOut').textContent=fmt(warranty);
+    const custom=MOMotorsFinance.normalize({...settings,apr:+$('rate').value||0,term_months:+$('term').value||settings.term_months,financing_fee:Math.max(0,+$('financingFee').value||0),payment_frequency:frequencyName(+$('frequency').value)});
+    const result=MOMotorsFinance.calculate({price:+$('price').value||0,warranty:+$('warranty').value||0,down:+$('down').value||0,trade:+$('trade').value||0,includeTax:$('tax').value==='yes',settings:custom});
+    $('financed').textContent=fmt(result.principal);$('payment').textContent=`${fmt(result.payment)} ${result.label}`;$('interest').textContent=fmt(result.total-result.principal);$('total').textContent=fmt(result.total);$('fee').textContent=fmt(result.fee);$('warrantyOut').textContent=fmt(result.warranty);
   }
 
   async function init(){
-    try{const response=await fetch(`${URL}/rest/v1/finance_settings?select=*&id=eq.1`,{headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}});if(!response.ok)throw new Error(await response.text());settings={...defaults,...((await response.json())[0]||{})}}catch(error){console.warn('Using default finance settings',error)}
+    settings=await MOMotorsFinance.load();
     $('down').value=settings.down_payment;$('rate').value=settings.apr;$('financingFee').value=settings.financing_fee;
-    if(![...$('term').options].some(option=>Number(option.value)===Number(settings.term_months)))$('term').add(new Option(`${settings.term_months} months`,settings.term_months));
+    if(![...$('term').options].some(option=>Number(option.value)===settings.term_months))$('term').add(new Option(`${settings.term_months} months`,settings.term_months));
     $('term').value=String(settings.term_months);$('frequency').value=String(frequencyValue(settings.payment_frequency));
     ['price','down','trade','financingFee','warranty','rate','term','frequency','tax'].forEach(id=>$(id).addEventListener('input',calculate));calculate();
   }
