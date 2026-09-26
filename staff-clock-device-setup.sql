@@ -26,6 +26,8 @@ create table if not exists public.office_clock_devices (
 grant select, insert, update, delete on table public.staff_members to service_role;
 grant select, insert, update, delete on table public.employee_timesheets to service_role;
 grant select, insert, update, delete on table public.office_clock_devices to service_role;
+grant usage on schema private to service_role;
+grant execute on function private.is_admin() to service_role;
 
 alter table public.employee_timesheets
   drop constraint if exists employee_timesheets_clock_in_device_id_fkey,
