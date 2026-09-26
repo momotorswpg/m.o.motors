@@ -64,7 +64,7 @@
     priceRange:"$$",
     address:{"@type":"PostalAddress",streetAddress:"Unit 104, 420 Des Meurons St",addressLocality:"Winnipeg",addressRegion:"MB",postalCode:"R2H 2N9",addressCountry:"CA"},
     areaServed:{"@type":"City",name:"Winnipeg"},
-    openingHoursSpecification:[{"@type":"OpeningHoursSpecification",dayOfWeek:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],opens:"10:00",closes:"18:00"}],
+    openingHoursSpecification:[{"@type":"OpeningHoursSpecification",dayOfWeek:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],opens:"12:00",closes:"18:00"}],
     sameAs:[]
   };
   let schema = document.getElementById("localBusinessSchema");

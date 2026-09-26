@@ -76,11 +76,11 @@ select employee.user_id, shift.weekday, shift.start_time, shift.end_time, date '
 from public.staff_members employee
 cross join (values
   (1, time '16:00', time '18:00'),
-  (2, time '10:00', time '18:00'),
+  (2, time '12:00', time '18:00'),
   (3, time '16:00', time '18:00'),
-  (4, time '10:00', time '18:00'),
+  (4, time '12:00', time '18:00'),
   (5, time '16:00', time '18:00'),
-  (6, time '10:00', time '18:00')
+  (6, time '12:00', time '18:00')
 ) as shift(weekday, start_time, end_time)
 cross join lateral (
   select user_id from public.staff_members where role = 'owner' and active = true order by user_id limit 1

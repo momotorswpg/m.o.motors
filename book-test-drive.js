@@ -1,6 +1,6 @@
 const U="https://dpsgtliddmdvfwjahkkq.supabase.co",K="sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0",H={apikey:K,Authorization:`Bearer ${K}`,"Content-Type":"application/json"};
 const sel=document.getElementById("vehicle"),dateInput=document.getElementById("date"),timeSelect=document.getElementById("time"),msg=document.getElementById("formMessage"),emailNote=document.getElementById("formEmailNote"),form=document.getElementById("testDriveForm"),params=new URLSearchParams(location.search);
-const slots=[];for(let h=10;h<18;h++)for(const m of [0,30]){if(h===17&&m===30)continue;const d=new Date(2000,0,1,h,m);slots.push(d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}));}
+const slots=[];for(let h=12;h<18;h++)for(const m of [0,30]){if(h===17&&m===30)continue;const d=new Date(2000,0,1,h,m);slots.push(d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}));}
 const localDateISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().split("T")[0]};
 dateInput.min=localDateISO();
 function resetTimes(text="Select a vehicle and date first"){timeSelect.innerHTML=`<option value="">${text}</option>`;timeSelect.disabled=true;}
