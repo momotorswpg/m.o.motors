@@ -20,12 +20,25 @@ create table if not exists public.office_clock_devices (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.office_clock_networks (
+  id uuid primary key default gen_random_uuid(),
+  ip_address text not null unique,
+  label text not null default 'Dealership Wi-Fi',
+  active boolean not null default true,
+  approved_by uuid not null references public.staff_members(user_id),
+  approved_at timestamptz not null default now(),
+  last_seen_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- Edge Functions use the service role after validating the signed-in user.
 -- Explicit grants are required because the staff tables intentionally revoke
 -- ordinary write access.
 grant select, insert, update, delete on table public.staff_members to service_role;
 grant select, insert, update, delete on table public.employee_timesheets to service_role;
 grant select, insert, update, delete on table public.office_clock_devices to service_role;
+grant select, insert, update, delete on table public.office_clock_networks to service_role;
 grant usage on schema private to service_role;
 grant execute on function private.is_admin() to service_role;
 
@@ -38,13 +51,21 @@ alter table public.employee_timesheets
 create index if not exists employee_timesheets_clock_in_device_idx on public.employee_timesheets(clock_in_device_id);
 create index if not exists employee_timesheets_clock_out_device_idx on public.employee_timesheets(clock_out_device_id);
 create index if not exists office_clock_devices_approved_by_idx on public.office_clock_devices(approved_by);
+create index if not exists office_clock_networks_approved_by_idx on public.office_clock_networks(approved_by);
 
 alter table public.office_clock_devices enable row level security;
+alter table public.office_clock_networks enable row level security;
 grant select on table public.office_clock_devices to authenticated;
+grant select on table public.office_clock_networks to authenticated;
 revoke insert, update, delete on table public.office_clock_devices from authenticated;
+revoke insert, update, delete on table public.office_clock_networks from authenticated;
 
 drop policy if exists "Admins read office clock devices" on public.office_clock_devices;
 create policy "Admins read office clock devices" on public.office_clock_devices
+for select to authenticated using ((select private.is_admin()));
+
+drop policy if exists "Admins read office clock networks" on public.office_clock_networks;
+create policy "Admins read office clock networks" on public.office_clock_networks
 for select to authenticated using ((select private.is_admin()));
 
 drop policy if exists "Employees clock themselves in" on public.employee_timesheets;
@@ -66,6 +87,6 @@ begin
     new.updated_at := now();
     return new;
   end if;
-  raise exception 'Clock actions must use an approved office device';
+  raise exception 'Clock actions must use the approved office Wi-Fi';
 end;
 $$;

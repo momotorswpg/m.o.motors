@@ -8,11 +8,6 @@ const cors = {
   "Content-Type": "application/json"
 };
 const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: cors });
-const validDeviceId = (value: unknown) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
-const hashDevice = async (value: string) => {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
-};
 const requestIp = (request: Request) => {
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   return request.headers.get("cf-connecting-ip") || forwarded || request.headers.get("x-real-ip") || "Unavailable";
@@ -36,52 +31,50 @@ Deno.serve(async request => {
     if (member.active === false) return reply({ error:"This staff account is inactive." }, 403);
 
     const body = await request.json();
-    const action = String(body?.action || "status"), deviceId = String(body?.device_id || "");
-    if (!validDeviceId(deviceId)) return reply({ error:"This browser could not be identified. Refresh and try again." }, 400);
-    const deviceHash = await hashDevice(deviceId), ip = requestIp(request);
+    const action = String(body?.action || "status"), ip = requestIp(request);
     const userAgent = String(request.headers.get("user-agent") || "Unavailable").slice(0, 500);
     const isAdmin = ["owner", "admin"].includes(member.role);
-    const { data:device } = await admin.from("office_clock_devices").select("id,label,active,approved_at,last_seen_at,last_seen_ip,last_seen_user_agent").eq("device_hash", deviceHash).maybeSingle();
+    const { data:network } = await admin.from("office_clock_networks").select("id,label,ip_address,active,approved_at,last_seen_at").eq("ip_address", ip).maybeSingle();
 
-    if (action === "status") return reply({ ok:true, approved:Boolean(device?.active), device:device || null, ip, user_agent:userAgent, can_approve:isAdmin });
-    if (action === "approve_device") {
+    if (action === "status") return reply({ ok:true, approved:Boolean(network?.active), network:network || null, ip, user_agent:userAgent, can_approve:isAdmin });
+    if (action === "approve_network") {
       if (!isAdmin) return reply({ error:"Administrator access required" }, 403);
-      const label = String(body?.label || "Office computer").trim().slice(0, 80) || "Office computer";
-      const { data, error } = await admin.from("office_clock_devices").upsert({ device_hash:deviceHash, label, active:true, approved_by:userId, approved_at:new Date().toISOString(), last_seen_at:new Date().toISOString(), last_seen_ip:ip, last_seen_user_agent:userAgent, updated_at:new Date().toISOString() }, { onConflict:"device_hash" }).select("id,label,active,approved_at,last_seen_ip,last_seen_user_agent").single();
+      const label = String(body?.label || "Dealership Wi-Fi").trim().slice(0, 80) || "Dealership Wi-Fi";
+      const { data, error } = await admin.from("office_clock_networks").upsert({ ip_address:ip, label, active:true, approved_by:userId, approved_at:new Date().toISOString(), last_seen_at:new Date().toISOString(), updated_at:new Date().toISOString() }, { onConflict:"ip_address" }).select("id,label,ip_address,active,approved_at,last_seen_at").single();
       if (error) throw error;
-      return reply({ ok:true, approved:true, device:data, ip, message:`${label} is approved for clock-ins.` });
+      return reply({ ok:true, approved:true, network:data, ip, message:`${label} is approved for clock-ins.` });
     }
-    if (action === "list_devices") {
+    if (action === "list_networks") {
       if (!isAdmin) return reply({ error:"Administrator access required" }, 403);
-      const { data, error } = await admin.from("office_clock_devices").select("id,label,active,approved_at,last_seen_at,last_seen_ip,last_seen_user_agent").order("approved_at", { ascending:false });
+      const { data, error } = await admin.from("office_clock_networks").select("id,label,ip_address,active,approved_at,last_seen_at").order("approved_at", { ascending:false });
       if (error) throw error;
-      return reply({ ok:true, devices:data || [], current_device_id:device?.id || null, ip });
+      return reply({ ok:true, networks:data || [], current_network_id:network?.id || null, ip });
     }
-    if (action === "set_device_active") {
+    if (action === "set_network_active") {
       if (!isAdmin) return reply({ error:"Administrator access required" }, 403);
       const targetId = String(body?.target_id || "");
-      if (!/^[0-9a-f-]{36}$/i.test(targetId)) return reply({ error:"Invalid device" }, 400);
-      const { error } = await admin.from("office_clock_devices").update({ active:body?.active === true, updated_at:new Date().toISOString() }).eq("id", targetId);
+      if (!/^[0-9a-f-]{36}$/i.test(targetId)) return reply({ error:"Invalid network" }, 400);
+      const { error } = await admin.from("office_clock_networks").update({ active:body?.active === true, updated_at:new Date().toISOString() }).eq("id", targetId);
       if (error) throw error;
-      return reply({ ok:true, message:body?.active === true ? "Device reactivated." : "Device access removed." });
+      return reply({ ok:true, message:body?.active === true ? "Network reactivated." : "Network access removed." });
     }
 
-    if (!device?.active) return reply({ error:"Clock-in is restricted to an approved office computer. Ask an administrator to approve this device." }, 403);
-    await admin.from("office_clock_devices").update({ last_seen_at:new Date().toISOString(), last_seen_ip:ip, last_seen_user_agent:userAgent, updated_at:new Date().toISOString() }).eq("id", device.id);
+    if (!network?.active) return reply({ error:"Clock-in is restricted to the approved dealership Wi-Fi. Connect to the office Wi-Fi and try again." }, 403);
+    await admin.from("office_clock_networks").update({ last_seen_at:new Date().toISOString(), updated_at:new Date().toISOString() }).eq("id", network.id);
     const now = new Date().toISOString();
     const { data:openShift, error:openError } = await admin.from("employee_timesheets").select("id,clock_in").eq("employee_id", userId).is("clock_out", null).maybeSingle();
     if (openError) throw openError;
     if (action === "clock_in") {
       if (openShift) return reply({ error:"You are already clocked in." }, 409);
-      const { error } = await admin.from("employee_timesheets").insert({ employee_id:userId, clock_in:now, clock_in_ip:ip, clock_in_user_agent:userAgent, clock_in_device_id:device.id });
+      const { error } = await admin.from("employee_timesheets").insert({ employee_id:userId, clock_in:now, clock_in_ip:ip, clock_in_user_agent:userAgent });
       if (error) throw error;
-      return reply({ ok:true, message:"You are clocked in.", ip, device_label:device.label });
+      return reply({ ok:true, message:"You are clocked in.", ip, network_label:network.label });
     }
     if (action === "clock_out") {
       if (!openShift) return reply({ error:"No open shift was found." }, 409);
-      const { error } = await admin.from("employee_timesheets").update({ clock_out:now, clock_out_ip:ip, clock_out_user_agent:userAgent, clock_out_device_id:device.id, updated_at:now }).eq("id", openShift.id).is("clock_out", null);
+      const { error } = await admin.from("employee_timesheets").update({ clock_out:now, clock_out_ip:ip, clock_out_user_agent:userAgent, updated_at:now }).eq("id", openShift.id).is("clock_out", null);
       if (error) throw error;
-      return reply({ ok:true, message:"You are clocked out.", ip, device_label:device.label });
+      return reply({ ok:true, message:"You are clocked out.", ip, network_label:network.label });
     }
     return reply({ error:"Unsupported action" }, 400);
   } catch (error) {
