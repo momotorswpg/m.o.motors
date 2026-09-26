@@ -60,8 +60,8 @@ async function showAdmin(session) {
   document.body.dataset.staffRole = isSales ? "sales" : "admin";
   const snapshot = document.querySelector(".sidebar-snapshot");
   if (snapshot) snapshot.innerHTML = isSales
-    ? '<span class="eyebrow">SALES WORKSPACE</span><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>My timesheet</div>'
-    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Website requests</div><div>Employee accounts</div><div>Payroll and timesheets</div><div>Finance applications</div><div>Payment defaults</div>';
+    ? '<span class="eyebrow">SALES WORKSPACE</span><div>Vehicle inventory</div><div>Customer bookings</div><div>Test drive consents</div><div>Trade-in requests</div><div>Bill of sale</div><div>My schedule and timesheet</div>'
+    : '<span class="eyebrow">ADMIN WORKSPACE</span><div>All sales tools</div><div>Website requests</div><div>Employee accounts</div><div>Schedules, payroll and timesheets</div><div>Finance applications</div><div>Payment defaults</div>';
   $("authView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
   $("sessionEmail").textContent = `${member.display_name} · ${member.role === "sales" ? "Sales" : "Admin"}`;

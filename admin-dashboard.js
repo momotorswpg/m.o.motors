@@ -1,7 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "timesheet"];
-  const adminPages = ["requests", "employees", "payroll", "finance"];
+  const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "myschedule", "timesheet"];
+  const adminPages = ["requests", "employees", "schedule", "payroll", "finance"];
   let pages = salesPages;
   let initialized = false;
 
@@ -32,6 +32,7 @@
     const finance = document.querySelector(".finance-panel");
     const employees = document.querySelector(".employees-panel");
     const timesheet = document.querySelector(".timesheet-panel");
+    const schedule = document.querySelector(".schedule-panel");
     const payroll = document.querySelector(".payroll-panel");
     const isAdmin = ["owner", "admin"].includes(window.moStaff?.role);
     pages = isAdmin ? [...salesPages, ...adminPages] : [...salesPages];
@@ -43,7 +44,7 @@
 
     const nav = document.createElement("nav");
     nav.className = "admin-page-nav";
-    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page === "requests" ? "Website Leads" : page === "finance" ? "Payment Defaults" : page[0].toUpperCase() + page.slice(1);
+    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page === "requests" ? "Website Leads" : page === "finance" ? "Payment Defaults" : page === "myschedule" ? "My Schedule" : page[0].toUpperCase() + page.slice(1);
     nav.innerHTML = `<div class="admin-nav-group"><span>SALES</span>${salesPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}</div>${isAdmin ? `<div class="admin-nav-group"><span>ADMIN</span>${adminPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}<a class="admin-nav-link" href="finance-admin-login.html">Finance Applications ↗</a></div>` : ""}`;
     top?.after(nav);
 
@@ -56,6 +57,7 @@
         if (name !== page) { element.style.display = "none"; return; }
         element.style.display = name === "inventory" && (element === stats || element === grid) ? "grid" : "block";
       }));
+      if (schedule) schedule.style.display = page === "schedule" || page === "myschedule" ? "block" : "none";
       nav.querySelectorAll("button").forEach(button => button.classList.toggle("active", button.dataset.page === page));
       if (page === "inventory") window.loadAll?.();
       if (page === "bookings") window.loadBookings?.();
@@ -65,6 +67,7 @@
       if (page === "billsale") window.loadBillOfSaleVehicles?.();
       if (page === "finance") window.loadFinanceSettings?.();
       if (page === "employees") window.loadEmployeeAdmin?.();
+      if (page === "schedule" || page === "myschedule") window.loadStaffSchedule?.(page === "schedule" ? "admin" : "self");
       if (page === "timesheet") window.loadEmployeeTimesheet?.();
       if (page === "payroll") window.loadPayrollAdmin?.();
       if (page === "dashboard") loadDashboard();
