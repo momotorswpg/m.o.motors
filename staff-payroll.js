@@ -19,7 +19,7 @@
     const timesheet = document.createElement("section");
     timesheet.className = "panel timesheet-panel";
     timesheet.innerHTML = `<div class="panel-head"><div><span class="eyebrow">MY TIMESHEET</span><h3>Clock in and out</h3><p class="muted">Record your workday electronically. Times are saved in Winnipeg time.</p></div><button id="refreshTimesheet" class="secondary-btn" type="button">Refresh</button></div>
-      <div class="clock-card"><div><span id="clockStateLabel" class="eyebrow">CURRENT STATUS</span><strong id="clockState">Checking…</strong><small id="clockStarted"></small><small id="clockDeviceState" class="clock-device-state">Checking office Wi-Fi…</small></div><div class="clock-actions"><button id="approveClockDeviceInline" class="secondary-btn hidden" type="button">Approve This Wi-Fi</button><button id="clockAction" class="primary-btn" type="button" disabled>Clock In</button></div></div>
+      <div class="clock-card"><div><span id="clockStateLabel" class="eyebrow">CURRENT STATUS</span><strong id="clockState">Checking…</strong><small id="clockStarted"></small><small class="clock-device-state approved">IP address and browser are recorded with every clock action.</small></div><div class="clock-actions"><button id="clockAction" class="primary-btn" type="button" disabled>Clock In</button></div></div>
       <div class="panel-head compact"><div><span class="eyebrow">RECENT SHIFTS</span><h4>Your recorded time</h4></div></div><div id="myTimesheetRows" class="payroll-table-wrap"><div class="muted">Loading timesheet…</div></div>`;
     admin.appendChild(timesheet);
 
@@ -38,8 +38,6 @@
         <section class="payroll-card"><h4>Add commission</h4><label>Date earned<input id="commissionDate" type="date"></label><label>Description<input id="commissionDescription" placeholder="Vehicle sale or bonus"></label><label>Amount (CAD)<input id="commissionAmount" type="number" min="0" step="0.01"></label><button id="addCommission" class="secondary-btn" type="button">Add Commission</button><p id="commissionStatus" class="status"></p></section>
       </div>
       <section class="payroll-period"><div class="panel-head compact"><div><span class="eyebrow">BIWEEKLY PERIOD</span><h4>Pay stub builder</h4></div></div><div class="payroll-period-fields"><label>Period start<input id="payPeriodStart" type="date"></label><label>Period end<input id="payPeriodEnd" type="date"></label><label>Other earnings<input id="payOtherEarnings" type="number" min="0" step="0.01" value="0"></label><label>Deductions<input id="payDeductions" type="number" min="0" step="0.01" value="0"></label></div><div class="form-actions"><button id="calculatePayroll" class="secondary-btn" type="button">Calculate</button><button id="savePayStub" class="primary-btn" type="button">Save Pay Stub</button><button id="printPayStub" class="secondary-btn" type="button">Print / Save PDF</button></div><p class="finance-note">Deductions are entered manually. This tool does not calculate CRA payroll deductions.</p><div id="payStubPreview" class="pay-stub-preview"><div class="muted">Choose an employee and period, then calculate.</div></div></section>
-      <div class="panel-head compact"><div><span class="eyebrow">OFFICE ACCESS</span><h4>Approved clock-in Wi-Fi</h4><p class="muted">Employees can clock in from any browser connected to an approved dealership network. IP address and browser details are recorded with every action.</p></div></div>
-      <div class="clock-device-admin"><div class="clock-device-approve"><label>Network name<input id="clockDeviceLabel" value="Dealership Wi-Fi" maxlength="80"></label><button id="approveClockDevice" class="primary-btn" type="button">Approve This Wi-Fi</button><p id="clockDeviceAdminStatus" class="status"></p></div><div id="clockDeviceList" class="payroll-table-wrap"><div class="muted payroll-empty">Loading approved networks…</div></div></div>
       <div class="panel-head compact"><div><span class="eyebrow">TIME CORRECTIONS</span><h4>Add or amend a shift</h4><p class="muted">Use this when an employee misses a clock-in or clock-out. Every correction records the administrator and reason.</p></div></div>
       <form id="shiftCorrectionForm" class="shift-correction-form"><input id="shiftCorrectionId" type="hidden"><label>Employee<select id="shiftCorrectionEmployee" required></select></label><label>Clock in<input id="shiftCorrectionIn" type="datetime-local" required></label><label>Clock out<input id="shiftCorrectionOut" type="datetime-local" required></label><label>Break (minutes)<input id="shiftCorrectionBreak" type="number" min="0" max="1440" step="1" value="0" required></label><label class="shift-correction-note">Correction reason<input id="shiftCorrectionNote" placeholder="Example: Employee forgot to clock out" required></label><div class="shift-correction-actions"><button id="saveShiftCorrection" class="primary-btn" type="submit">Add Shift</button><button id="cancelShiftCorrection" class="secondary-btn hidden" type="button">Cancel Edit</button></div><p id="shiftCorrectionStatus" class="status"></p></form>
       <div class="panel-head compact"><div><span class="eyebrow">EMPLOYEE TIME</span><h4>Recorded shifts</h4></div></div><div id="adminTimesheetRows" class="payroll-table-wrap"></div>
@@ -49,7 +47,7 @@
 
   function table(rows, admin = false) {
     if (!rows.length) return '<div class="muted payroll-empty">No time entries found.</div>';
-    return `<table class="payroll-table"><thead><tr>${admin ? "<th>Employee</th>" : ""}<th>Clock in</th><th>Clock out</th><th>Break</th><th>Hours</th>${admin ? "<th>Network / IP</th><th>Correction</th><th></th>" : ""}</tr></thead><tbody>${rows.map(row => `<tr>${admin ? `<td>${esc(row.staff_members?.display_name || "Employee")}</td>` : ""}<td>${esc(stamp(row.clock_in))}</td><td>${esc(stamp(row.clock_out))}</td><td>${Number(row.break_minutes)||0} min</td><td>${hoursBetween(row).toFixed(2)}</td>${admin ? `<td class="shift-device"><strong>${esc(row.clock_in_device?.label || (row.adjusted_by ? "Admin entry" : "Office Wi-Fi"))}</strong><small>In: ${esc(row.clock_in_ip || "Not recorded")}</small>${row.clock_out ? `<small>Out: ${esc(row.clock_out_ip || "Not recorded")}</small>` : ""}</td><td>${row.adjusted_by ? esc(row.notes || "Adjusted by administrator") : "—"}</td><td><button class="mini-btn" type="button" data-shift-edit="${esc(row.id)}">Edit</button></td>` : ""}</tr>`).join("")}</tbody></table>`;
+    return `<table class="payroll-table"><thead><tr>${admin ? "<th>Employee</th>" : ""}<th>Clock in</th><th>Clock out</th><th>Break</th><th>Hours</th>${admin ? "<th>IP address</th><th>Correction</th><th></th>" : ""}</tr></thead><tbody>${rows.map(row => `<tr>${admin ? `<td>${esc(row.staff_members?.display_name || "Employee")}</td>` : ""}<td>${esc(stamp(row.clock_in))}</td><td>${esc(stamp(row.clock_out))}</td><td>${Number(row.break_minutes)||0} min</td><td>${hoursBetween(row).toFixed(2)}</td>${admin ? `<td class="shift-device"><small>In: ${esc(row.clock_in_ip || "Not recorded")}</small>${row.clock_out ? `<small>Out: ${esc(row.clock_out_ip || "Not recorded")}</small>` : ""}</td><td>${row.adjusted_by ? esc(row.notes || "Adjusted by administrator") : "—"}</td><td><button class="mini-btn" type="button" data-shift-edit="${esc(row.id)}">Edit</button></td>` : ""}</tr>`).join("")}</tbody></table>`;
   }
 
   const localDateTime = value => {
@@ -111,21 +109,14 @@
 
   async function loadMyTimesheet() {
     if (!currentUser) return;
-    const [{ data, error }, deviceResult] = await Promise.all([
-      db.from("employee_timesheets").select("*").eq("employee_id", currentUser.id).order("clock_in", { ascending:false }).limit(30),
-      invokeTimeClock("status").catch(error => ({ error:error.message }))
-    ]);
+    const { data, error } = await db.from("employee_timesheets").select("*").eq("employee_id", currentUser.id).order("clock_in", { ascending:false }).limit(30);
     if (error) { $("myTimesheetRows").innerHTML = `<div class="muted">${esc(error.message)}</div>`; return; }
     const rows = data || [], open = rows.find(row => !row.clock_out), button = $("clockAction");
     $("clockState").textContent = open ? "Clocked in" : "Clocked out";
     $("clockStarted").textContent = open ? `Started ${stamp(open.clock_in)}` : "Ready for your next shift";
     button.textContent = open ? "Clock Out" : "Clock In";
     button.dataset.shiftId = open?.id || "";
-    const approved = deviceResult?.approved === true;
-    $("clockDeviceState").textContent = deviceResult?.error ? deviceResult.error : approved ? `${deviceResult.network?.label || "Office Wi-Fi"} approved · IP ${deviceResult.ip}` : `This Wi-Fi is not approved · IP ${deviceResult?.ip || "unavailable"}`;
-    $("clockDeviceState").classList.toggle("approved", approved);
-    $("approveClockDeviceInline").classList.toggle("hidden", approved || !["owner","admin"].includes(window.moStaff?.role));
-    button.disabled = !approved;
+    button.disabled = false;
     $("myTimesheetRows").innerHTML = table(rows);
   }
 
@@ -135,47 +126,11 @@
     const shiftId = button.dataset.shiftId;
     try {
       const result = await invokeTimeClock(shiftId ? "clock_out" : "clock_in");
-      toast(`${result.message} ${result.network_label || ""} · IP ${result.ip || "unavailable"}`.trim());
+      toast(`${result.message} IP ${result.ip || "unavailable"}`.trim());
     } catch (error) {
       toast("Could not update timesheet: " + error.message);
     }
     await loadMyTimesheet();
-  }
-
-  async function loadClockDevices() {
-    if (!["owner","admin"].includes(window.moStaff?.role) || !$("clockDeviceList")) return;
-    try {
-      const result = await invokeTimeClock("list_networks");
-      $("clockDeviceAdminStatus").textContent = `Current public IP: ${result.ip || "unavailable"}`;
-      $("clockDeviceList").innerHTML = result.networks.length ? `<table class="payroll-table"><thead><tr><th>Network</th><th>Public IP</th><th>Last used</th><th>Status</th><th></th></tr></thead><tbody>${result.networks.map(network => `<tr><td><strong>${esc(network.label)}</strong>${network.id === result.current_network_id ? '<small class="current-device">Current Wi-Fi</small>' : ""}</td><td>${esc(network.ip_address || "Not recorded")}</td><td>${esc(stamp(network.last_seen_at || network.approved_at))}</td><td>${network.active ? "Approved" : "Blocked"}</td><td><button class="mini-btn ${network.active ? "danger" : ""}" type="button" data-clock-device="${esc(network.id)}" data-device-active="${network.active ? "false" : "true"}">${network.active ? "Remove Access" : "Reactivate"}</button></td></tr>`).join("")}</tbody></table>` : '<div class="muted payroll-empty">No office Wi-Fi approved yet. Approve the dealership network above.</div>';
-    } catch (error) {
-      $("clockDeviceList").innerHTML = `<div class="muted payroll-empty">${esc(error.message)}</div>`;
-    }
-  }
-
-  async function approveClockDevice(event) {
-    const button = event?.currentTarget || $("approveClockDevice"), status = $("clockDeviceAdminStatus");
-    button.disabled = true;
-    if (status) status.textContent = "Approving this Wi-Fi…";
-    $("clockDeviceState").textContent = "Approving this Wi-Fi…";
-    try {
-      const result = await invokeTimeClock("approve_network", { label:$("clockDeviceLabel").value.trim() });
-      if (status) status.textContent = `${result.message} Current IP: ${result.ip}`;
-      await Promise.all([loadClockDevices(), loadMyTimesheet()]);
-    } catch (error) { if (status) status.textContent = error.message; $("clockDeviceState").textContent = error.message; }
-    finally { button.disabled = false; }
-  }
-
-  async function clockDeviceListAction(event) {
-    const button = event.target.closest("[data-clock-device]");
-    if (!button) return;
-    const activating = button.dataset.deviceActive === "true";
-    if (!activating && !confirm("Remove clock-in access from this network? Employees connected to it will no longer be able to clock in or out.")) return;
-    button.disabled = true;
-    try {
-      const result = await invokeTimeClock("set_network_active", { target_id:button.dataset.clockDevice, active:activating });
-      toast(result.message); await Promise.all([loadClockDevices(), loadMyTimesheet()]);
-    } catch (error) { toast("Could not update network: " + error.message); button.disabled = false; }
   }
 
   function defaultPeriod() {
@@ -210,7 +165,6 @@
     $("adminTimesheetRows").innerHTML = table(payrollShifts, true);
     $("savedPayStubs").innerHTML = stubs?.length ? `<table class="payroll-table"><thead><tr><th>Employee</th><th>Period</th><th>Hours</th><th>Gross</th><th>Net</th></tr></thead><tbody>${stubs.map(stub => `<tr><td>${esc(stub.staff_members?.display_name)}</td><td>${esc(stub.period_start)} – ${esc(stub.period_end)}</td><td>${Number(stub.regular_hours).toFixed(2)}</td><td>${cash(stub.gross_pay)}</td><td>${cash(stub.net_pay)}</td></tr>`).join("")}</tbody></table>` : '<div class="muted payroll-empty">No saved pay stubs yet.</div>';
     calculatePayroll();
-    loadClockDevices();
   }
 
   async function invokeEmployeeAction(action, payload = {}) {
@@ -346,9 +300,6 @@
     $("printPayStub")?.addEventListener("click", printStub);
     $("shiftCorrectionForm")?.addEventListener("submit", saveShiftCorrection);
     $("cancelShiftCorrection")?.addEventListener("click", resetShiftCorrection);
-    $("approveClockDevice")?.addEventListener("click", approveClockDevice);
-    $("approveClockDeviceInline")?.addEventListener("click", approveClockDevice);
-    $("clockDeviceList")?.addEventListener("click", clockDeviceListAction);
     $("adminTimesheetRows")?.addEventListener("click", event => {
       const button = event.target.closest("[data-shift-edit]");
       if (button) editShift(button.dataset.shiftEdit);
