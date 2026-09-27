@@ -39,3 +39,6 @@ footer img{display:none}
 /* Let the inventory browser use the available desktop width. */
 .inventory-page{max-width:none;padding-left:3%;padding-right:3%}
 @media(max-width:800px){.inventory-page{padding:38px 6% 70px}}
+
+/* Improve vehicle mileage and transmission readability. */
+.detail-meta{font-size:15px}
