@@ -2,7 +2,13 @@
   const U = "https://dpsgtliddmdvfwjahkkq.supabase.co";
   const K = "sb_publishable_f-MRqpvq-FGsxQ7dBNIyKQ_r8MB1VM0";
   const H = { apikey: K, Authorization: `Bearer ${K}`, "Content-Type": "application/json" };
-  const fallback = { booking_start: "12:00:00", booking_end: "18:00:00", slot_minutes: 30 };
+  const fallback = Array.from({ length: 7 }, (_, weekday) => ({
+    weekday,
+    is_open: weekday !== 0,
+    booking_start: "12:00:00",
+    booking_end: "18:00:00",
+    slot_minutes: 30
+  }));
 
   function minutes(value) {
     const [hours = 0, mins = 0] = String(value || "").split(":").map(Number);
@@ -16,7 +22,8 @@
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   }
 
-  function createSlots(settings = fallback) {
+  function createSlots(settings) {
+    if (!settings || settings.is_open === false) return [];
     const start = minutes(settings.booking_start);
     const end = minutes(settings.booking_end);
     const interval = Number(settings.slot_minutes) || 30;
@@ -27,15 +34,20 @@
 
   async function loadSettings() {
     try {
-      const response = await fetch(`${U}/rest/v1/booking_settings?select=booking_start,booking_end,slot_minutes&id=eq.1`, { headers: H });
+      const response = await fetch(`${U}/rest/v1/booking_weekly_availability?select=weekday,is_open,booking_start,booking_end,slot_minutes&order=weekday`, { headers: H });
       if (!response.ok) throw new Error("Unable to load booking settings");
-      const [settings] = await response.json();
-      return settings || fallback;
+      const settings = await response.json();
+      return settings.length === 7 ? settings : fallback;
     } catch (error) {
       console.warn(error);
       return fallback;
     }
   }
 
-  window.moBookingAvailability = { U, K, H, fallback, createSlots, loadSettings };
+  function settingsForDate(schedule, date) {
+    const weekday = new Date(`${date}T12:00:00`).getDay();
+    return (schedule || fallback).find(day => Number(day.weekday) === weekday) || fallback[weekday];
+  }
+
+  window.moBookingAvailability = { U, K, H, fallback, createSlots, loadSettings, settingsForDate };
 })();

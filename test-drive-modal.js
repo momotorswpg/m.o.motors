@@ -1,5 +1,5 @@
 (() => {
-  const { U, H, loadSettings, createSlots } = window.moBookingAvailability;
+  const { U, H, fallback, loadSettings, createSlots, settingsForDate } = window.moBookingAvailability;
   const modal = document.createElement("div");
   modal.className = "test-drive-modal";
   modal.hidden = true;
@@ -17,6 +17,7 @@
   const message = modal.querySelector("#modalTestDriveMessage");
   const emailNote = modal.querySelector("#modalTestDriveEmailNote");
   let loaded = false;
+  let weeklySchedule = fallback;
   let slots = [];
   const localDateISO = () => {
     const date = new Date();
@@ -58,11 +59,13 @@
   async function loadAvailability() {
     const date = dateInput.value;
     if (!date) return resetTimes();
-    if (new Date(`${date}T12:00:00`).getDay() === 0) {
-      resetTimes("Closed Sundays");
-      message.textContent = "M.O Motors is closed on Sundays. Please choose Monday through Saturday.";
+    const daySettings = settingsForDate(weeklySchedule, date);
+    if (!daySettings.is_open) {
+      resetTimes("Closed this day");
+      message.textContent = "Online appointments are closed on this day. Please choose another date.";
       return;
     }
+    slots = createSlots(daySettings);
     message.textContent = "Checking available times…";
     resetTimes("Loading available times…");
     try {
@@ -70,7 +73,7 @@
       if (!response.ok) throw new Error();
       const data = await response.json();
       renderTimes(data.map(row => row.preferred_time), date);
-      message.textContent = "Choose an available appointment time.";
+      message.textContent = `Choose an available ${daySettings.slot_minutes}-minute appointment time.`;
     } catch {
       renderTimes([], date);
       message.textContent = "We couldn't check existing bookings, so please choose a time and we'll confirm availability.";
@@ -81,7 +84,7 @@
     try {
       if (!loaded) {
         const [settings, response] = await Promise.all([loadSettings(), fetch(`${U}/rest/v1/Vehicles?select=*&order=created_at.desc`, { headers: H })]);
-        slots = createSlots(settings);
+        weeklySchedule = settings;
         if (!response.ok) throw new Error();
         const rows = await response.json();
         rows.filter(vehicle => ["available", "in stock", "active"].includes(String(vehicle.Status || "Available").toLowerCase())).forEach(vehicle => {
@@ -95,7 +98,7 @@
       if (selected) vehicleSelect.value = selected;
       if (dateInput.value) await loadAvailability();
     } catch {
-      slots = createSlots();
+      weeklySchedule = fallback;
       message.textContent = "We couldn't load the vehicle list. You can still book a time without selecting a vehicle.";
     }
   }

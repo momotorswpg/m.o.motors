@@ -1,4 +1,4 @@
-const { U, H, loadSettings, createSlots } = window.moBookingAvailability;
+const { U, H, fallback, loadSettings, createSlots, settingsForDate } = window.moBookingAvailability;
 const sel = document.getElementById("vehicle");
 const dateInput = document.getElementById("date");
 const timeSelect = document.getElementById("time");
@@ -6,6 +6,7 @@ const msg = document.getElementById("formMessage");
 const emailNote = document.getElementById("formEmailNote");
 const form = document.getElementById("testDriveForm");
 const params = new URLSearchParams(location.search);
+let weeklySchedule = fallback;
 let slots = [];
 
 const localDateISO = () => {
@@ -48,12 +49,14 @@ function renderTimes(booked = [], date = dateInput.value) {
 async function loadAvailability() {
   const date = dateInput.value;
   if (!date) return resetTimes();
-  if (new Date(`${date}T12:00:00`).getDay() === 0) {
-    resetTimes("Closed Sundays");
-    msg.textContent = "M.O Motors is closed on Sundays. Please choose Monday through Saturday.";
+  const daySettings = settingsForDate(weeklySchedule, date);
+  if (!daySettings.is_open) {
+    resetTimes("Closed this day");
+    msg.textContent = "Online appointments are closed on this day. Please choose another date.";
     if (emailNote) emailNote.hidden = true;
     return;
   }
+  slots = createSlots(daySettings);
   msg.textContent = "Checking available times…";
   resetTimes("Loading available times…");
   try {
@@ -61,7 +64,7 @@ async function loadAvailability() {
     if (!response.ok) throw new Error();
     const data = await response.json();
     renderTimes(data.map(row => row.preferred_time), date);
-    msg.textContent = "Choose an available appointment time.";
+    msg.textContent = `Choose an available ${daySettings.slot_minutes}-minute appointment time.`;
   } catch {
     renderTimes([], date);
     msg.textContent = "We couldn't check existing bookings, so please choose a time and we'll confirm availability.";
@@ -69,7 +72,7 @@ async function loadAvailability() {
 }
 
 async function initialize() {
-  slots = createSlots(await loadSettings());
+  weeklySchedule = await loadSettings();
   try {
     const response = await fetch(`${U}/rest/v1/Vehicles?select=*&order=created_at.desc`, { headers: H });
     const rows = await response.json();
