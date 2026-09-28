@@ -60,7 +60,7 @@
       if (schedule) schedule.style.display = page === "schedule" || page === "myschedule" ? "block" : "none";
       nav.querySelectorAll("button").forEach(button => button.classList.toggle("active", button.dataset.page === page));
       if (page === "inventory") window.loadAll?.();
-      if (page === "bookings") window.loadBookings?.();
+      if (page === "bookings") { window.loadBookings?.(); window.loadBookingAvailabilitySettings?.(); }
       if (page === "consents") { window.dispatchEvent(new Event("resize")); window.loadTestDriveConsents?.(); }
       if (page === "tradeins") window.loadTradeins?.();
       if (page === "requests") window.loadCustomerRequests?.();
