@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <title>Book a Test Drive | M.O Motors</title>
+  <link rel="canonical" href="https://www.momotors.ca/booking">
+  <script>
+    const target = new URL("/index.html", location.origin);
+    target.searchParams.set("booking", "1");
+    const vehicle = new URLSearchParams(location.search).get("vehicle");
+    if (vehicle) target.searchParams.set("vehicle", vehicle);
+    location.replace(target);
+  </script>
+</head>
+<body><p>Opening the M.O Motors test-drive booking form…</p></body>
+</html>

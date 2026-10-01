@@ -16,6 +16,8 @@
   const timeSelect = modal.querySelector("#modalTime");
   const message = modal.querySelector("#modalTestDriveMessage");
   const emailNote = modal.querySelector("#modalTestDriveEmailNote");
+  const bookingPath = "/booking";
+  let returnUrl = null;
   let loaded = false;
   let weeklySchedule = fallback;
   let slots = [];
@@ -103,26 +105,46 @@
     }
   }
 
-  async function open(vehicleId) {
+  function isBookingUrl() {
+    return location.pathname.replace(/\/$/, "") === bookingPath;
+  }
+
+  async function open(vehicleId, updateUrl = true) {
     message.textContent = "";
     emailNote.hidden = true;
+    if (updateUrl && !isBookingUrl()) {
+      returnUrl = `${location.pathname}${location.search}${location.hash}`;
+      const params = new URLSearchParams();
+      if (vehicleId) params.set("vehicle", vehicleId);
+      history.pushState({ testDriveBooking: true }, "", `${bookingPath}${params.size ? `?${params}` : ""}`);
+    }
     modal.hidden = false;
     document.body.style.overflow = "hidden";
     await loadVehicles(vehicleId);
   }
-  function close() {
+  function close(restoreUrl = true) {
     modal.hidden = true;
     document.body.style.overflow = "";
+    if (restoreUrl && isBookingUrl()) history.replaceState({}, "", returnUrl || "/");
   }
 
   document.addEventListener("click", event => {
-    const link = event.target.closest('a[href*="book-test-drive.html"]');
+    const link = event.target.closest('a[href*="book-test-drive.html"],a[href^="/booking"],a[href^="booking"]');
     if (link) {
       event.preventDefault();
       open(new URL(link.href, location.href).searchParams.get("vehicle"));
     }
     if (event.target.matches("[data-close]")) close();
   });
+  addEventListener("popstate", () => {
+    if (isBookingUrl()) open(new URLSearchParams(location.search).get("vehicle"), false);
+    else if (!modal.hidden) close(false);
+  });
+  if (isBookingUrl() || new URLSearchParams(location.search).get("booking") === "1") {
+    const vehicleId = new URLSearchParams(location.search).get("vehicle");
+    if (!isBookingUrl()) history.replaceState({ testDriveBooking: true }, "", `${bookingPath}${vehicleId ? `?vehicle=${encodeURIComponent(vehicleId)}` : ""}`);
+    open(vehicleId, false);
+  }
   dateInput.addEventListener("change", loadAvailability);
 
   form.addEventListener("submit", async event => {
