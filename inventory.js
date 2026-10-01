@@ -71,9 +71,10 @@ function bindGalleries(root){
   MOMotorsImages.bindFallbacks(root);
   root.querySelectorAll(".vehicle-image[data-gallery]").forEach(box=>{
     const gallery=JSON.parse(box.dataset.gallery||"[]");let index=0;const image=box.querySelector("img"),counter=box.querySelector(".photo-counter");
-    const change=direction=>{if(!gallery.length||!image)return;index=(index+direction+gallery.length)%gallery.length;const original=gallery[index];image.src=MOMotorsImages.thumbnail(original);image.dataset.originalSrc=original;box.dataset.index=index;if(counter)counter.textContent=`${index+1} / ${gallery.length}`};
+    const change=direction=>{if(!gallery.length||!image)return;index=(index+direction+gallery.length)%gallery.length;const original=gallery[index];image.src=MOMotorsImages.thumbnail(original);image.dataset.originalSrc=original;box.dataset.index=index;if(counter)counter.textContent=`${index+1} / ${gallery.length}`;MOMotorsImages.preloadNeighbors(gallery,index)};
     box.querySelector(".prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();change(-1)});box.querySelector(".next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();change(1)});
   });
+  MOMotorsImages.warmCardGalleries(root);
 }
 function render(){
   updateUrl();
