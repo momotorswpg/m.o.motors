@@ -22,6 +22,8 @@ const esc = (value = "") => String(value).replaceAll("&","&amp;").replaceAll("<"
 let vehicles = [];
 let selectedVehicleId = null;
 let selectedImages = [];
+let pendingVehicleFiles = [];
+let pendingPreviewUrls = [];
 let activeAdminUserId = null;
 let activeStaffMember = null;
 let loadAllPromise = null;
@@ -161,13 +163,21 @@ $("vehicleForm").addEventListener("submit", async (event) => {
 
   status.textContent = "Vehicle added.";
   toast("Vehicle added successfully.");
+  selectedVehicleId = data.id;
+  const queuedFiles = [...pendingVehicleFiles];
+  pendingVehicleFiles = [];
+  clearPendingPreviewUrls();
+  if (queuedFiles.length) {
+    status.textContent = `Vehicle added. Uploading ${queuedFiles.length} photo${queuedFiles.length === 1 ? "" : "s"}…`;
+    const uploaded = await uploadVehicleFiles(queuedFiles);
+    status.textContent = uploaded ? `Vehicle and ${queuedFiles.length} photo${queuedFiles.length === 1 ? "" : "s"} added.` : "Vehicle added, but one or more photos could not be uploaded.";
+  } else {
+    await loadAll();
+    selectVehicle(data.id);
+  }
   $("vehicleForm").reset();
   $("status").value = "Available";
   ["transmissionCustom", "exteriorColorCustom", "interiorColorCustom"].forEach(id => $(id)?.classList.add("hidden"));
-  selectedVehicleId = data.id;
-  await loadAll();
-  selectVehicle(data.id);
-  requestAnimationFrame(() => $("photoUploadPanel").scrollIntoView({ behavior: "smooth", block: "start" }));
 });
 
 $("resetFormBtn").addEventListener("click", () => {
@@ -175,6 +185,9 @@ $("resetFormBtn").addEventListener("click", () => {
   $("status").value = "Available";
   $("vehicleStatus").textContent = "";
   $("vinLookupStatus").textContent = "";
+  pendingVehicleFiles = [];
+  clearPendingPreviewUrls();
+  if (!selectedVehicleId) renderPendingPhotos();
   ["transmissionCustom", "exteriorColorCustom", "interiorColorCustom"].forEach(id => $(id)?.classList.add("hidden"));
 });
 
@@ -182,13 +195,13 @@ const vehicleWorkflowModal = $("vehicleWorkflowModal");
 
 function clearVehiclePhotoSelection() {
   selectedVehicleId = null;
+  pendingVehicleFiles = [];
+  clearPendingPreviewUrls();
   $("selectedVehicleLabel").textContent = "None";
-  $("uploadHint").textContent = "Add the vehicle first, then its photo uploader will become available here.";
-  $("photoInput").disabled = true;
+  $("uploadHint").textContent = "Choose photos now. They will upload automatically when you click Add Vehicle.";
+  $("photoInput").disabled = false;
   $("photoInput").value = "";
-  $("photoHelp").textContent = "No vehicle selected";
-  $("photoGrid").className = "photo-grid empty-grid";
-  $("photoGrid").textContent = "Save the vehicle details to enable photo uploads.";
+  renderPendingPhotos();
 }
 
 function openVehicleWorkflow(mode = "add") {
@@ -228,10 +241,52 @@ dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover
 dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropZone.classList.remove("dragover");
-  if (!selectedVehicleId) return toast("Select a vehicle first.");
-  handleFiles([...e.dataTransfer.files]);
+  if (!selectedVehicleId) queueVehicleFiles([...e.dataTransfer.files]);
+  else uploadVehicleFiles([...e.dataTransfer.files]);
 });
-$("photoInput").addEventListener("change", (e) => handleFiles([...e.target.files]));
+$("photoInput").addEventListener("change", (e) => {
+  if (!selectedVehicleId) queueVehicleFiles([...e.target.files]);
+  else uploadVehicleFiles([...e.target.files]);
+});
+
+function clearPendingPreviewUrls() {
+  pendingPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+  pendingPreviewUrls = [];
+}
+
+function validImageFiles(files) {
+  return files.filter(file => file.type.startsWith("image/") || /\.(jpe?g|png|webp|heic)$/i.test(file.name));
+}
+
+function queueVehicleFiles(files) {
+  const valid = validImageFiles(files);
+  if (!valid.length) return toast("Please select image files.");
+  pendingVehicleFiles.push(...valid);
+  $("photoInput").value = "";
+  renderPendingPhotos();
+}
+
+function renderPendingPhotos() {
+  const grid = $("photoGrid");
+  clearPendingPreviewUrls();
+  if (!pendingVehicleFiles.length) {
+    grid.className = "photo-grid empty-grid";
+    grid.textContent = "Choose photos to include with this vehicle.";
+    $("photoHelp").textContent = "No photos selected";
+    return;
+  }
+  pendingPreviewUrls = pendingVehicleFiles.map(file => URL.createObjectURL(file));
+  $("photoHelp").textContent = `${pendingVehicleFiles.length} photo${pendingVehicleFiles.length === 1 ? "" : "s"} ready to upload`;
+  grid.className = "photo-grid";
+  grid.innerHTML = pendingVehicleFiles.map((file, index) => `<div class="photo-card pending-photo-card">
+    <img src="${pendingPreviewUrls[index]}" alt="Selected vehicle photo ${index + 1}">
+    <div class="photo-info"><${index === 0 ? "strong" : "span"}>${index === 0 ? "Primary photo" : `Photo ${index + 1}`}</${index === 0 ? "strong" : "span"}><button class="mini-btn danger" type="button" data-remove-pending-photo="${index}">Remove</button></div>
+  </div>`).join("");
+  grid.querySelectorAll("[data-remove-pending-photo]").forEach(button => button.addEventListener("click", () => {
+    pendingVehicleFiles.splice(Number(button.dataset.removePendingPhoto), 1);
+    renderPendingPhotos();
+  }));
+}
 
 function loadAll() {
   if (loadAllPromise) return loadAllPromise;
@@ -241,7 +296,7 @@ function loadAll() {
     const { data, error } = await db.from("Vehicles").select("*").order("created_at", { ascending: false });
     if (error) throw error;
     vehicles = data || [];
-    $("availableCount").textContent = vehicles.filter(v => String(v.Status || "Available").toLowerCase() === "available").length;
+    $("availableCount").textContent = vehicles.filter(v => ["available", "coming soon"].includes(String(v.Status || "Available").toLowerCase())).length;
     await loadAllPhotos();
     renderInventory();
     if (selectedVehicleId) selectVehicle(selectedVehicleId);
@@ -292,8 +347,9 @@ function renderInventory() {
   const statusOf = vehicle => String(vehicle.Status || "Available").toLowerCase();
   const groups = [
     ["Available", vehicle => statusOf(vehicle) === "available"],
+    ["Coming Soon", vehicle => statusOf(vehicle) === "coming soon"],
     ["Sold", vehicle => statusOf(vehicle) === "sold"],
-    ["Other", vehicle => !["available", "sold"].includes(statusOf(vehicle))]
+    ["Other", vehicle => !["available", "coming soon", "sold"].includes(statusOf(vehicle))]
   ];
   list.innerHTML = groups.map(([name, matches]) => {
     const groupVehicles = filtered.filter(matches);
@@ -324,9 +380,9 @@ function publicImagePath(url) {
   return idx >= 0 ? decodeURIComponent(String(url).slice(idx + marker.length)) : null;
 }
 
-async function handleFiles(files) {
+async function uploadVehicleFiles(files) {
   if (!selectedVehicleId) return toast("Select a vehicle first.");
-  const valid = files.filter(file => file.type.startsWith("image/") || /\.(jpe?g|png|webp|heic)$/i.test(file.name));
+  const valid = validImageFiles(files);
   if (!valid.length) return toast("Please select image files.");
 
   const existing = (window.allPhotos || []).filter(p => String(p.vehicle_id) === String(selectedVehicleId));
@@ -370,9 +426,11 @@ async function handleFiles(files) {
     await loadAll();
     selectVehicle(selectedVehicleId);
     $("photoInput").value = "";
+    return true;
   } catch (error) {
     console.error(error);
     toast("Photo upload failed: " + error.message);
+    return false;
   } finally {
     setTimeout(() => progressWrap.classList.add("hidden"), 800);
   }

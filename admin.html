@@ -44,7 +44,7 @@
         <section class="panel bookings-panel">
           <div class="panel-head"><div><span class="eyebrow">TEST DRIVE BOOKINGS</span><h3>Customer requests</h3><p class="muted">Review requests, appointment details and status.</p></div><button id="refreshBookingsBtn" class="secondary-btn" type="button">Refresh Bookings</button></div>
           <section id="bookingAvailabilityAdmin" class="booking-availability-admin" hidden>
-            <div class="panel-head"><div><span class="eyebrow">ADMIN ONLY · REPEATS WEEKLY</span><h4>Customer booking availability</h4><p class="muted">Set separate recurring hours for each day. All available times stay within dealership hours (12 PM–6 PM).</p></div></div>
+            <div class="panel-head"><div><span class="eyebrow">ADMIN ONLY · REPEATS WEEKLY</span><h4>Customer booking availability</h4><p class="muted">Set separate recurring booking hours for each day. Appointment times may extend beyond regular dealership hours.</p></div></div>
             <form id="bookingAvailabilityForm">
               <div class="booking-weekly-head" aria-hidden="true"><span>Day</span><span>Available</span><span>Starts</span><span>Ends</span><span>Spacing</span></div>
               <div id="bookingWeeklyRows" class="booking-weekly-rows"></div>
@@ -82,14 +82,14 @@
 
         <div id="vehicleWorkflowModal" class="inventory-modal hidden" role="dialog" aria-modal="true" aria-labelledby="vehicleWorkflowTitle">
           <div class="inventory-modal-card">
-            <div class="inventory-modal-head"><div><span class="eyebrow">INVENTORY WORKFLOW</span><h2 id="vehicleWorkflowTitle">Add vehicle and photos</h2><p class="muted">Enter the vehicle details first. Once saved, upload and arrange its photos without leaving this window.</p></div><button id="closeVehicleModalBtn" class="inventory-modal-close" type="button" aria-label="Close add vehicle form">×</button></div>
+            <div class="inventory-modal-head"><div><span class="eyebrow">INVENTORY WORKFLOW</span><h2 id="vehicleWorkflowTitle">Add vehicle and photos</h2><p class="muted">Enter the vehicle details and choose its photos, then click Add Vehicle once to save everything together.</p></div><button id="closeVehicleModalBtn" class="inventory-modal-close" type="button" aria-label="Close add vehicle form">×</button></div>
         <div class="layout-grid inventory-workflow-grid">
           <section class="panel">
             <div class="panel-head"><div><span class="eyebrow">ADD VEHICLE</span><h3>Add a vehicle</h3></div><button id="resetFormBtn" class="link-btn" type="button">Clear</button></div>
             <form id="vehicleForm" class="form-grid">
               <label class="wide">VIN<div class="vin-lookup-row"><input id="vin" name="vin" type="text" minlength="17" maxlength="17" required><button id="vinLookupBtn" class="secondary-btn" type="button">Lookup VIN</button></div></label>
               <p id="vinLookupStatus" class="status wide"></p>
-              <label>Status<select id="status" name="status"><option>Available</option><option>Sold</option><option>Pending</option><option>Hold</option></select></label>
+              <label>Status<select id="status" name="status"><option>Available</option><option>Coming Soon</option><option>Sold</option><option>Pending</option><option>Hold</option></select></label>
               <label>Year<input id="year" name="year" type="number" min="1980" max="2100" required></label>
               <label>Make<input id="make" name="make" list="vehicleMakes" required><datalist id="vehicleMakes"><option value="Chevrolet"><option value="Dodge"><option value="Ford"><option value="GMC"><option value="Honda"><option value="Hyundai"><option value="Jeep"><option value="Kia"><option value="Mazda"><option value="Mitsubishi"><option value="Nissan"><option value="Subaru"><option value="Toyota"><option value="Volkswagen"></datalist></label><label>Model<input id="model" name="model" required></label>
               <label>Trim<input id="trim" name="trim"></label><label>Body Style<select id="bodyStyle" name="bodyStyle"><option value="">Select body style</option><option>Sedan</option><option>SUV</option><option>Hatchback</option><option>Minivan</option><option>Truck</option><option>Coupe</option><option>Convertible</option><option>Wagon</option></select></label>
@@ -110,10 +110,10 @@
 
           <section id="photoUploadPanel" class="panel">
             <div class="panel-head"><div><span class="eyebrow">PHOTOS</span><h3>Upload photos</h3></div></div>
-            <div id="uploadHint" class="notice">Select a vehicle below, then choose multiple photos at once.</div>
-            <div id="dropZone" class="drop-zone"><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple disabled><div class="drop-title">Drop photos here</div><div class="drop-sub">or click to choose multiple files</div><div class="drop-note">The first uploaded photo becomes the primary photo. Drag cards to reorder.</div></div>
+            <div id="uploadHint" class="notice">Choose photos now. They will upload automatically when you click Add Vehicle.</div>
+            <div id="dropZone" class="drop-zone"><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple><div class="drop-title">Drop photos here</div><div class="drop-sub">or click to choose multiple files</div><div class="drop-note">The first selected photo becomes the primary photo. You can reorder photos after saving.</div></div>
             <div id="uploadProgressWrap" class="progress-wrap hidden"><div class="progress-bar"><span id="uploadProgress"></span></div><small id="uploadProgressText">Uploading…</small></div>
-            <div class="photo-section-head"><h4>Current photos</h4><span id="photoHelp" class="muted">No vehicle selected</span></div><div id="photoGrid" class="photo-grid empty-grid">Select a vehicle to manage its photos.</div>
+            <div class="photo-section-head"><h4>Vehicle photos</h4><span id="photoHelp" class="muted">No photos selected</span></div><div id="photoGrid" class="photo-grid empty-grid">Choose photos to include with this vehicle.</div>
           </section>
         </div>
           </div>
@@ -143,6 +143,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="vendor/pdf-lib.min.js"></script>
-  <script src="vehicle-normalize.js?v=1"></script><script src="admin.js?v=inventorymodal2"></script><script src="vin-lookup.js?v=standardize1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-config.js?v=1"></script><script src="finance-settings.js?v=finance2"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="booking-settings-admin.js?v=2"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=deviceclock2"></script><script src="staff-schedule.js?v=2"></script><script src="admin-dashboard.js?v=schedule2"></script><script src="vehicle-edit-admin.js?v=standardize1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
+  <script src="vehicle-normalize.js?v=1"></script><script src="admin.js?v=combinedvehicle1"></script><script src="vin-lookup.js?v=standardize1"></script><script src="featured-admin.js?v=adminrestore1"></script><script src="finance-config.js?v=1"></script><script src="finance-settings.js?v=finance2"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="booking-settings-admin.js?v=3"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=deviceclock2"></script><script src="staff-schedule.js?v=2"></script><script src="admin-dashboard.js?v=schedule2"></script><script src="vehicle-edit-admin.js?v=comingsoon1"></script><script src="bill-of-sale-admin.js?v=bill6"></script>
 </body>
 </html>

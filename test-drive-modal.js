@@ -87,7 +87,7 @@
         weeklySchedule = settings;
         if (!response.ok) throw new Error();
         const rows = await response.json();
-        rows.filter(vehicle => ["available", "in stock", "active"].includes(String(vehicle.Status || "Available").toLowerCase())).forEach(vehicle => {
+        rows.filter(vehicle => ["available", "in stock", "active", "coming soon"].includes(String(vehicle.Status || "Available").toLowerCase())).forEach(vehicle => {
           const option = document.createElement("option");
           option.value = vehicle.id;
           option.textContent = `${vehicle.Year || ""} ${vehicle.Make || ""} ${vehicle.Model || ""}`.trim();

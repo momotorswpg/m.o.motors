@@ -6,7 +6,7 @@
 
   const fields = [
     ["VIN","VIN","vin"],["Year","Year","number"],["Make","Make","customselect:Chevrolet,Dodge,Ford,GMC,Honda,Hyundai,Jeep,Kia,Mazda,Mitsubishi,Nissan,Subaru,Toyota,Volkswagen"],["Model","Model","text"],["Trim","Trim","text"],
-    ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Sold,Pending,Hold"],
+    ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Coming Soon,Sold,Pending,Hold"],
     ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","customselect:Sedan,SUV,Hatchback,Minivan,Truck,Coupe,Convertible,Wagon"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
     ["Drivetrain","Drivetrain","customselect:FWD,RWD,AWD,4x4"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
     ["Doors","Doors","number"],["FuelType","Fuel Type","customselect:Gasoline,Diesel,Hybrid,Plug-in Hybrid,Electric"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]

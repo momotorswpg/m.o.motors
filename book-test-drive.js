@@ -76,7 +76,7 @@ async function initialize() {
   try {
     const response = await fetch(`${U}/rest/v1/Vehicles?select=*&order=created_at.desc`, { headers: H });
     const rows = await response.json();
-    rows.filter(vehicle => String(vehicle.Status || "Available").toLowerCase() === "available").forEach(vehicle => {
+    rows.filter(vehicle => ["available", "in stock", "active", "coming soon"].includes(String(vehicle.Status || "Available").toLowerCase())).forEach(vehicle => {
       const option = document.createElement("option");
       option.value = vehicle.id;
       option.textContent = `${vehicle.Year} ${vehicle.Make} ${vehicle.Model}`;

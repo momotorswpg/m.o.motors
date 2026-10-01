@@ -16,8 +16,8 @@
     return `<div class="booking-weekly-row" data-weekday="${day.weekday}">
       <strong>${days[day.weekday]}</strong>
       <label class="booking-day-toggle"><input type="checkbox" data-field="is_open" ${day.is_open ? "checked" : ""}><span>${day.is_open ? "Open" : "Closed"}</span></label>
-      <label><span class="mobile-field-label">Starts</span><input type="time" data-field="booking_start" min="12:00" max="17:45" value="${start}" ${day.is_open ? "" : "disabled"} required></label>
-      <label><span class="mobile-field-label">Ends</span><input type="time" data-field="booking_end" min="12:15" max="18:00" value="${end}" ${day.is_open ? "" : "disabled"} required></label>
+      <label><span class="mobile-field-label">Starts</span><input type="time" data-field="booking_start" value="${start}" ${day.is_open ? "" : "disabled"} required></label>
+      <label><span class="mobile-field-label">Ends</span><input type="time" data-field="booking_end" value="${end}" ${day.is_open ? "" : "disabled"} required></label>
       <label><span class="mobile-field-label">Spacing</span><select data-field="slot_minutes" ${day.is_open ? "" : "disabled"}><option value="15" ${Number(day.slot_minutes) === 15 ? "selected" : ""}>15 min</option><option value="30" ${Number(day.slot_minutes) === 30 ? "selected" : ""}>30 min</option><option value="60" ${Number(day.slot_minutes) === 60 ? "selected" : ""}>60 min</option></select></label>
     </div>`;
   }
@@ -63,8 +63,8 @@
       const isOpen = row.querySelector('[data-field="is_open"]').checked;
       const start = row.querySelector('[data-field="booking_start"]').value;
       const end = row.querySelector('[data-field="booking_end"]').value;
-      if (isOpen && (start < "12:00" || end > "18:00" || start >= end)) {
-        status.textContent = `${days[Number(row.dataset.weekday)]} needs a valid time range between 12:00 PM and 6:00 PM.`;
+      if (isOpen && (!start || !end || start >= end)) {
+        status.textContent = `${days[Number(row.dataset.weekday)]} needs an end time later than its start time.`;
         return;
       }
       updates.push({
