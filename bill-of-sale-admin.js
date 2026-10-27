@@ -244,7 +244,9 @@
     if (!window.PDFLib) throw new Error("The PDF generator did not load. Please refresh the page and try again.");
     if (!value("bosVehicleSelect")) throw new Error("Choose an available inventory vehicle from the suggestions first.");
     if (!value("bosVin") || !value("bosBuyerName") || !value("bosDateSold") || !value("bosInvoice")) throw new Error("Complete the invoice number, date sold, buyer name and vehicle information first.");
-    const treatySale = value("bosSaleType") === "treaty";
+    const saleType = value("bosSaleType");
+    const treatySale = saleType === "treaty";
+    const depositSale = saleType === "deposit";
     if (treatySale && (!value("bosTreatyNumber") || !value("bosRequestedDeliveryDate"))) throw new Error("Complete the treaty number and requested delivery date first.");
     const response = await fetch(treatySale ? TREATY_TEMPLATE_URL : TEMPLATE_URL, {cache:"no-store"});
     if (!response.ok) throw new Error("The original bill of sale template could not be loaded.");
@@ -305,6 +307,18 @@
       drawText(page,font,formatDate(value("bosRequestedDeliveryDate")),248,45,{maxWidth:118,size:8.5});
     }
 
+    if (depositSale) {
+      page.drawText("DEPOSIT", {
+        x: 86,
+        y: 350,
+        size: 88,
+        font: bold,
+        color: PDFLib.rgb(.82,.05,.08),
+        opacity: .18,
+        rotate: PDFLib.degrees(32)
+      });
+    }
+
     return pdf.save();
   }
 
@@ -332,7 +346,8 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `M-O-Motors-${value("bosSaleType") === "treaty" ? "Treaty-" : ""}Bill-of-Sale-${value("bosInvoice") || "draft"}.pdf`;
+      const typePrefix = value("bosSaleType") === "treaty" ? "Treaty-" : value("bosSaleType") === "deposit" ? "Deposit-" : "";
+      link.download = `M-O-Motors-${typePrefix}Bill-of-Sale-${value("bosInvoice") || "draft"}.pdf`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url),1000);
     } catch (error) { setStatus(error.message); }
