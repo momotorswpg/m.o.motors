@@ -47,7 +47,7 @@
   function updateSaleType() {
     const treatySale = value("bosSaleType") === "treaty";
     if ($("bosTreatyFields")) $("bosTreatyFields").hidden = !treatySale;
-    ["bosTreatyNumber","bosRequestedDeliveryDate"].forEach(id => { if ($(id)) $(id).required = treatySale; });
+    ["bosTreatyNumber","bosRequestedDeliveryDate"].forEach(id => { if ($(id)) $(id).required = false; });
     ["bosGst","bosRst"].forEach(id => { if ($(id)) $(id).disabled = treatySale; });
     recalculate();
   }
@@ -242,12 +242,9 @@
 
   async function createPdf() {
     if (!window.PDFLib) throw new Error("The PDF generator did not load. Please refresh the page and try again.");
-    if (!value("bosVehicleSelect")) throw new Error("Choose an available inventory vehicle from the suggestions first.");
-    if (!value("bosVin") || !value("bosBuyerName") || !value("bosDateSold") || !value("bosInvoice")) throw new Error("Complete the invoice number, date sold, buyer name and vehicle information first.");
     const saleType = value("bosSaleType");
     const treatySale = saleType === "treaty";
     const depositSale = saleType === "deposit";
-    if (treatySale && (!value("bosTreatyNumber") || !value("bosRequestedDeliveryDate"))) throw new Error("Complete the treaty number and requested delivery date first.");
     const response = await fetch(treatySale ? TREATY_TEMPLATE_URL : TEMPLATE_URL, {cache:"no-store"});
     if (!response.ok) throw new Error("The original bill of sale template could not be loaded.");
     const template = await response.arrayBuffer();
