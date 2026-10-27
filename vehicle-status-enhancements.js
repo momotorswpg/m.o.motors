@@ -11,7 +11,7 @@
       });
       if (!response.ok) return;
       const vehicle = (await response.json())[0];
-      if (String(vehicle?.Status || "").toLowerCase() !== "coming soon") return;
+      if (!["coming soon", "pending"].includes(String(vehicle?.Status || "").toLowerCase())) return;
 
       const decorate = () => {
         const image = document.querySelector(".detail-main-image");

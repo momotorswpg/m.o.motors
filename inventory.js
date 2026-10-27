@@ -11,8 +11,8 @@ const filterLabels={inventorySearch:"Search",makeFilter:"Make",modelFilter:"Mode
 
 const status=v=>text(v.Status??v.status??"Available").toLowerCase();
 const isSold=v=>status(v)==="sold";
-const isComingSoon=v=>status(v)==="coming soon";
-const isAvailable=v=>["available","in stock","active","coming soon"].includes(status(v));
+const isComingSoon=v=>["coming soon","pending"].includes(status(v));
+const isAvailable=v=>["available","in stock","active","coming soon","pending"].includes(status(v));
 const numericSetting=(key,fallback)=>Number.isFinite(Number(finance[key]))?Number(finance[key]):fallback;
 const unique=(field,predicate=()=>true)=>[...new Set(vehicles.filter(predicate).map(v=>text(v[field])).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 

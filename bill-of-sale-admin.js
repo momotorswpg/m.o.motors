@@ -130,7 +130,7 @@
     if (!select || typeof db === "undefined" || loaded) return;
     setStatus("Loading inventory...");
     try {
-      const {data,error} = await db.from("Vehicles").select("*").eq("Status","Available").order("created_at", {ascending:false});
+      const {data,error} = await db.from("Vehicles").select("*").in("Status",["Available","Coming Soon","Pending"]).order("created_at", {ascending:false});
       if (error) throw error;
       vehicles = data || [];
       select.value = "";
