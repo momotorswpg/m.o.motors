@@ -5,13 +5,13 @@
     document.head.appendChild(seo);
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
-  const dealerMapQuery='M.O. Motors, '+dealerAddress;
   const dealerMapUrl='https://share.google/PErWD86BbGRDqupQl';
+  const dealerMapEmbed='https://maps.google.com/maps?q=49.88599,-97.11032+(M.O.+Motors)&z=17&output=embed';
   function syncDealerAddress(root=document){
     root.querySelectorAll?.('.mobile-location').forEach(link=>{link.textContent='UNIT 104, 420 DES MEURONS ST, WINNIPEG';link.href=dealerMapUrl});
     root.querySelectorAll?.('.test-drive-contact .contact-value').forEach(element=>{if(/420\s+Des\s+Meurons/i.test(element.textContent||''))element.textContent=dealerAddress});
     root.querySelectorAll?.('.contact-list a[href*="google.com/maps"],.contact-list a[href*="share.google"]').forEach(link=>{link.href=dealerMapUrl;link.innerHTML='Unit 104, 420 Des Meurons St<br>Winnipeg, MB R2H 2N9'});
-    root.querySelectorAll?.('iframe[title="M.O Motors location"]').forEach(frame=>{frame.src='https://www.google.com/maps?q='+encodeURIComponent(dealerMapQuery)+'&output=embed'});
+    root.querySelectorAll?.('iframe[title="M.O Motors location"]').forEach(frame=>{frame.src=dealerMapEmbed});
   }
   syncDealerAddress();
   new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)syncDealerAddress(node)}))).observe(document.body,{childList:true,subtree:true});
