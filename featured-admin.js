@@ -84,8 +84,8 @@
 
   function decorate() {
     list.querySelectorAll(".inventory-row").forEach(row => {
-      const actions = row.querySelector(".row-actions");
-      if (!actions) return;
+      const slot = row.querySelector("[data-feature-slot]");
+      if (!slot) return;
       const id = row.dataset.id;
       const vehicle = rows.find(v => String(v.id) === String(id));
       if (!vehicle) return;
@@ -95,7 +95,7 @@
         toggleButton.type = "button";
         toggleButton.className = "featured-toggle";
         toggleButton.dataset.featureToggle = id;
-        actions.prepend(toggleButton);
+        slot.prepend(toggleButton);
         toggleButton.addEventListener("click", () => toggle(id, !vehicle.Featured));
       }
       toggleButton.textContent = vehicle.Featured ? "Featured ✓" : "Feature";
@@ -108,7 +108,7 @@
         control.className = "featured-position";
         control.dataset.featuredPosition = id;
         control.innerHTML = 'Order <select aria-label="Featured order"></select>';
-        actions.appendChild(control);
+        slot.appendChild(control);
         control.querySelector("select").addEventListener("change", event => setPosition(id, event.target.value));
       }
       const position = featured().findIndex(v => String(v.id) === String(id)) + 1;

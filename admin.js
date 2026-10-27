@@ -484,13 +484,14 @@ function renderInventory() {
       <div class="inventory-vehicle-cell">
         ${primaryPhoto?.image_url ? `<img class="inventory-thumb" src="${esc(primaryPhoto.image_url)}" alt="${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">` : `<div class="inventory-thumb inventory-thumb-placeholder" aria-hidden="true">No photo</div>`}
         <div>
-          <div class="inventory-title">${esc(v.Year)} ${esc(v.Make)} ${esc(v.Model)}</div>
+          <div class="inventory-title"><a href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing in a new tab">${esc(v.Year)} ${esc(v.Make)} ${esc(v.Model)} <span aria-hidden="true">↗</span></a></div>
           <div class="inventory-sub">VIN ${esc(v.VIN)} · ${esc(km(v.Mileage))} · ${esc(money(v.Price))} · ${photoCount} photo${photoCount === 1 ? "" : "s"}</div>
         </div>
       </div>
       <div class="inventory-controls">
+        <div class="featured-slot" data-feature-slot></div>
         <label class="inventory-status-control"><span>Status</span><select class="inventory-status-select" data-status-select="${esc(v.id)}" aria-label="Status for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">${statusOptions.map(option => `<option value="${esc(option)}"${option.toLowerCase() === status.toLowerCase() ? " selected" : ""}>${esc(option)}</option>`).join("")}</select></label>
-        <div class="row-actions"><a class="mini-btn inventory-listing-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing">Listing ↗</a><button class="mini-btn" type="button" data-edit-workflow="${esc(v.id)}">Edit Vehicle</button></div>
+        <div class="row-actions"><button class="mini-btn" type="button" data-edit-workflow="${esc(v.id)}">Edit Vehicle</button></div>
       </div>
     </div>`;
   };
