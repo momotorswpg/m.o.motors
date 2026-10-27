@@ -48,3 +48,7 @@ footer img{display:none}
 .price-row .listing-book-link{padding:7px 9px;border:1px solid var(--red);font-size:10px}
 .price-row .listing-book-link:hover{background:var(--red);color:#fff}
 @media(max-width:620px){.price-row .listing-book-link{padding:8px}}
+
+/* Keep the dealership identity visible over Google's recently updated map listing. */
+.map-wrap{position:relative}.map-business-card{position:absolute;z-index:2;top:20px;right:20px;display:flex;flex-direction:column;gap:4px;min-width:245px;padding:16px 18px;background:#fff;color:var(--black);text-decoration:none;border-left:4px solid var(--red);box-shadow:0 8px 24px rgba(16,17,20,.2)}.map-business-card strong{font-family:"Barlow Condensed",Arial,sans-serif;font-size:27px;line-height:1;text-transform:uppercase}.map-business-card span{font-size:12px;font-weight:700}.map-business-card small{margin-top:4px;color:var(--red);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}.map-business-card:hover,.map-business-card:focus-visible{transform:translateY(-1px);box-shadow:0 10px 30px rgba(16,17,20,.28)}
+@media(max-width:560px){.map-business-card{top:14px;right:14px;left:14px;min-width:0;padding:13px 15px}.map-business-card strong{font-size:24px}}
