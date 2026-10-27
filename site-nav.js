@@ -6,7 +6,7 @@
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
   const dealerMapUrl='https://share.google/PErWD86BbGRDqupQl';
-  const dealerMapEmbed='https://maps.google.com/maps?q=49.88599,-97.11032+(M.O.+Motors)&z=17&output=embed';
+  const dealerMapEmbed='https://www.google.com/maps?q=420+Des+Meurons+St,+Winnipeg,+MB+R2H+2N9&output=embed';
   function syncDealerAddress(root=document){
     root.querySelectorAll?.('.mobile-location').forEach(link=>{link.textContent='UNIT 104, 420 DES MEURONS ST, WINNIPEG';link.href=dealerMapUrl});
     root.querySelectorAll?.('.test-drive-contact .contact-value').forEach(element=>{if(/420\s+Des\s+Meurons/i.test(element.textContent||''))element.textContent=dealerAddress});
