@@ -6,7 +6,7 @@
 
   const fields = [
     ["VIN","VIN","vin"],["Year","Year","number"],["Make","Make","customselect:Chevrolet,Dodge,Ford,GMC,Honda,Hyundai,Jeep,Kia,Mazda,Mitsubishi,Nissan,Subaru,Toyota,Volkswagen"],["Model","Model","text"],["Trim","Trim","text"],
-    ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Coming Soon,Sold,Pending,Hold"],
+    ["Mileage","Mileage (km)","number"],["Price","Price (CAD)","number"],["Status","Status","select:Available,Coming Soon,Hold,Sold"],
     ["Transmission","Transmission","customselect:Automatic,Manual,CVT,Automated Manual"],["BodyStyle","Body Style","customselect:Sedan,SUV,Hatchback,Minivan,Truck,Coupe,Convertible,Wagon"],["EngineCylinders","Engine Cylinders","number"],["EngineSize","Engine Size","engine"],
     ["Drivetrain","Drivetrain","customselect:FWD,RWD,AWD,4x4"],["ExteriorColor","Exterior Colour","customselect:Black,White,Silver,Grey,Red,Blue,Brown,Beige,Tan,Green,Orange,Yellow,Gold,Maroon,Purple,Bronze"],["InteriorColor","Interior Colour","customselect:Black,Grey,Beige,Brown,Tan,White,Red,Blue,Burgundy"],
     ["Doors","Doors","number"],["FuelType","Fuel Type","customselect:Gasoline,Diesel,Hybrid,Plug-in Hybrid,Electric"],["Passengers","Passengers","number"],["AdditionalInfo","Features / Additional Information","textarea"],["Description","Description","textarea"],["CarfaxURL","CARFAX URL","url"]
@@ -14,6 +14,7 @@
 
   function esc(v="") { return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
   function input(field, label, type, value) {
+    if (field === "Status" && String(value).toLowerCase() === "pending") value = "Coming Soon";
     if (type === "vin") return `<label class="edit-wide edit-vin-label">${label}<span class="edit-vin-row"><input name="${field}" type="text" minlength="17" maxlength="17" value="${esc(value ?? "")}"><button class="secondary-btn" type="button" data-edit-vin-lookup>Lookup VIN</button></span><small class="edit-vin-status" role="status"></small></label>`;
     if (type === "textarea") return `<label class="edit-wide">${label}<textarea name="${field}" rows="5" placeholder="Add features, options, condition notes or other vehicle details not covered above.">${esc(value || "")}</textarea></label>`;
     if (type.startsWith("select:")) {
@@ -138,7 +139,7 @@
       const actions = row.querySelector(".row-actions");
       if (!actions) return;
       const btn = document.createElement("button");
-      btn.type = "button"; btn.className = "mini-btn edit-vehicle-btn"; btn.dataset.editVehicle = row.dataset.id; btn.textContent = "Edit Vehicle";
+      btn.type = "button"; btn.className = "mini-btn edit-vehicle-btn"; btn.dataset.editVehicle = row.dataset.id; btn.textContent = "Edit";
       btn.addEventListener("click", () => open(row.dataset.id));
       actions.appendChild(btn);
     });

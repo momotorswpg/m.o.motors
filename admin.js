@@ -400,11 +400,12 @@ function renderInventory() {
   }
   const renderRow = v => {
     const selected = String(v.id) === String(selectedVehicleId);
-    const status = String(v.Status || "Available");
+    const storedStatus = String(v.Status || "Available");
+    const status = storedStatus.toLowerCase() === "pending" ? "Coming Soon" : storedStatus;
     const photos = (window.allPhotos || []).filter(p => String(p.vehicle_id) === String(v.id));
     const photoCount = photos.length;
     const primaryPhoto = photos.find(photo => photo.is_primary) || photos.slice().sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0))[0];
-    const statusOptions = ["Available", "Coming Soon", "Pending", "Hold", "Sold"];
+    const statusOptions = ["Available", "Coming Soon", "Hold", "Sold"];
     if (!statusOptions.some(option => option.toLowerCase() === status.toLowerCase())) statusOptions.push(status);
     return `<div class="inventory-row" data-id="${esc(v.id)}">
       <div class="inventory-vehicle-cell">
@@ -414,14 +415,16 @@ function renderInventory() {
           <div class="inventory-sub">VIN ${esc(v.VIN)} · ${esc(km(v.Mileage))} · ${esc(money(v.Price))} · ${photoCount} photo${photoCount === 1 ? "" : "s"}</div>
         </div>
       </div>
-      <label class="inventory-status-control"><span>Status</span><select class="inventory-status-select" data-status-select="${esc(v.id)}" aria-label="Status for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">${statusOptions.map(option => `<option value="${esc(option)}"${option.toLowerCase() === status.toLowerCase() ? " selected" : ""}>${esc(option)}</option>`).join("")}</select></label>
-      <div class="row-actions"><a class="mini-btn inventory-listing-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing">Open listing ↗</a><button class="mini-btn" type="button" data-select="${esc(v.id)}">${selected ? "Selected" : "Manage Photos"}</button></div>
+      <div class="inventory-controls">
+        <label class="inventory-status-control"><span>Status</span><select class="inventory-status-select" data-status-select="${esc(v.id)}" aria-label="Status for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">${statusOptions.map(option => `<option value="${esc(option)}"${option.toLowerCase() === status.toLowerCase() ? " selected" : ""}>${esc(option)}</option>`).join("")}</select></label>
+        <div class="row-actions"><a class="mini-btn inventory-listing-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing">Listing ↗</a><button class="mini-btn" type="button" data-select="${esc(v.id)}">${selected ? "Selected" : "Photos"}</button></div>
+      </div>
     </div>`;
   };
   const statusOf = vehicle => String(vehicle.Status || "Available").toLowerCase();
   const groups = [
     ["Available", vehicle => statusOf(vehicle) === "available"],
-    ["Coming Soon / Pending", vehicle => ["coming soon", "pending"].includes(statusOf(vehicle))],
+    ["Coming Soon", vehicle => ["coming soon", "pending"].includes(statusOf(vehicle))],
     ["Sold", vehicle => statusOf(vehicle) === "sold"],
     ["Other", vehicle => !["available", "coming soon", "pending", "sold"].includes(statusOf(vehicle))]
   ];
@@ -441,7 +444,8 @@ function renderInventory() {
 }
 
 async function updateInventoryStatus(id, status, select) {
-  const previous = vehicles.find(vehicle => String(vehicle.id) === String(id))?.Status || "Available";
+  const previousStored = vehicles.find(vehicle => String(vehicle.id) === String(id))?.Status || "Available";
+  const previous = String(previousStored).toLowerCase() === "pending" ? "Coming Soon" : previousStored;
   select.disabled = true;
   const { data, error } = await db.from("Vehicles").update({ Status: status }).eq("id", id).select("id,Status").single();
   select.disabled = false;

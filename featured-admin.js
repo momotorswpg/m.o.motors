@@ -98,7 +98,7 @@
         actions.prepend(toggleButton);
         toggleButton.addEventListener("click", () => toggle(id, !vehicle.Featured));
       }
-      toggleButton.textContent = vehicle.Featured ? "Remove Featured" : "Feature";
+      toggleButton.textContent = vehicle.Featured ? "Featured ✓" : "Feature";
       toggleButton.classList.toggle("is-featured", vehicle.Featured);
 
       let control = row.querySelector("[data-featured-position]");
@@ -107,7 +107,7 @@
         control = document.createElement("label");
         control.className = "featured-position";
         control.dataset.featuredPosition = id;
-        control.innerHTML = 'Featured order <select aria-label="Featured order"></select>';
+        control.innerHTML = 'Order <select aria-label="Featured order"></select>';
         actions.appendChild(control);
         control.querySelector("select").addEventListener("change", event => setPosition(id, event.target.value));
       }
