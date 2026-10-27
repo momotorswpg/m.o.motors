@@ -24,6 +24,8 @@ let selectedVehicleId = null;
 let selectedImages = [];
 let pendingVehicleFiles = [];
 let pendingPreviewUrls = [];
+let selectedPendingFiles = new Set();
+let selectedSavedPhotoIds = new Set();
 let activeAdminUserId = null;
 let activeStaffMember = null;
 let loadAllPromise = null;
@@ -196,6 +198,8 @@ const vehicleWorkflowModal = $("vehicleWorkflowModal");
 function clearVehiclePhotoSelection() {
   selectedVehicleId = null;
   pendingVehicleFiles = [];
+  selectedPendingFiles.clear();
+  selectedSavedPhotoIds.clear();
   clearPendingPreviewUrls();
   $("selectedVehicleLabel").textContent = "None";
   $("uploadHint").textContent = "Choose photos now. They will upload automatically when you click Add Vehicle.";
@@ -266,6 +270,51 @@ function queueVehicleFiles(files) {
   renderPendingPhotos();
 }
 
+function updatePhotoSelectionControls(total, selectedCount) {
+  const actions = $("photoSelectionActions");
+  const selectAll = $("selectAllPhotos");
+  const remove = $("removeSelectedPhotos");
+  actions.classList.toggle("hidden", total === 0);
+  selectAll.checked = total > 0 && selectedCount === total;
+  selectAll.indeterminate = selectedCount > 0 && selectedCount < total;
+  remove.disabled = selectedCount === 0;
+  remove.textContent = selectedCount ? `Remove selected (${selectedCount})` : "Remove selected";
+}
+
+function bindPhotoCardDrag(grid, selector, onReorder) {
+  let dragged = null;
+  grid.querySelectorAll(selector).forEach(card => {
+    card.addEventListener("dragstart", event => {
+      if (event.target.closest("button,input,label")) {
+        event.preventDefault();
+        return;
+      }
+      dragged = card;
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", card.dataset.photoId || card.dataset.pendingIndex || "photo");
+    });
+    card.addEventListener("dragover", event => {
+      event.preventDefault();
+      if (!dragged || dragged === card) return;
+      const rect = card.getBoundingClientRect();
+      const sameRow = event.clientY >= rect.top && event.clientY <= rect.bottom;
+      const before = sameRow ? event.clientX < rect.left + rect.width / 2 : event.clientY < rect.top + rect.height / 2;
+      grid.insertBefore(dragged, before ? card : card.nextElementSibling);
+      grid.querySelectorAll(".drag-target").forEach(item => item.classList.remove("drag-target"));
+      card.classList.add("drag-target");
+    });
+    card.addEventListener("dragend", async () => {
+      if (!dragged) return;
+      dragged.classList.remove("dragging");
+      grid.querySelectorAll(".drag-target").forEach(item => item.classList.remove("drag-target"));
+      const order = [...grid.querySelectorAll(selector)].map(item => item.dataset.photoId ?? item.dataset.pendingIndex);
+      dragged = null;
+      await onReorder(order);
+    });
+  });
+}
+
 function renderPendingPhotos() {
   const grid = $("photoGrid");
   clearPendingPreviewUrls();
@@ -273,19 +322,37 @@ function renderPendingPhotos() {
     grid.className = "photo-grid empty-grid";
     grid.textContent = "Choose photos to include with this vehicle.";
     $("photoHelp").textContent = "No photos selected";
+    selectedPendingFiles.clear();
+    updatePhotoSelectionControls(0, 0);
     return;
   }
+  selectedPendingFiles = new Set([...selectedPendingFiles].filter(file => pendingVehicleFiles.includes(file)));
   pendingPreviewUrls = pendingVehicleFiles.map(file => URL.createObjectURL(file));
   $("photoHelp").textContent = `${pendingVehicleFiles.length} photo${pendingVehicleFiles.length === 1 ? "" : "s"} ready to upload`;
   grid.className = "photo-grid";
-  grid.innerHTML = pendingVehicleFiles.map((file, index) => `<div class="photo-card pending-photo-card">
+  grid.innerHTML = pendingVehicleFiles.map((file, index) => `<div class="photo-card pending-photo-card ${selectedPendingFiles.has(file) ? "selected" : ""}" draggable="true" data-pending-index="${index}">
+    <input class="photo-select" type="checkbox" data-select-pending-photo="${index}" aria-label="Select photo ${index + 1}" ${selectedPendingFiles.has(file) ? "checked" : ""}>
+    <div class="photo-drag-handle" title="Drag to reorder" aria-label="Drag to reorder photo">☷</div>
     <img src="${pendingPreviewUrls[index]}" alt="Selected vehicle photo ${index + 1}">
     <div class="photo-info"><${index === 0 ? "strong" : "span"}>${index === 0 ? "Primary photo" : `Photo ${index + 1}`}</${index === 0 ? "strong" : "span"}><button class="mini-btn danger" type="button" data-remove-pending-photo="${index}">Remove</button></div>
   </div>`).join("");
   grid.querySelectorAll("[data-remove-pending-photo]").forEach(button => button.addEventListener("click", () => {
-    pendingVehicleFiles.splice(Number(button.dataset.removePendingPhoto), 1);
+    const [removed] = pendingVehicleFiles.splice(Number(button.dataset.removePendingPhoto), 1);
+    selectedPendingFiles.delete(removed);
     renderPendingPhotos();
   }));
+  grid.querySelectorAll("[data-select-pending-photo]").forEach(input => input.addEventListener("change", () => {
+    const file = pendingVehicleFiles[Number(input.dataset.selectPendingPhoto)];
+    if (input.checked) selectedPendingFiles.add(file); else selectedPendingFiles.delete(file);
+    input.closest(".photo-card").classList.toggle("selected", input.checked);
+    updatePhotoSelectionControls(pendingVehicleFiles.length, selectedPendingFiles.size);
+  }));
+  bindPhotoCardDrag(grid, ".pending-photo-card", order => {
+    const current = [...pendingVehicleFiles];
+    pendingVehicleFiles = order.map(index => current[Number(index)]).filter(Boolean);
+    renderPendingPhotos();
+  });
+  updatePhotoSelectionControls(pendingVehicleFiles.length, selectedPendingFiles.size);
 }
 
 function loadAll() {
@@ -367,6 +434,7 @@ function selectVehicle(id) {
   const vehicle = vehicles.find(v => String(v.id) === String(id));
   if (!vehicle) return;
   selectedVehicleId = vehicle.id;
+  selectedSavedPhotoIds.clear();
   $("selectedVehicleLabel").textContent = `${vehicle.Year} ${vehicle.Make}`;
   $("uploadHint").textContent = `${vehicle.Year} ${vehicle.Make} ${vehicle.Model} · ${km(vehicle.Mileage)} · ${money(vehicle.Price)}`;
   $("photoInput").disabled = false;
@@ -446,12 +514,18 @@ function renderPhotos() {
     grid.className = "photo-grid empty-grid";
     grid.textContent = "No photos yet. Choose multiple files above to upload them all at once.";
     $("photoHelp").textContent = "No photos";
+    selectedSavedPhotoIds.clear();
+    updatePhotoSelectionControls(0, 0);
     return;
   }
 
+  const imageIds = new Set(images.map(image => String(image.id)));
+  selectedSavedPhotoIds = new Set([...selectedSavedPhotoIds].filter(id => imageIds.has(String(id))));
+
   grid.className = "photo-grid";
   $("photoHelp").textContent = `${images.length} photo${images.length === 1 ? "" : "s"} · Drag to reorder`;
-  grid.innerHTML = images.map((img, index) => `<div class="photo-card" draggable="true" data-photo-id="${esc(img.id)}">
+  grid.innerHTML = images.map((img, index) => `<div class="photo-card ${selectedSavedPhotoIds.has(String(img.id)) ? "selected" : ""}" draggable="true" data-photo-id="${esc(img.id)}">
+    <input class="photo-select" type="checkbox" data-select-saved-photo="${esc(img.id)}" aria-label="Select photo ${index + 1}" ${selectedSavedPhotoIds.has(String(img.id)) ? "checked" : ""}>
     <div class="photo-drag-handle" title="Drag to reorder" aria-label="Drag to reorder photo">☷</div>
     <img src="${esc(img.image_url)}" alt="${esc(img.alt_text || "Vehicle photo")}" loading="lazy">
     <div class="photo-info">
@@ -465,35 +539,14 @@ function renderPhotos() {
 
   grid.querySelectorAll("[data-primary]").forEach(btn => btn.addEventListener("click", () => makePrimary(btn.dataset.primary)));
   grid.querySelectorAll("[data-delete-image]").forEach(btn => btn.addEventListener("click", () => deleteImage(btn.dataset.deleteImage)));
-
-  let draggedId = null;
-  grid.querySelectorAll(".photo-card").forEach(card => {
-    card.addEventListener("dragstart", (event) => {
-      draggedId = card.dataset.photoId;
-      card.classList.add("dragging");
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", draggedId);
-    });
-
-    card.addEventListener("dragend", async () => {
-      card.classList.remove("dragging");
-      const ids = [...grid.querySelectorAll(".photo-card")].map(el => el.dataset.photoId);
-      if (!draggedId || !ids.includes(draggedId)) return;
-      await savePhotoOrder(ids);
-      draggedId = null;
-    });
-
-    card.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      const dragging = grid.querySelector(".photo-card.dragging");
-      if (!dragging || dragging === card) return;
-
-      const rect = card.getBoundingClientRect();
-      const before = event.clientY < rect.top + rect.height / 2;
-      const reference = before ? card : card.nextElementSibling;
-      if (reference !== dragging) grid.insertBefore(dragging, reference);
-    });
-  });
+  grid.querySelectorAll("[data-select-saved-photo]").forEach(input => input.addEventListener("change", () => {
+    const id = String(input.dataset.selectSavedPhoto);
+    if (input.checked) selectedSavedPhotoIds.add(id); else selectedSavedPhotoIds.delete(id);
+    input.closest(".photo-card").classList.toggle("selected", input.checked);
+    updatePhotoSelectionControls(images.length, selectedSavedPhotoIds.size);
+  }));
+  bindPhotoCardDrag(grid, ".photo-card", savePhotoOrder);
+  updatePhotoSelectionControls(images.length, selectedSavedPhotoIds.size);
 }
 
 async function savePhotoOrder(ids) {
@@ -514,13 +567,13 @@ async function savePhotoOrder(ids) {
 
     for (let i = 0; i < ordered.length; i++) {
       const { error } = await db.from("vehicle_images")
-        .update({ sort_order: i + 1 })
+        .update({ sort_order: i + 1, is_primary: i === 0 })
         .eq("id", ordered[i].id)
         .eq("vehicle_id", selectedVehicleId);
       if (error) throw error;
     }
 
-    const byId = new Map(ordered.map((photo, index) => [String(photo.id), { ...photo, sort_order: index + 1 }]));
+    const byId = new Map(ordered.map((photo, index) => [String(photo.id), { ...photo, sort_order: index + 1, is_primary: index === 0 }]));
     window.allPhotos = (window.allPhotos || []).map(photo => byId.get(String(photo.id)) || photo);
     renderPhotos();
     toast("Photo order saved.");
@@ -547,17 +600,53 @@ async function makePrimary(imageId) {
 }
 
 async function deleteImage(imageId) {
-  const image = (window.allPhotos || []).find(p => String(p.id) === String(imageId));
-  if (!image) return;
-  if (!confirm("Delete this photo?")) return;
-
-  const path = publicImagePath(image.image_url);
-  if (path) await db.storage.from(BUCKET).remove([path]);
-  const { error } = await db.from("vehicle_images").delete().eq("id", imageId);
-  if (error) return toast(error.message);
-  toast("Photo deleted.");
-  await loadAll();
-  selectVehicle(selectedVehicleId);
+  await deleteImages([imageId]);
 }
+
+async function deleteImages(imageIds) {
+  const ids = [...new Set(imageIds.map(String))];
+  const images = (window.allPhotos || []).filter(photo => ids.includes(String(photo.id)) && String(photo.vehicle_id) === String(selectedVehicleId));
+  if (!images.length) return;
+  if (!confirm(`Permanently delete ${images.length} selected photo${images.length === 1 ? "" : "s"}?`)) return;
+
+  const paths = images.map(image => publicImagePath(image.image_url)).filter(Boolean);
+  if (paths.length) {
+    const { error: storageError } = await db.storage.from(BUCKET).remove(paths);
+    if (storageError) return toast("Could not delete photo files: " + storageError.message);
+  }
+  const { error } = await db.from("vehicle_images").delete().in("id", ids).eq("vehicle_id", selectedVehicleId);
+  if (error) return toast(error.message);
+
+  const removedPrimary = images.some(image => image.is_primary);
+  selectedSavedPhotoIds.clear();
+  await loadAll();
+  const remaining = (window.allPhotos || []).filter(photo => String(photo.vehicle_id) === String(selectedVehicleId)).sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0));
+  if (removedPrimary && remaining.length) await makePrimary(remaining[0].id);
+  else selectVehicle(selectedVehicleId);
+  toast(`${images.length} photo${images.length === 1 ? "" : "s"} deleted.`);
+}
+
+$("selectAllPhotos").addEventListener("change", event => {
+  if (selectedVehicleId) {
+    const images = (window.allPhotos || []).filter(photo => String(photo.vehicle_id) === String(selectedVehicleId));
+    selectedSavedPhotoIds = event.target.checked ? new Set(images.map(photo => String(photo.id))) : new Set();
+    renderPhotos();
+  } else {
+    selectedPendingFiles = event.target.checked ? new Set(pendingVehicleFiles) : new Set();
+    renderPendingPhotos();
+  }
+});
+
+$("removeSelectedPhotos").addEventListener("click", async () => {
+  if (selectedVehicleId) {
+    await deleteImages([...selectedSavedPhotoIds]);
+    return;
+  }
+  if (!selectedPendingFiles.size) return;
+  pendingVehicleFiles = pendingVehicleFiles.filter(file => !selectedPendingFiles.has(file));
+  selectedPendingFiles.clear();
+  renderPendingPhotos();
+  toast("Selected photos removed from this vehicle.");
+});
 
 requireSession();
