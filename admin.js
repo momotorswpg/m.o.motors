@@ -21,6 +21,7 @@ const esc = (value = "") => String(value).replaceAll("&","&amp;").replaceAll("<"
 
 let vehicles = [];
 let selectedVehicleId = null;
+let editingVehicleId = null;
 let selectedImages = [];
 let pendingVehicleFiles = [];
 let pendingPreviewUrls = [];
@@ -156,6 +157,21 @@ $("vehicleForm").addEventListener("submit", async (event) => {
     CarfaxURL: formValue("carfaxUrl") || null
   };
 
+  if (editingVehicleId) {
+    const vehicleId = editingVehicleId;
+    const { data, error } = await db.from("Vehicles").update(row).eq("id", vehicleId).select().single();
+    if (error) {
+      console.error(error);
+      status.textContent = error.message;
+      return;
+    }
+    status.textContent = "Vehicle details saved.";
+    toast("Vehicle and photo changes saved.");
+    await loadAll();
+    selectVehicle(data.id);
+    return;
+  }
+
   const { data, error } = await db.from("Vehicles").insert(row).select().single();
   if (error) {
     console.error(error);
@@ -183,6 +199,13 @@ $("vehicleForm").addEventListener("submit", async (event) => {
 });
 
 $("resetFormBtn").addEventListener("click", () => {
+  if (editingVehicleId) {
+    const vehicle = vehicles.find(item => String(item.id) === String(editingVehicleId));
+    if (vehicle) populateVehicleForm(vehicle);
+    $("vehicleStatus").textContent = "";
+    $("vinLookupStatus").textContent = "";
+    return;
+  }
   $("vehicleForm").reset();
   $("status").value = "Available";
   $("vehicleStatus").textContent = "";
@@ -194,6 +217,47 @@ $("resetFormBtn").addEventListener("click", () => {
 });
 
 const vehicleWorkflowModal = $("vehicleWorkflowModal");
+
+function setVehicleFormSelect(selectId, customId, value) {
+  const select = $(selectId);
+  if (!select) return;
+  const normalized = String(value || "");
+  const match = [...select.options].find(option => option.value.toLowerCase() === normalized.toLowerCase());
+  if (match) {
+    select.value = match.value;
+    if (customId) { $(customId).value = ""; $(customId).classList.add("hidden"); }
+  } else if (customId && normalized) {
+    select.value = "Other";
+    $(customId).value = normalized;
+    $(customId).classList.remove("hidden");
+  } else select.value = "";
+}
+
+function populateVehicleForm(vehicle) {
+  const values = {
+    vin: vehicle.VIN, year: vehicle.Year, make: vehicle.Make, model: vehicle.Model, trim: vehicle.Trim,
+    mileage: vehicle.Mileage, price: vehicle.Price, bodyStyle: vehicle.BodyStyle, engineCylinders: vehicle.EngineCylinders,
+    engineSize: vehicle.EngineSize, drivetrain: vehicle.Drivetrain, doors: vehicle.Doors, fuelType: vehicle.FuelType,
+    passengers: vehicle.Passengers, additionalInfo: vehicle.AdditionalInfo, description: vehicle.Description, carfaxUrl: vehicle.CarfaxURL
+  };
+  Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).value = value ?? ""; });
+  $("status").value = String(vehicle.Status || "Available").toLowerCase() === "pending" ? "Coming Soon" : (vehicle.Status || "Available");
+  setVehicleFormSelect("transmission", "transmissionCustom", vehicle.Transmission);
+  setVehicleFormSelect("exteriorColor", "exteriorColorCustom", vehicle.ExteriorColor);
+  setVehicleFormSelect("interiorColor", "interiorColorCustom", vehicle.InteriorColor);
+}
+
+function configureVehicleWorkflow(mode, vehicle = null) {
+  const editing = mode === "edit";
+  $("vehicleWorkflowTitle").textContent = editing ? "Edit vehicle and photos" : "Add vehicle and photos";
+  $("vehicleWorkflowDescription").textContent = editing
+    ? "Update the vehicle details, upload or reorder photos, then save your changes in one place."
+    : "Enter the vehicle details and choose its photos, then click Add Vehicle once to save everything together.";
+  $("vehicleFormEyebrow").textContent = editing ? "EDIT VEHICLE" : "ADD VEHICLE";
+  $("vehicleFormHeading").textContent = editing ? `${vehicle?.Year || ""} ${vehicle?.Make || ""} ${vehicle?.Model || ""}`.trim() : "Add a vehicle";
+  $("vehicleFormSubmit").textContent = editing ? "Save Changes" : "Add Vehicle";
+  $("resetFormBtn").textContent = editing ? "Reset Changes" : "Clear";
+}
 
 function clearVehiclePhotoSelection() {
   selectedVehicleId = null;
@@ -208,16 +272,26 @@ function clearVehiclePhotoSelection() {
   renderPendingPhotos();
 }
 
-function openVehicleWorkflow(mode = "add") {
+function openVehicleWorkflow(mode = "add", vehicleId = null) {
   if (mode === "add") {
+    editingVehicleId = null;
+    configureVehicleWorkflow("add");
     $("resetFormBtn").click();
     clearVehiclePhotoSelection();
+  } else if (mode === "edit") {
+    const vehicle = vehicles.find(item => String(item.id) === String(vehicleId));
+    if (!vehicle) return toast("Could not find that vehicle.");
+    editingVehicleId = vehicle.id;
+    selectVehicle(vehicle.id);
+    configureVehicleWorkflow("edit", vehicle);
+    populateVehicleForm(vehicle);
+    $("vehicleStatus").textContent = "";
+    $("vinLookupStatus").textContent = "";
   }
   vehicleWorkflowModal.classList.remove("hidden");
   document.body.classList.add("inventory-modal-open");
   requestAnimationFrame(() => {
-    if (mode === "photos") $("photoUploadPanel").scrollIntoView({ block: "start" });
-    else $("vin").focus();
+    $("vin").focus();
   });
 }
 
@@ -399,7 +473,6 @@ function renderInventory() {
     return;
   }
   const renderRow = v => {
-    const selected = String(v.id) === String(selectedVehicleId);
     const storedStatus = String(v.Status || "Available");
     const status = storedStatus.toLowerCase() === "pending" ? "Coming Soon" : storedStatus;
     const photos = (window.allPhotos || []).filter(p => String(p.vehicle_id) === String(v.id));
@@ -417,7 +490,7 @@ function renderInventory() {
       </div>
       <div class="inventory-controls">
         <label class="inventory-status-control"><span>Status</span><select class="inventory-status-select" data-status-select="${esc(v.id)}" aria-label="Status for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">${statusOptions.map(option => `<option value="${esc(option)}"${option.toLowerCase() === status.toLowerCase() ? " selected" : ""}>${esc(option)}</option>`).join("")}</select></label>
-        <div class="row-actions"><a class="mini-btn inventory-listing-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing">Listing ↗</a><button class="mini-btn" type="button" data-select="${esc(v.id)}">${selected ? "Selected" : "Photos"}</button></div>
+        <div class="row-actions"><a class="mini-btn inventory-listing-link" href="vehicle.html?id=${encodeURIComponent(v.id)}" target="_blank" rel="noopener" aria-label="Open ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())} listing">Listing ↗</a><button class="mini-btn" type="button" data-edit-workflow="${esc(v.id)}">Edit Vehicle</button></div>
       </div>
     </div>`;
   };
@@ -434,10 +507,7 @@ function renderInventory() {
     return `<details class="inventory-group" ${name === "Available" ? "open" : ""}><summary>${name} vehicles <span>${groupVehicles.length}</span></summary><div class="inventory-group-list">${groupVehicles.map(renderRow).join("")}</div></details>`;
   }).join("");
 
-  list.querySelectorAll("[data-select]").forEach(btn => btn.addEventListener("click", () => {
-    selectVehicle(btn.dataset.select);
-    openVehicleWorkflow("photos");
-  }));
+  list.querySelectorAll("[data-edit-workflow]").forEach(btn => btn.addEventListener("click", () => openVehicleWorkflow("edit", btn.dataset.editWorkflow)));
   list.querySelectorAll("[data-status-select]").forEach(select => select.addEventListener("change", async () => {
     await updateInventoryStatus(select.dataset.statusSelect, select.value, select);
   }));

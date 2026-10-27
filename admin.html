@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="tradeins-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="requests-admin.css?v=requestsclean1">
   <link rel="stylesheet" href="admin-dashboard.css?v=adminrestore1">
-  <link rel="stylesheet" href="vehicle-edit-admin.css?v=adminrestore1">
   <link rel="stylesheet" href="vehicle-edit-vin.css?v=editvin1">
   <link rel="stylesheet" href="bill-of-sale-admin.css?v=bill3">
   <link rel="stylesheet" href="staff-payroll.css?v=deviceclock2">
@@ -82,14 +81,14 @@
 
         <div id="vehicleWorkflowModal" class="inventory-modal hidden" role="dialog" aria-modal="true" aria-labelledby="vehicleWorkflowTitle">
           <div class="inventory-modal-card">
-            <div class="inventory-modal-head"><div><span class="eyebrow">INVENTORY WORKFLOW</span><h2 id="vehicleWorkflowTitle">Add vehicle and photos</h2><p class="muted">Enter the vehicle details and choose its photos, then click Add Vehicle once to save everything together.</p></div><button id="closeVehicleModalBtn" class="inventory-modal-close" type="button" aria-label="Close add vehicle form">×</button></div>
+            <div class="inventory-modal-head"><div><span class="eyebrow">INVENTORY WORKFLOW</span><h2 id="vehicleWorkflowTitle">Add vehicle and photos</h2><p id="vehicleWorkflowDescription" class="muted">Enter the vehicle details and choose its photos, then click Add Vehicle once to save everything together.</p></div><button id="closeVehicleModalBtn" class="inventory-modal-close" type="button" aria-label="Close vehicle form">×</button></div>
         <div class="layout-grid inventory-workflow-grid">
           <section class="panel">
-            <div class="panel-head"><div><span class="eyebrow">ADD VEHICLE</span><h3>Add a vehicle</h3></div><button id="resetFormBtn" class="link-btn" type="button">Clear</button></div>
+            <div class="panel-head"><div><span id="vehicleFormEyebrow" class="eyebrow">ADD VEHICLE</span><h3 id="vehicleFormHeading">Add a vehicle</h3></div><button id="resetFormBtn" class="link-btn" type="button">Clear</button></div>
             <form id="vehicleForm" class="form-grid">
               <label class="wide">VIN<div class="vin-lookup-row"><input id="vin" name="vin" type="text" minlength="17" maxlength="17" required><button id="vinLookupBtn" class="secondary-btn" type="button">Lookup VIN</button></div></label>
               <p id="vinLookupStatus" class="status wide"></p>
-              <label>Status<select id="status" name="status"><option>Available</option><option>Coming Soon</option><option>Sold</option><option>Pending</option><option>Hold</option></select></label>
+              <label>Status<select id="status" name="status"><option>Available</option><option>Coming Soon</option><option>Hold</option><option>Sold</option></select></label>
               <label>Year<input id="year" name="year" type="number" min="1980" max="2100" required></label>
               <label>Make<input id="make" name="make" list="vehicleMakes" required><datalist id="vehicleMakes"><option value="Chevrolet"><option value="Dodge"><option value="Ford"><option value="GMC"><option value="Honda"><option value="Hyundai"><option value="Jeep"><option value="Kia"><option value="Mazda"><option value="Mitsubishi"><option value="Nissan"><option value="Subaru"><option value="Toyota"><option value="Volkswagen"></datalist></label><label>Model<input id="model" name="model" required></label>
               <label>Trim<input id="trim" name="trim"></label><label>Body Style<select id="bodyStyle" name="bodyStyle"><option value="">Select body style</option><option>Sedan</option><option>SUV</option><option>Hatchback</option><option>Minivan</option><option>Truck</option><option>Coupe</option><option>Convertible</option><option>Wagon</option></select></label>
@@ -104,7 +103,7 @@
               <label class="wide">CARFAX URL<input id="carfaxUrl" name="carfaxUrl" type="url"></label>
               <label class="wide">Features / Additional Information<textarea id="additionalInfo" name="additionalInfo" rows="4"></textarea></label>
               <label class="wide">Description<textarea id="description" name="description" rows="4"></textarea></label>
-              <div class="wide form-actions"><button class="primary-btn" type="submit">Add Vehicle</button><p id="vehicleStatus" class="status"></p></div>
+              <div class="wide form-actions"><button id="vehicleFormSubmit" class="primary-btn" type="submit">Add Vehicle</button><p id="vehicleStatus" class="status"></p></div>
             </form>
           </section>
 
@@ -143,6 +142,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="vendor/pdf-lib.min.js"></script>
-  <script src="vehicle-normalize.js?v=1"></script><script src="admin.js?v=inventory-compact1"></script><script src="vin-lookup.js?v=standardize1"></script><script src="featured-admin.js?v=compact1"></script><script src="finance-config.js?v=1"></script><script src="finance-settings.js?v=finance2"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="booking-settings-admin.js?v=3"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=deviceclock2"></script><script src="staff-schedule.js?v=2"></script><script src="admin-dashboard.js?v=schedule2"></script><script src="vehicle-edit-admin.js?v=compact1"></script><script src="bill-of-sale-admin.js?v=pending1"></script>
+  <script src="vehicle-normalize.js?v=1"></script><script src="admin.js?v=combined-edit1"></script><script src="vin-lookup.js?v=standardize1"></script><script src="featured-admin.js?v=compact1"></script><script src="finance-config.js?v=1"></script><script src="finance-settings.js?v=finance2"></script><script src="bookings-admin.js?v=bookingsclean1"></script><script src="booking-settings-admin.js?v=3"></script><script src="test-drive-consent-admin.js?v=consent1"></script><script src="tradeins-admin.js?v=adminrestore1"></script><script src="requests-admin.js?v=requestsclean1"></script><script src="staff-payroll.js?v=deviceclock2"></script><script src="staff-schedule.js?v=2"></script><script src="admin-dashboard.js?v=schedule2"></script><script src="bill-of-sale-admin.js?v=pending1"></script>
 </body>
 </html>
