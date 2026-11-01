@@ -27,6 +27,7 @@ let pendingVehicleFiles = [];
 let pendingPreviewUrls = [];
 let selectedPendingFiles = new Set();
 let selectedSavedPhotoIds = new Set();
+let stagedSavedPhotoOrder = null;
 let activeAdminUserId = null;
 let activeStaffMember = null;
 let loadAllPromise = null;
@@ -165,6 +166,15 @@ $("vehicleForm").addEventListener("submit", async (event) => {
       status.textContent = error.message;
       return;
     }
+    if (stagedSavedPhotoOrder?.length) {
+      status.textContent = "Saving photo order…";
+      const orderSaved = await savePhotoOrder(stagedSavedPhotoOrder, { silent: true });
+      if (!orderSaved) {
+        status.textContent = "Vehicle details saved, but the photo order could not be saved.";
+        return;
+      }
+      stagedSavedPhotoOrder = null;
+    }
     status.textContent = "Vehicle details saved.";
     toast("Vehicle and photo changes saved.");
     await loadAll();
@@ -204,6 +214,8 @@ $("resetFormBtn").addEventListener("click", () => {
     if (vehicle) populateVehicleForm(vehicle);
     $("vehicleStatus").textContent = "";
     $("vinLookupStatus").textContent = "";
+    stagedSavedPhotoOrder = null;
+    renderPhotos();
     return;
   }
   $("vehicleForm").reset();
@@ -273,6 +285,7 @@ function clearVehiclePhotoSelection() {
 }
 
 function openVehicleWorkflow(mode = "add", vehicleId = null) {
+  stagedSavedPhotoOrder = null;
   if (mode === "add") {
     editingVehicleId = null;
     configureVehicleWorkflow("add");
@@ -296,6 +309,7 @@ function openVehicleWorkflow(mode = "add", vehicleId = null) {
 }
 
 function closeVehicleWorkflow() {
+  stagedSavedPhotoOrder = null;
   vehicleWorkflowModal.classList.add("hidden");
   document.body.classList.remove("inventory-modal-open");
   $("openVehicleModalBtn").focus();
@@ -536,6 +550,7 @@ function selectVehicle(id) {
   const vehicle = vehicles.find(v => String(v.id) === String(id));
   if (!vehicle) return;
   selectedVehicleId = vehicle.id;
+  stagedSavedPhotoOrder = null;
   selectedSavedPhotoIds.clear();
   $("selectedVehicleLabel").textContent = `${vehicle.Year} ${vehicle.Make}`;
   $("uploadHint").textContent = `${vehicle.Year} ${vehicle.Make} ${vehicle.Model} · ${km(vehicle.Mileage)} · ${money(vehicle.Price)}`;
@@ -608,9 +623,14 @@ async function uploadVehicleFiles(files) {
 
 function renderPhotos() {
   const grid = $("photoGrid");
-  const images = (window.allPhotos || [])
+  let images = (window.allPhotos || [])
     .filter(p => String(p.vehicle_id) === String(selectedVehicleId))
     .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0));
+
+  if (stagedSavedPhotoOrder?.length) {
+    const byId = new Map(images.map(photo => [String(photo.id), photo]));
+    images = stagedSavedPhotoOrder.map(id => byId.get(String(id))).filter(Boolean);
+  }
 
   if (!images.length) {
     grid.className = "photo-grid empty-grid";
@@ -647,11 +667,17 @@ function renderPhotos() {
     input.closest(".photo-card").classList.toggle("selected", input.checked);
     updatePhotoSelectionControls(images.length, selectedSavedPhotoIds.size);
   }));
-  bindPhotoCardDrag(grid, ".photo-card", savePhotoOrder);
+  bindPhotoCardDrag(grid, ".photo-card", stagePhotoOrder);
   updatePhotoSelectionControls(images.length, selectedSavedPhotoIds.size);
 }
 
-async function savePhotoOrder(ids) {
+function stagePhotoOrder(ids) {
+  stagedSavedPhotoOrder = [...ids];
+  renderPhotos();
+  $("photoHelp").textContent += " · Unsaved order";
+}
+
+async function savePhotoOrder(ids, { silent = false } = {}) {
   if (!selectedVehicleId || !ids.length) return;
   const photoById = new Map((window.allPhotos || []).map(photo => [String(photo.id), photo]));
   const ordered = ids.map(id => photoById.get(String(id))).filter(Boolean);
@@ -678,11 +704,13 @@ async function savePhotoOrder(ids) {
     const byId = new Map(ordered.map((photo, index) => [String(photo.id), { ...photo, sort_order: index + 1, is_primary: index === 0 }]));
     window.allPhotos = (window.allPhotos || []).map(photo => byId.get(String(photo.id)) || photo);
     renderPhotos();
-    toast("Photo order saved.");
+    if (!silent) toast("Photo order saved.");
+    return true;
   } catch (error) {
     console.error(error);
     toast("Could not save photo order: " + error.message);
     renderPhotos();
+    return false;
   }
 }
 
