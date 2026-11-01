@@ -179,6 +179,7 @@ $("vehicleForm").addEventListener("submit", async (event) => {
     toast("Vehicle and photo changes saved.");
     await loadAll();
     selectVehicle(data.id);
+    closeVehicleWorkflow();
     return;
   }
 
