@@ -46,10 +46,15 @@
   ensureMeta('meta[property="og:title"]', { property:"og:title", content:page[0] });
   ensureMeta('meta[property="og:description"]', { property:"og:description", content:page[1] });
   ensureMeta('meta[property="og:url"]', { property:"og:url", content:canonical });
-  ensureMeta('meta[property="og:image"]', { property:"og:image", content:`${site}/mo-motors-logo.png` });
+  const socialImage = `${site}/mo-motors-social-share.png?v=1`;
+  ensureMeta('meta[property="og:image"]', { property:"og:image", content:socialImage });
+  ensureMeta('meta[property="og:image:type"]', { property:"og:image:type", content:"image/png" });
+  ensureMeta('meta[property="og:image:width"]', { property:"og:image:width", content:"1200" });
+  ensureMeta('meta[property="og:image:height"]', { property:"og:image:height", content:"630" });
   ensureMeta('meta[name="twitter:card"]', { name:"twitter:card", content:"summary_large_image" });
   ensureMeta('meta[name="twitter:title"]', { name:"twitter:title", content:page[0] });
   ensureMeta('meta[name="twitter:description"]', { name:"twitter:description", content:page[1] });
+  ensureMeta('meta[name="twitter:image"]', { name:"twitter:image", content:socialImage });
   ensureLink("canonical", canonical);
 
   const localBusiness = {
