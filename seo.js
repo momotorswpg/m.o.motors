@@ -2,7 +2,7 @@
   const site = "https://www.momotors.ca";
   const path = location.pathname.split("/").pop() || "index.html";
   const pages = {
-    "index.html": ["Used Vehicles in Winnipeg | M.O Motors", "Shop quality used and pre-owned vehicles in Winnipeg at M.O Motors. Browse our inventory, value your trade, explore financing and book a test drive."],
+    "index.html": ["Used Vehicles in Winnipeg | M.O. Motors", "Shop quality used and pre-owned vehicles in Winnipeg at M.O. Motors. Browse our inventory, value your trade, explore financing and book a test drive."],
     "inventory.html": ["Used Vehicle Inventory in Winnipeg | M.O Motors", "Browse used cars, SUVs, trucks and vans for sale in Winnipeg. View current pre-owned inventory, pricing, photos and payment estimates from M.O Motors."],
     "vehicle.html": ["Used Vehicle for Sale in Winnipeg | M.O Motors", "View pricing, photos, specifications and purchase options for this pre-owned vehicle at M.O Motors in Winnipeg."],
     "pre-approval.html": ["Used Car Financing Pre-Approval Winnipeg | M.O Motors", "Apply online for used vehicle financing pre-approval in Winnipeg. M.O Motors offers a simple application for a range of credit situations."],
@@ -42,7 +42,7 @@
   ensureMeta('meta[name="description"]', { name:"description", content:page[1] });
   ensureMeta('meta[name="robots"]', { name:"robots", content:"index,follow,max-image-preview:large" });
   ensureMeta('meta[property="og:type"]', { property:"og:type", content:path === "vehicle.html" ? "product" : "website" });
-  ensureMeta('meta[property="og:site_name"]', { property:"og:site_name", content:"M.O Motors" });
+  ensureMeta('meta[property="og:site_name"]', { property:"og:site_name", content:"M.O. Motors" });
   ensureMeta('meta[property="og:title"]', { property:"og:title", content:page[0] });
   ensureMeta('meta[property="og:description"]', { property:"og:description", content:page[1] });
   ensureMeta('meta[property="og:url"]', { property:"og:url", content:canonical });
@@ -61,7 +61,7 @@
     "@context":"https://schema.org",
     "@type":"AutoDealer",
     "@id":`${site}/#dealership`,
-    name:"M.O Motors",
+    name:"M.O. Motors",
     url:`${site}/`,
     logo:`${site}/mo-motors-logo.png`,
     image:`${site}/mo-motors-logo.png`,
