@@ -506,6 +506,7 @@ function renderInventory() {
       <div class="inventory-controls">
         <div class="featured-slot" data-feature-slot></div>
         <label class="inventory-status-control"><span>Status</span><select class="inventory-status-select" data-status-select="${esc(v.id)}" aria-label="Status for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}">${statusOptions.map(option => `<option value="${esc(option)}"${option.toLowerCase() === status.toLowerCase() ? " selected" : ""}>${esc(option)}</option>`).join("")}</select></label>
+        <label class="inventory-price-control"><span>Price</span><div class="inventory-price-input-wrap"><span aria-hidden="true">$</span><input class="inventory-price-input" type="number" min="0" step="0.01" inputmode="decimal" value="${Number.isFinite(Number(v.Price)) ? esc(Number(v.Price)) : ""}" data-price-input="${esc(v.id)}" aria-label="Price for ${esc(`${v.Year || ""} ${v.Make || ""} ${v.Model || ""}`.trim())}"></div></label>
         <div class="row-actions"><button class="mini-btn" type="button" data-edit-workflow="${esc(v.id)}">Edit Vehicle</button></div>
       </div>
     </div>`;
@@ -527,6 +528,17 @@ function renderInventory() {
   list.querySelectorAll("[data-status-select]").forEach(select => select.addEventListener("change", async () => {
     await updateInventoryStatus(select.dataset.statusSelect, select.value, select);
   }));
+  list.querySelectorAll("[data-price-input]").forEach(input => {
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        input.blur();
+      }
+    });
+    input.addEventListener("change", async () => {
+      await updateInventoryPrice(input.dataset.priceInput, input.value, input);
+    });
+  });
 }
 
 async function updateInventoryStatus(id, status, select) {
@@ -545,6 +557,36 @@ async function updateInventoryStatus(id, status, select) {
   $("availableCount").textContent = vehicles.filter(item => ["available", "coming soon", "pending"].includes(String(item.Status || "Available").toLowerCase())).length;
   renderInventory();
   toast(`Vehicle status updated to ${data?.Status || status}.`);
+}
+
+async function updateInventoryPrice(id, value, input) {
+  const vehicle = vehicles.find(item => String(item.id) === String(id));
+  if (!vehicle) return;
+  const previous = vehicle.Price;
+  const price = Number(value);
+  if (value === "" || !Number.isFinite(price) || price < 0) {
+    input.value = Number.isFinite(Number(previous)) ? Number(previous) : "";
+    toast("Enter a valid vehicle price.");
+    return;
+  }
+
+  input.disabled = true;
+  const { data, error } = await db.from("Vehicles").update({ Price: price }).eq("id", id).select("id,Price").single();
+  input.disabled = false;
+  if (error) {
+    input.value = Number.isFinite(Number(previous)) ? Number(previous) : "";
+    toast("Could not update vehicle price: " + error.message);
+    return;
+  }
+
+  vehicle.Price = data?.Price ?? price;
+  input.value = Number(vehicle.Price);
+  const summary = input.closest(".inventory-row")?.querySelector(".inventory-sub");
+  if (summary) {
+    const photos = (window.allPhotos || []).filter(photo => String(photo.vehicle_id) === String(id));
+    summary.textContent = `VIN ${vehicle.VIN || ""} · ${km(vehicle.Mileage)} · ${money(vehicle.Price)} · ${photos.length} photo${photos.length === 1 ? "" : "s"}`;
+  }
+  toast(`Vehicle price updated to ${money(vehicle.Price)}.`);
 }
 
 function selectVehicle(id) {
