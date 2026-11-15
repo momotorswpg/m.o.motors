@@ -7,7 +7,7 @@
   }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
-    seo.src = 'seo.js?v=6';
+    seo.src = 'seo.js?v=7';
     document.head.appendChild(seo);
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';

@@ -71,9 +71,12 @@
     logo:`${site}/mo-motors-logo.png`,
     image:`${site}/mo-motors-logo.png`,
     telephone:"+1-204-963-4462",
+    email:"momotorswpg@gmail.com",
     priceRange:"$$",
+    hasMap:"https://share.google/PErWD86BbGRDqupQl",
     address:{"@type":"PostalAddress",streetAddress:"Unit 104, 420 Des Meurons St",addressLocality:"Winnipeg",addressRegion:"MB",postalCode:"R2H 2N9",addressCountry:"CA"},
     areaServed:{"@type":"City",name:"Winnipeg"},
+    contactPoint:{"@type":"ContactPoint",telephone:"+1-204-963-4462",contactType:"sales",areaServed:"CA",availableLanguage:"English"},
     openingHoursSpecification:[{"@type":"OpeningHoursSpecification",dayOfWeek:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],opens:"12:00",closes:"18:00"}],
     sameAs:[
       "https://www.google.com/maps/place/M.O.+Motors/data=!4m2!3m1!1s0x0:0xd2d181aaae856edf",
@@ -90,6 +93,24 @@
     document.head.appendChild(schema);
   }
   schema.textContent = JSON.stringify(localBusiness);
+
+  let websiteSchema = document.getElementById("websiteSchema");
+  if (!websiteSchema) {
+    websiteSchema = document.createElement("script");
+    websiteSchema.id = "websiteSchema";
+    websiteSchema.type = "application/ld+json";
+    document.head.appendChild(websiteSchema);
+  }
+  websiteSchema.textContent = JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "@id":`${site}/#website`,
+    url:`${site}/`,
+    name:"M.O. Motors",
+    alternateName:"M.O. Motors Winnipeg",
+    publisher:{"@id":`${site}/#dealership`},
+    inLanguage:"en-CA"
+  });
 
   const pageTypes = {
     "inventory.html": ["CollectionPage", "Used Vehicle Inventory in Winnipeg"],
