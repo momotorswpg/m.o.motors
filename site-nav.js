@@ -23,10 +23,10 @@
   new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)syncDealerAddress(node)}))).observe(document.body,{childList:true,subtree:true});
 
   document.querySelectorAll('.brand-wordmark').forEach(brand=>{
-    brand.innerHTML='<span class="site-logo-crop"><img src="mo-motors-logo.png" alt="M.O Motors Certified Pre-Owned Vehicles"></span>';
+    brand.innerHTML='<span class="site-logo-crop"><img src="mo-motors-logo.png?v=2" alt="M.O. Motors Certified Pre-Owned Vehicles" width="836" height="471"></span>';
   });
   document.querySelectorAll('.footer-wordmark').forEach(brand=>{
-    brand.innerHTML='<span class="footer-logo-crop"><img src="mo-motors-logo.png" alt="M.O Motors Certified Pre-Owned Vehicles"></span>';
+    brand.innerHTML='<span class="footer-logo-crop"><img src="mo-motors-logo.png?v=2" alt="M.O. Motors Certified Pre-Owned Vehicles" width="836" height="471"></span>';
   });
 
   document.querySelectorAll('.brand-tagline').forEach(tagline=>{tagline.textContent='CERTIFIED PRE-OWNED VEHICLES'});
