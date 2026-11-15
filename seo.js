@@ -15,7 +15,8 @@
     "referral.html": ["Customer Referral Rewards | M.O Motors Winnipeg", "Refer a friend or family member shopping for a used vehicle in Winnipeg and register the referral with M.O Motors."],
     "financing.html": ["Used Car Financing Winnipeg | M.O Motors", "Explore used vehicle financing options and apply for pre-approval with M.O Motors in Winnipeg."],
     "used-car-buying-guide-winnipeg.html": ["Used Car Buying Guide for Winnipeg | M.O. Motors", "A practical Winnipeg used-car buying guide covering vehicle history, inspections, winter readiness, financing, warranties and test drives."],
-    "used-suvs-under-15000-winnipeg.html": ["Used SUVs Under $15,000 in Winnipeg | Buying Guide", "Shopping for a used SUV under $15,000 in Winnipeg? Compare mileage, condition, winter features, ownership costs and financing before choosing."]
+    "used-suvs-under-15000-winnipeg.html": ["Used SUVs Under $15,000 in Winnipeg | Buying Guide", "Shopping for a used SUV under $15,000 in Winnipeg? Compare mileage, condition, winter features, ownership costs and financing before choosing."],
+    "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."]
   };
   const page = pages[path];
   if (!page) return;
@@ -94,7 +95,8 @@
     "service-repairs.html": ["Service", "Vehicle Service and Repair Referrals"],
     "referral.html": ["Service", "Customer Referral Rewards"],
     "used-car-buying-guide-winnipeg.html": ["Article", "Used Car Buying Guide for Winnipeg"],
-    "used-suvs-under-15000-winnipeg.html": ["Article", "Used SUVs Under $15,000 in Winnipeg"]
+    "used-suvs-under-15000-winnipeg.html": ["Article", "Used SUVs Under $15,000 in Winnipeg"],
+    "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"]
   };
   const pageType = pageTypes[path];
   if (pageType) {
