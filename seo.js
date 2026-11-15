@@ -198,18 +198,34 @@
     const product = document.createElement("script");
     product.id = "vehicleProductSchema";
     product.type = "application/ld+json";
+    const status=String(vehicle.Status || "").toLowerCase();
+    const availability=status === "sold" ? "https://schema.org/OutOfStock" : ["coming soon","pending"].includes(status) ? "https://schema.org/PreOrder" : "https://schema.org/InStock";
+    const engineName=[vehicle.EngineSize,vehicle.EngineCylinders ? `${vehicle.EngineCylinders} cylinder` : ""].filter(Boolean).join(" ");
     product.textContent = JSON.stringify({
       "@context":"https://schema.org",
       "@type":"Vehicle",
+      "@id":`${canonical}#vehicle`,
       name,
+      description,
       url:canonical,
       image:photos.map(photo => photo.image_url).filter(Boolean),
+      sku:vehicle.id ? String(vehicle.id) : undefined,
+      itemCondition:"https://schema.org/UsedCondition",
       vehicleIdentificationNumber:vehicle.VIN || undefined,
       mileageFromOdometer:vehicle.Mileage ? {"@type":"QuantitativeValue",value:Number(vehicle.Mileage),unitCode:"KMT"} : undefined,
       vehicleModelDate:vehicle.Year ? String(vehicle.Year) : undefined,
+      brand:vehicle.Make ? {"@type":"Brand",name:vehicle.Make} : undefined,
       manufacturer:vehicle.Make ? {"@type":"Organization",name:vehicle.Make} : undefined,
       model:vehicle.Model || undefined,
-      offers:{"@type":"Offer",price:Number(vehicle.Price || 0),priceCurrency:"CAD",availability:String(vehicle.Status || "").toLowerCase() === "sold" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",url:canonical,seller:{"@id":`${site}/#dealership`}}
+      vehicleConfiguration:vehicle.Trim || undefined,
+      bodyType:vehicle.BodyStyle || undefined,
+      vehicleTransmission:vehicle.Transmission || undefined,
+      driveWheelConfiguration:vehicle.Drivetrain || undefined,
+      fuelType:vehicle.FuelType || undefined,
+      color:vehicle.ExteriorColor || undefined,
+      vehicleInteriorColor:vehicle.InteriorColor || undefined,
+      vehicleEngine:engineName ? {"@type":"EngineSpecification",name:engineName} : undefined,
+      offers:{"@type":"Offer",price:Number(vehicle.Price || 0),priceCurrency:"CAD",availability,url:canonical,itemCondition:"https://schema.org/UsedCondition",seller:{"@id":`${site}/#dealership`}}
     });
     document.getElementById("vehicleProductSchema")?.remove();
     document.head.appendChild(product);
