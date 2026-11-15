@@ -1,4 +1,10 @@
 (()=>{
+  if (!document.querySelector('script[data-mo-analytics]')) {
+    const analytics = document.createElement('script');
+    analytics.src = '/analytics.js?v=1';
+    analytics.dataset.moAnalytics = 'true';
+    document.head.appendChild(analytics);
+  }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
     seo.src = 'seo.js?v=1';
