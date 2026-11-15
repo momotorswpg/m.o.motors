@@ -23,6 +23,7 @@
   new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)syncDealerAddress(node)}))).observe(document.body,{childList:true,subtree:true});
 
   document.querySelectorAll('.brand-wordmark').forEach(brand=>{
+    brand.href='/';
     brand.innerHTML='<span class="site-logo-crop"><img src="mo-motors-logo.png?v=2" alt="M.O. Motors Certified Pre-Owned Vehicles" width="836" height="471"></span>';
   });
   document.querySelectorAll('.footer-wordmark').forEach(brand=>{
@@ -74,7 +75,7 @@
   const nav=document.getElementById('nav');
   const menuBtn=document.getElementById('menuBtn');
   if(nav){
-    nav.innerHTML=`<div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Inventory</button><div class="finance-dropdown-menu"><a href="inventory.html">Browse Inventory</a><a href="vehicle-sourcing.html">Find a Vehicle for Me</a></div></div><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="warranty.html">Warranty</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Trade-In</button><div class="finance-dropdown-menu"><a href="trade-in.html?intent=trade">Trade In Your Vehicle</a><a href="trade-in.html?intent=sell">Sell Your Vehicle</a><a href="trade-in.html?intent=consign">Consign Your Vehicle</a></div></div><a href="service-repairs.html">Services &amp; Repairs</a><a href="index.html#contact">Contact</a><a class="nav-cta" href="/booking">Book a Test Drive</a>`;
+    nav.innerHTML=`<div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Inventory</button><div class="finance-dropdown-menu"><a href="inventory.html">Browse Inventory</a><a href="vehicle-sourcing.html">Find a Vehicle for Me</a></div></div><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="warranty.html">Warranty</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Trade-In</button><div class="finance-dropdown-menu"><a href="trade-in.html?intent=trade">Trade In Your Vehicle</a><a href="trade-in.html?intent=sell">Sell Your Vehicle</a><a href="trade-in.html?intent=consign">Consign Your Vehicle</a></div></div><a href="service-repairs.html">Services &amp; Repairs</a><a href="/#contact">Contact</a><a class="nav-cta" href="/booking">Book a Test Drive</a>`;
     nav.addEventListener('click',event=>{const link=event.target.closest('a[href*="trade-in.html?intent="]');if(!link)return;event.preventDefault();event.stopImmediatePropagation();location.assign(link.href)},true);
   }
 
