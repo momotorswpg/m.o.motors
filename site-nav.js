@@ -7,7 +7,7 @@
   }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
-    seo.src = 'seo.js?v=1';
+    seo.src = 'seo.js?v=4';
     document.head.appendChild(seo);
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
@@ -57,6 +57,7 @@
     </div>
     <nav class="site-footer-links" aria-label="Footer navigation">
       <a href="inventory.html">Used Vehicle Inventory</a>
+      <a href="used-cars-under-10000-winnipeg.html">Vehicles Under $10,000</a>
       <a href="affordable-used-cars-winnipeg.html">Affordable Used Cars</a>
       <a href="pre-approval.html">Financing Pre-Approval</a>
       <a href="trade-in.html">Sell or Trade Your Car</a>

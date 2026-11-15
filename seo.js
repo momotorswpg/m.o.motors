@@ -2,7 +2,7 @@
   const site = "https://www.momotors.ca";
   const path = location.pathname.split("/").pop() || "index.html";
   const pages = {
-    "index.html": ["Used Vehicles in Winnipeg | M.O. Motors", "Shop quality used and pre-owned vehicles in Winnipeg at M.O. Motors. Browse our inventory, value your trade, explore financing and book a test drive."],
+    "index.html": ["Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, trucks and vans in Winnipeg at M.O. Motors. Browse current prices and photos, value your trade or book a test drive."],
     "inventory.html": ["Used Vehicle Inventory in Winnipeg | M.O. Motors", "Browse used cars, SUVs, trucks and vans for sale in Winnipeg. View current pre-owned inventory, pricing, photos and payment estimates from M.O. Motors."],
     "vehicle.html": ["Used Vehicle for Sale in Winnipeg | M.O. Motors", "View pricing, photos, specifications and purchase options for this pre-owned vehicle at M.O. Motors in Winnipeg."],
     "pre-approval.html": ["Used Car Financing Pre-Approval Winnipeg | M.O. Motors", "Apply online for used vehicle financing pre-approval in Winnipeg. M.O. Motors offers a simple application for a range of credit situations."],
@@ -16,6 +16,7 @@
     "financing.html": ["Used Car Financing Winnipeg | M.O. Motors", "Explore used vehicle financing options and apply for pre-approval with M.O. Motors in Winnipeg."],
     "used-car-buying-guide-winnipeg.html": ["Used Car Buying Guide for Winnipeg | M.O. Motors", "A practical Winnipeg used-car buying guide covering vehicle history, inspections, winter readiness, financing, warranties and test drives."],
     "used-suvs-under-15000-winnipeg.html": ["Used SUVs Under $15,000 in Winnipeg | Buying Guide", "Shopping for a used SUV under $15,000 in Winnipeg? Compare mileage, condition, winter features, ownership costs and financing before choosing."],
+    "used-cars-under-10000-winnipeg.html": ["Used Cars Under $10,000 in Winnipeg | M.O. Motors", "Shop used cars, SUVs and vans under $10,000 in Winnipeg at M.O. Motors. See current prices and photos, then book a test drive or ask us to source a vehicle."],
     "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."]
   };
   const page = pages[path];
@@ -101,6 +102,7 @@
     "referral.html": ["Service", "Customer Referral Rewards"],
     "used-car-buying-guide-winnipeg.html": ["Article", "Used Car Buying Guide for Winnipeg"],
     "used-suvs-under-15000-winnipeg.html": ["Article", "Used SUVs Under $15,000 in Winnipeg"],
+    "used-cars-under-10000-winnipeg.html": ["CollectionPage", "Used Cars Under $10,000 in Winnipeg"],
     "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"]
   };
   const pageType = pageTypes[path];
@@ -157,6 +159,12 @@
       ["Is AWD required for Winnipeg winters?","AWD can help with acceleration, but tires remain critical for braking and steering. Choose based on your driving needs and total ownership cost."],
       ["Is an older SUV with high kilometres worth considering?","It can be, depending on condition, maintenance and price. Review the vehicle history and consider an independent inspection."],
       ["Can M.O. Motors look for a specific SUV?","Yes. Submit your preferred makes, models, budget, mileage and must-have features through the vehicle sourcing form."]
+    ],
+    "used-cars-under-10000-winnipeg.html":[
+      ["Are there currently vehicles under $10,000?","Use the live under-$10,000 inventory filter for current availability and pricing. Inventory can change when vehicles arrive or sell."],
+      ["Can I book a test drive before choosing a vehicle?","Yes. You can reserve a time without selecting a specific vehicle, then discuss suitable choices with the M.O. Motors team."],
+      ["Can I trade in my current vehicle?","Yes. Submit your vehicle information through the sell-or-trade form so the M.O. Motors team can review it."],
+      ["Does every vehicle qualify for financing or warranty coverage?","No. Financing and protection-plan availability depend on the specific vehicle and provider or lender approval. Confirm the available options for the vehicle you are considering."]
     ],
     "affordable-used-cars-winnipeg.html":[
       ["Can I trade in a vehicle toward an affordable car?","Yes. Submit your vehicle details through the trade-in form so the M.O. Motors team can review it."],
