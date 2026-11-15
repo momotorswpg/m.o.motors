@@ -7,7 +7,7 @@
   }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
-    seo.src = 'seo.js?v=5';
+    seo.src = 'seo.js?v=6';
     document.head.appendChild(seo);
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
@@ -63,6 +63,7 @@
       <a href="pre-approval.html">Financing Pre-Approval</a>
       <a href="trade-in.html">Sell or Trade Your Car</a>
       <a href="/booking">Book a Test Drive</a>
+      <a href="contact.html">Contact &amp; Directions</a>
       <a href="used-car-buying-guide-winnipeg.html">Winnipeg Buying Guide</a>
     </nav>
     <div class="site-footer-social">
@@ -75,7 +76,7 @@
   const nav=document.getElementById('nav');
   const menuBtn=document.getElementById('menuBtn');
   if(nav){
-    nav.innerHTML=`<div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Inventory</button><div class="finance-dropdown-menu"><a href="inventory.html">Browse Inventory</a><a href="vehicle-sourcing.html">Find a Vehicle for Me</a></div></div><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="warranty.html">Warranty</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Trade-In</button><div class="finance-dropdown-menu"><a href="trade-in.html?intent=trade">Trade In Your Vehicle</a><a href="trade-in.html?intent=sell">Sell Your Vehicle</a><a href="trade-in.html?intent=consign">Consign Your Vehicle</a></div></div><a href="service-repairs.html">Services &amp; Repairs</a><a href="/#contact">Contact</a><a class="nav-cta" href="/booking">Book a Test Drive</a>`;
+    nav.innerHTML=`<div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Inventory</button><div class="finance-dropdown-menu"><a href="inventory.html">Browse Inventory</a><a href="vehicle-sourcing.html">Find a Vehicle for Me</a></div></div><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Financing</button><div class="finance-dropdown-menu"><a href="pre-approval.html">Get Pre-Approved</a><a href="payment-estimator.html">Payment Estimator</a></div></div><a href="warranty.html">Warranty</a><div class="finance-dropdown"><button type="button" class="finance-dropdown-toggle" aria-expanded="false">Trade-In</button><div class="finance-dropdown-menu"><a href="trade-in.html?intent=trade">Trade In Your Vehicle</a><a href="trade-in.html?intent=sell">Sell Your Vehicle</a><a href="trade-in.html?intent=consign">Consign Your Vehicle</a></div></div><a href="service-repairs.html">Services &amp; Repairs</a><a href="contact.html">Contact</a><a class="nav-cta" href="/booking">Book a Test Drive</a>`;
     nav.addEventListener('click',event=>{const link=event.target.closest('a[href*="trade-in.html?intent="]');if(!link)return;event.preventDefault();event.stopImmediatePropagation();location.assign(link.href)},true);
   }
 
