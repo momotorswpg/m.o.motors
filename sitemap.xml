@@ -14,4 +14,37 @@
   <url><loc>https://www.momotors.ca/used-suvs-under-15000-winnipeg.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.momotors.ca/affordable-used-cars-winnipeg.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.momotors.ca/review.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <!-- Current and recently sold inventory pages. Available listings use a
+       higher priority; sold pages remain crawlable as inventory history. -->
+  <url><loc>https://www.momotors.ca/vehicle.html?id=31</loc><lastmod>2026-11-11</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=30</loc><lastmod>2026-11-11</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=29</loc><lastmod>2026-11-10</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=28</loc><lastmod>2026-11-10</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=27</loc><lastmod>2026-10-27</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=24</loc><lastmod>2026-09-30</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=21</loc><lastmod>2026-09-30</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=19</loc><lastmod>2026-09-11</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=14</loc><lastmod>2026-08-22</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=13</loc><lastmod>2026-08-22</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=26</loc><lastmod>2026-10-27</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=25</loc><lastmod>2026-10-15</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=23</loc><lastmod>2026-09-30</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=22</loc><lastmod>2026-09-30</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=20</loc><lastmod>2026-09-30</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=18</loc><lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=17</loc><lastmod>2026-08-26</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=16</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=15</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=12</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=11</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=10</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=9</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=8</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=7</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=6</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=5</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=4</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=3</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=2</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.momotors.ca/vehicle.html?id=1</loc><lastmod>2026-08-22</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

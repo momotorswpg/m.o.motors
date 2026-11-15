@@ -147,6 +147,36 @@
     document.head.appendChild(breadcrumb);
   }
 
+  const faqByPage = {
+    "used-car-buying-guide-winnipeg.html":[
+      ["Should I get a pre-purchase inspection?","It is a sensible step whenever you want an independent assessment of a used vehicle's current mechanical condition."],
+      ["Can I test drive without choosing a vehicle online?","Yes. You can reserve a time first and discuss suitable vehicles when the M.O. Motors team contacts you."],
+      ["Can I estimate financing before applying?","Yes. The payment estimator can show illustrative payments, but final rates and terms depend on lender approval and the completed deal."]
+    ],
+    "used-suvs-under-15000-winnipeg.html":[
+      ["Is AWD required for Winnipeg winters?","AWD can help with acceleration, but tires remain critical for braking and steering. Choose based on your driving needs and total ownership cost."],
+      ["Is an older SUV with high kilometres worth considering?","It can be, depending on condition, maintenance and price. Review the vehicle history and consider an independent inspection."],
+      ["Can M.O. Motors look for a specific SUV?","Yes. Submit your preferred makes, models, budget, mileage and must-have features through the vehicle sourcing form."]
+    ],
+    "affordable-used-cars-winnipeg.html":[
+      ["Can I trade in a vehicle toward an affordable car?","Yes. Submit your vehicle details through the trade-in form so the M.O. Motors team can review it."],
+      ["Can I reserve a test drive without choosing a vehicle?","Yes. Book a time first and discuss suitable vehicles when the M.O. Motors team follows up."],
+      ["What if the vehicle I want is not currently listed?","Submit a vehicle sourcing request with your preferred budget, makes, models and features."]
+    ]
+  };
+  const pageFaqs=faqByPage[path];
+  if(pageFaqs){
+    const faq=document.createElement("script");
+    faq.id="faqSchema";
+    faq.type="application/ld+json";
+    faq.textContent=JSON.stringify({
+      "@context":"https://schema.org",
+      "@type":"FAQPage",
+      mainEntity:pageFaqs.map(([name,text])=>({"@type":"Question",name,acceptedAnswer:{"@type":"Answer",text}}))
+    });
+    document.head.appendChild(faq);
+  }
+
   window.updateVehicleSeo = (vehicle, photos = []) => {
     const name = [vehicle.Year, vehicle.Make, vehicle.Model, vehicle.Trim].filter(Boolean).join(" ");
     const title = `${name} Used for Sale in Winnipeg | M.O. Motors`;
