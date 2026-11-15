@@ -1,7 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const salesPages = ["dashboard", "inventory", "bookings", "consents", "tradeins", "billsale", "myschedule", "timesheet"];
-  const adminPages = ["requests", "employees", "schedule", "payroll", "finance"];
+  const adminPages = ["requests", "reviews", "employees", "schedule", "payroll", "finance"];
   let pages = salesPages;
   let initialized = false;
 
@@ -28,6 +28,7 @@
     const consents = document.querySelector(".test-drive-consent-panel");
     const tradeins = document.querySelector(".tradeins-panel");
     const requests = ensurePanel("requests-panel", '<div class="panel-head"><div><span class="eyebrow">CUSTOMER REQUESTS</span><h3>Website leads</h3><p class="muted">Active requests appear first. Completed and cancelled requests stay out of the way until you choose to view them.</p></div><button id="refreshRequestsBtn" class="secondary-btn" type="button">Refresh Requests</button></div><div id="requestFilters" class="request-toolbar"><label><span>Request type</span><select id="requestTypeFilter"><option value="all">All request types</option><option value="warranty">Warranty</option><option value="vehicle_sourcing">Vehicle Sourcing</option><option value="service_repair">Service & Repair</option><option value="vehicle_disposition">Sell / Trade / Consign</option><option value="referral">Referral</option></select></label><label><span>Show</span><select id="requestStatusFilter"><option value="active">Active requests</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="all">All requests</option></select></label></div><div id="requestsList" class="requests-list"><div class="muted">Loading customer requests…</div></div>');
+    const reviews = ensurePanel("reviews-panel", '<div class="panel-head"><div><span class="eyebrow">LOCAL REPUTATION</span><h3>Request a Google review</h3><p class="muted">After a completed sale or service interaction, invite every customer to share honest feedback. Do not offer rewards or ask only satisfied customers.</p></div><a class="secondary-btn review-public-link" href="review.html" target="_blank" rel="noopener">Open review page ↗</a></div><div class="review-admin-grid"><section><span class="eyebrow">OFFICIAL GOOGLE LINK</span><h4>Direct review link</h4><p class="muted review-url">https://g.page/r/Cd9uha6qgdHSEBM/review</p><div class="review-actions"><button class="primary-btn" type="button" data-copy-review="link">Copy Link</button><a class="secondary-btn" href="https://g.page/r/Cd9uha6qgdHSEBM/review" target="_blank" rel="noopener">Open Google ↗</a></div></section><section><span class="eyebrow">TEXT MESSAGE</span><h4>Short follow-up</h4><textarea id="reviewSmsTemplate" rows="5" readonly>Thank you for choosing M.O. Motors. We would appreciate your honest feedback about your experience: https://g.page/r/Cd9uha6qgdHSEBM/review</textarea><button class="secondary-btn" type="button" data-copy-review="sms">Copy Text</button></section><section><span class="eyebrow">EMAIL</span><h4>Customer follow-up</h4><textarea id="reviewEmailTemplate" rows="7" readonly>Thank you for choosing M.O. Motors. Your feedback helps our team improve and helps Winnipeg drivers make informed decisions. If you have a moment, please share an honest review of your experience: https://g.page/r/Cd9uha6qgdHSEBM/review</textarea><button class="secondary-btn" type="button" data-copy-review="email">Copy Email</button></section></div><p id="reviewCopyStatus" class="status" aria-live="polite"></p>');
     const billsale = document.querySelector(".bill-of-sale-panel");
     const finance = document.querySelector(".finance-panel");
     const employees = document.querySelector(".employees-panel");
@@ -44,11 +45,11 @@
 
     const nav = document.createElement("nav");
     nav.className = "admin-page-nav";
-    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page === "requests" ? "Website Leads" : page === "finance" ? "Payment Defaults" : page === "myschedule" ? "My Schedule" : page[0].toUpperCase() + page.slice(1);
+    const label = page => page === "tradeins" ? "Trade-Ins" : page === "billsale" ? "Bill of Sale" : page === "consents" ? "Test Drive Consent" : page === "requests" ? "Website Leads" : page === "reviews" ? "Reviews" : page === "finance" ? "Payment Defaults" : page === "myschedule" ? "My Schedule" : page[0].toUpperCase() + page.slice(1);
     nav.innerHTML = `<div class="admin-nav-group"><span>SALES</span>${salesPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}</div>${isAdmin ? `<div class="admin-nav-group"><span>ADMIN</span>${adminPages.map(page => `<button type="button" data-page="${page}">${label(page)}</button>`).join("")}<a class="admin-nav-link" href="finance-admin-login.html">Finance Applications ↗</a></div>` : ""}`;
     top?.after(nav);
 
-    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],billsale:[billsale],finance:[finance],employees:[employees],timesheet:[timesheet],payroll:[payroll]};
+    const targets = {inventory:[stats,grid,inventory],bookings:[bookings],consents:[consents],tradeins:[tradeins],requests:[requests],reviews:[reviews],billsale:[billsale],finance:[finance],employees:[employees],timesheet:[timesheet],payroll:[payroll]};
     function show(page) {
       if (!pages.includes(page)) page = "dashboard";
       dashboard.style.display = page === "dashboard" ? "block" : "none";
@@ -79,6 +80,17 @@
       if (button) show(button.dataset.page);
     });
     dashboard.querySelector("#viewBookingsFromDash")?.addEventListener("click", () => show("bookings"));
+    reviews?.addEventListener("click", async event => {
+      const button = event.target.closest("[data-copy-review]");
+      if (!button) return;
+      const templates = {link:"https://g.page/r/Cd9uha6qgdHSEBM/review",sms:$("reviewSmsTemplate")?.value || "",email:$("reviewEmailTemplate")?.value || ""};
+      try {
+        await navigator.clipboard.writeText(templates[button.dataset.copyReview] || "");
+        $("reviewCopyStatus").textContent = "Copied to clipboard.";
+      } catch {
+        $("reviewCopyStatus").textContent = "Copy failed. Select the text and copy it manually.";
+      }
+    });
     window.addEventListener("hashchange", () => {
       const page = location.hash.slice(1);
       if (page && pages.includes(page) && !nav.querySelector(`[data-page="${page}"].active`)) show(page);
