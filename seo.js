@@ -75,7 +75,9 @@
     openingHoursSpecification:[{"@type":"OpeningHoursSpecification",dayOfWeek:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],opens:"12:00",closes:"18:00"}],
     sameAs:[
       "https://www.google.com/maps/place/M.O.+Motors/data=!4m2!3m1!1s0x0:0xd2d181aaae856edf",
-      "https://www.autotrader.ca/dealers/63572103"
+      "https://www.autotrader.ca/dealers/63572103",
+      "https://www.facebook.com/profile.php?id=61595889765047",
+      "https://www.instagram.com/Momotorswpg"
     ]
   };
   let schema = document.getElementById("localBusinessSchema");
