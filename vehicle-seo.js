@@ -12,12 +12,21 @@
       if (label && value) specs[label] = value;
     });
     window.updateVehicleSeo({
+      id: new URLSearchParams(location.search).get("id") || undefined,
       Year: specs.Year || parts.shift(),
       Make: specs.Make || parts.shift(),
       Model: specs.Model || parts.join(" "),
       Trim: specs.Trim,
       Mileage: Number((specs.Odometer || "").replace(/[^0-9]/g, "")) || undefined,
       VIN: specs.VIN,
+      BodyStyle: specs["Body Style"],
+      Transmission: specs.Transmission,
+      EngineCylinders: specs["Engine Cylinders"],
+      EngineSize: specs["Engine Size"],
+      Drivetrain: specs.Drivetrain,
+      ExteriorColor: specs["Exterior Colour"],
+      InteriorColor: specs["Interior Colour"],
+      FuelType: specs["Fuel Type"],
       Price: Number((root.querySelector(".detail-price strong")?.textContent || "").replace(/[^0-9.]/g, "")) || 0,
       Status: root.querySelector(".detail-year")?.textContent.trim()
     }, Array.from(root.querySelectorAll(".detail-main-image img, .detail-thumb img")).map(image => ({ image_url:image.currentSrc || image.src })));
