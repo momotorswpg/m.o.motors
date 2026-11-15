@@ -17,7 +17,8 @@
     "used-car-buying-guide-winnipeg.html": ["Used Car Buying Guide for Winnipeg | M.O. Motors", "A practical Winnipeg used-car buying guide covering vehicle history, inspections, winter readiness, financing, warranties and test drives."],
     "used-suvs-under-15000-winnipeg.html": ["Used SUVs Under $15,000 in Winnipeg | Buying Guide", "Shopping for a used SUV under $15,000 in Winnipeg? Compare mileage, condition, winter features, ownership costs and financing before choosing."],
     "used-cars-under-10000-winnipeg.html": ["Used Cars Under $10,000 in Winnipeg | M.O. Motors", "Shop used cars, SUVs and vans under $10,000 in Winnipeg at M.O. Motors. See current prices and photos, then book a test drive or ask us to source a vehicle."],
-    "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."]
+    "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."],
+    "contact.html": ["Contact M.O. Motors | Winnipeg Used Car Dealership", "Contact M.O. Motors at Unit 104, 420 Des Meurons St in Winnipeg. Call 204-963-4462, get directions, browse used vehicles or book a test drive."]
   };
   const page = pages[path];
   if (!page) return;
@@ -103,7 +104,8 @@
     "used-car-buying-guide-winnipeg.html": ["Article", "Used Car Buying Guide for Winnipeg"],
     "used-suvs-under-15000-winnipeg.html": ["Article", "Used SUVs Under $15,000 in Winnipeg"],
     "used-cars-under-10000-winnipeg.html": ["CollectionPage", "Used Cars Under $10,000 in Winnipeg"],
-    "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"]
+    "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"],
+    "contact.html": ["ContactPage", "Contact M.O. Motors in Winnipeg"]
   };
   const pageType = pageTypes[path];
   if (pageType) {
