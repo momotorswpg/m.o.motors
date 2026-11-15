@@ -7,7 +7,7 @@
   }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
-    seo.src = 'seo.js?v=1';
+    seo.src = 'seo.js?v=4';
     document.head.appendChild(seo);
   }
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
@@ -31,6 +31,45 @@
 
   document.querySelectorAll('.brand-tagline').forEach(tagline=>{tagline.textContent='CERTIFIED PRE-OWNED VEHICLES'});
   document.querySelectorAll('.hero-line .accent').forEach(accent=>{accent.textContent=accent.textContent.replace(/\./g,'')});
+
+  // Keep the dealership's name, address, phone and important crawl paths
+  // consistent on every public page. This also gives visitors a useful footer
+  // on service and guide pages that previously ended abruptly.
+  let siteFooter=document.querySelector('body > footer');
+  if(!siteFooter){
+    siteFooter=document.createElement('footer');
+    document.body.appendChild(siteFooter);
+  }
+  siteFooter.classList.add('site-footer');
+  siteFooter.innerHTML=`
+    <div class="site-footer-brand">
+      <a class="footer-wordmark" href="/" aria-label="M.O. Motors home">
+        <span class="footer-brand-name"><span class="footer-brand-accent">M.O.</span><span class="footer-brand-main">MOTORS</span></span>
+        <span class="footer-brand-tagline">CERTIFIED PRE-OWNED VEHICLES</span>
+      </a>
+      <p>Affordable used cars, SUVs, trucks and vans in Winnipeg.</p>
+    </div>
+    <div class="site-footer-contact">
+      <strong>M.O. Motors</strong>
+      <a href="${dealerMapUrl}" target="_blank" rel="noopener">Unit 104, 420 Des Meurons St<br>Winnipeg, MB R2H 2N9</a>
+      <a href="tel:+12049634462">204-963-4462</a>
+      <span>Monday–Saturday: 12 PM–6 PM</span>
+    </div>
+    <nav class="site-footer-links" aria-label="Footer navigation">
+      <a href="inventory.html">Used Vehicle Inventory</a>
+      <a href="used-cars-under-10000-winnipeg.html">Vehicles Under $10,000</a>
+      <a href="affordable-used-cars-winnipeg.html">Affordable Used Cars</a>
+      <a href="pre-approval.html">Financing Pre-Approval</a>
+      <a href="trade-in.html">Sell or Trade Your Car</a>
+      <a href="/booking">Book a Test Drive</a>
+      <a href="used-car-buying-guide-winnipeg.html">Winnipeg Buying Guide</a>
+    </nav>
+    <div class="site-footer-social">
+      <a href="https://www.facebook.com/profile.php?id=61595889765047" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.instagram.com/Momotorswpg" target="_blank" rel="noopener">Instagram</a>
+      <a href="review.html">Leave a Review</a>
+      <small>© ${new Date().getFullYear()} M.O. Motors</small>
+    </div>`;
 
   const nav=document.getElementById('nav');
   const menuBtn=document.getElementById('menuBtn');
@@ -79,8 +118,17 @@
 
   const style=document.createElement('style');
   style.textContent=`
+    .site-footer{display:grid;grid-template-columns:1.25fr 1fr 1fr .75fr;gap:38px;align-items:start;padding:48px 8%;background:#101114;color:#b9bbc1}
+    .site-footer>div,.site-footer nav{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+    .site-footer p,.site-footer small{margin:4px 0 0;font-size:12px;line-height:1.6}
+    .site-footer strong{color:#fff;font-size:13px}
+    .site-footer a{color:#fff;text-decoration:none;font-size:12px;line-height:1.55}
+    .site-footer a:hover,.site-footer a:focus{color:#ff4a4f}
+    .site-footer .footer-wordmark{margin-bottom:8px}
     .mobile-action-bar{display:none}
+    @media(max-width:900px){.site-footer{grid-template-columns:1fr 1fr}}
     @media(max-width:560px){
+      .site-footer{grid-template-columns:1fr;gap:28px;padding:42px 7% 92px}
       body{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
       .mobile-action-bar{
         position:fixed;
