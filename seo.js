@@ -81,6 +81,55 @@
   }
   schema.textContent = JSON.stringify(localBusiness);
 
+  const pageTypes = {
+    "inventory.html": ["CollectionPage", "Used Vehicle Inventory in Winnipeg"],
+    "pre-approval.html": ["WebPage", "Used Car Financing Pre-Approval"],
+    "payment-estimator.html": ["WebApplication", "Used Car Payment Calculator"],
+    "warranty.html": ["Service", "Used Vehicle Warranty Options"],
+    "trade-in.html": ["Service", "Sell, Trade or Consign a Vehicle"],
+    "book-test-drive.html": ["Service", "Book a Used Vehicle Test Drive"],
+    "vehicle-sourcing.html": ["Service", "Used Vehicle Sourcing Service"],
+    "service-repairs.html": ["Service", "Vehicle Service and Repair Referrals"],
+    "referral.html": ["Service", "Customer Referral Rewards"]
+  };
+  const pageType = pageTypes[path];
+  if (pageType) {
+    const pageSchema = {
+      "@context":"https://schema.org",
+      "@type":pageType[0],
+      "@id":`${canonical}#page`,
+      url:canonical,
+      name:pageType[1],
+      description:page[1],
+      isPartOf:{"@id":`${site}/#website`},
+      provider:{"@id":`${site}/#dealership`},
+      areaServed:{"@type":"City",name:"Winnipeg"}
+    };
+    if (pageType[0] === "WebApplication") {
+      pageSchema.applicationCategory = "FinanceApplication";
+      pageSchema.operatingSystem = "Any";
+      pageSchema.offers = {"@type":"Offer",price:"0",priceCurrency:"CAD"};
+    }
+    const pageSchemaNode = document.createElement("script");
+    pageSchemaNode.id = "pageSchema";
+    pageSchemaNode.type = "application/ld+json";
+    pageSchemaNode.textContent = JSON.stringify(pageSchema);
+    document.head.appendChild(pageSchemaNode);
+
+    const breadcrumb = document.createElement("script");
+    breadcrumb.id = "breadcrumbSchema";
+    breadcrumb.type = "application/ld+json";
+    breadcrumb.textContent = JSON.stringify({
+      "@context":"https://schema.org",
+      "@type":"BreadcrumbList",
+      itemListElement:[
+        {"@type":"ListItem",position:1,name:"Home",item:`${site}/`},
+        {"@type":"ListItem",position:2,name:pageType[1],item:canonical}
+      ]
+    });
+    document.head.appendChild(breadcrumb);
+  }
+
   window.updateVehicleSeo = (vehicle, photos = []) => {
     const name = [vehicle.Year, vehicle.Make, vehicle.Model, vehicle.Trim].filter(Boolean).join(" ");
     const title = `${name} Used for Sale in Winnipeg | M.O Motors`;
