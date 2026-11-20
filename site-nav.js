@@ -229,4 +229,28 @@
     }
   `;
   document.head.appendChild(style);
+
+  // Give service pages clear, search-focused headings without changing their forms.
+  const searchPageCopy = {
+    "payment-estimator.html": ["Used car payment calculator.", "Estimate payments for a used vehicle in Winnipeg by adjusting the price, down payment, trade-in, financing fee, warranty, rate and term. Estimates are for illustration only and are not a financing offer."],
+    "pre-approval.html": ["Used vehicle financing pre-approval.", "Apply online for used vehicle financing in Winnipeg. Complete one secure application and the M.O Motors team will contact you about available financing options."],
+    "warranty.html": ["Used vehicle warranty options.", "Compare optional used vehicle protection plans in Winnipeg, from essential powertrain coverage to comprehensive and electric-vehicle options. We’ll help you understand what your vehicle qualifies for."],
+    "vehicle-sourcing.html": ["Winnipeg used vehicle sourcing.", "Tell us the vehicle, budget and features you want. M.O Motors will search its dealership and auction network for suitable used vehicles."],
+    "referral.html": ["Customer referral rewards.", "Know someone shopping for a used vehicle in Winnipeg? Register the referral so our team can connect the purchase to you and confirm the reward after a completed sale."]
+  };
+  const pageName = location.pathname.split("/").pop() || "index.html";
+  const improvedCopy = searchPageCopy[pageName];
+  if (improvedCopy) {
+    const heroHeading = document.querySelector("main h1");
+    const heroIntro = heroHeading?.nextElementSibling;
+    if (heroHeading) heroHeading.textContent = improvedCopy[0];
+    if (heroIntro?.tagName === "P") heroIntro.textContent = improvedCopy[1];
+  }
+
+  // These two standalone pages predate the shared SEO loader.
+  if (["vehicle-sourcing.html", "referral.html"].includes(pageName) && typeof window.updateVehicleSeo !== "function") {
+    const seoLoader = document.createElement("script");
+    seoLoader.src = "seo.js?v=8";
+    document.head.appendChild(seoLoader);
+  }
 })();

@@ -11,6 +11,13 @@
       const value = row.querySelector("b")?.textContent.trim();
       if (label && value) specs[label] = value;
     });
+    if (!root.querySelector(".stable-description")) {
+      const details = root.querySelector(".stable-details h2");
+      const name = heading.textContent.trim();
+      const mileage = specs.Odometer ? ` with ${specs.Odometer}` : "";
+      const vin = specs.VIN ? ` VIN ${specs.VIN}.` : ".";
+      details?.insertAdjacentHTML("afterend", `<p class="stable-description">View this ${name}${mileage} at M.O. Motors in Winnipeg${vin} Review its specifications, photos, price and available purchase options below.</p>`);
+    }
     window.updateVehicleSeo({
       id: new URLSearchParams(location.search).get("id") || undefined,
       Year: specs.Year || parts.shift(),
