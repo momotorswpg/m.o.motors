@@ -60,6 +60,7 @@
       <a href="inventory.html">Used Vehicle Inventory</a>
       <a href="used-cars-under-10000-winnipeg.html">Vehicles Under $10,000</a>
       <a href="affordable-used-cars-winnipeg.html">Affordable Used Cars</a>
+      <a href="winter-beaters-winnipeg.html">Winter Beaters</a>
       <a href="pre-approval.html">Financing Pre-Approval</a>
       <a href="trade-in.html">Sell or Trade Your Car</a>
       <a href="/booking">Book a Test Drive</a>

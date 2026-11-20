@@ -16,8 +16,9 @@
     "financing.html": ["Used Car Financing Winnipeg | M.O. Motors", "Explore used vehicle financing options and apply for pre-approval with M.O. Motors in Winnipeg."],
     "used-car-buying-guide-winnipeg.html": ["Used Car Buying Guide for Winnipeg | M.O. Motors", "A practical Winnipeg used-car buying guide covering vehicle history, inspections, winter readiness, financing, warranties and test drives."],
     "used-suvs-under-15000-winnipeg.html": ["Used SUVs Under $15,000 in Winnipeg | Buying Guide", "Shopping for a used SUV under $15,000 in Winnipeg? Compare mileage, condition, winter features, ownership costs and financing before choosing."],
-    "used-cars-under-10000-winnipeg.html": ["Used Cars Under $10,000 in Winnipeg | M.O. Motors", "Shop used cars, SUVs and vans under $10,000 in Winnipeg at M.O. Motors. See current prices and photos, then book a test drive or ask us to source a vehicle."],
+    "used-cars-under-10000-winnipeg.html": ["Used Cars Under $10,000 in Winnipeg | M.O. Motors", "Shop used cars and used vehicles under $10,000 or $10K in Winnipeg. Browse affordable ten-thousand-dollar vehicles, prices and photos at M.O. Motors."],
     "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."],
+    "winter-beaters-winnipeg.html": ["Winter Beaters for Sale in Winnipeg | M.O. Motors", "Shop affordable winter beaters and cheap used cars in Winnipeg. Compare current vehicles, cold-weather basics and practical winter buying tips."],
     "contact.html": ["Contact M.O. Motors | Winnipeg Used Car Dealership", "Contact M.O. Motors at Unit 104, 420 Des Meurons St in Winnipeg. Call 204-963-4462, get directions, browse used vehicles or book a test drive."]
   };
   const page = pages[path];
@@ -126,6 +127,7 @@
     "used-suvs-under-15000-winnipeg.html": ["Article", "Used SUVs Under $15,000 in Winnipeg"],
     "used-cars-under-10000-winnipeg.html": ["CollectionPage", "Used Cars Under $10,000 in Winnipeg"],
     "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"],
+    "winter-beaters-winnipeg.html": ["CollectionPage", "Winter Beaters for Sale in Winnipeg"],
     "contact.html": ["ContactPage", "Contact M.O. Motors in Winnipeg"]
   };
   const pageType = pageTypes[path];
@@ -199,6 +201,12 @@
       ["Can I trade in a vehicle toward an affordable car?","Yes. Submit your vehicle details through the trade-in form so the M.O. Motors team can review it."],
       ["Can I reserve a test drive without choosing a vehicle?","Yes. Book a time first and discuss suitable vehicles when the M.O. Motors team follows up."],
       ["What if the vehicle I want is not currently listed?","Submit a vehicle sourcing request with your preferred budget, makes, models and features."]
+    ],
+    "winter-beaters-winnipeg.html":[
+      ["Do you have winter beaters available now?","Inventory changes frequently. Use the live affordable-vehicle filter to see current prices and photos, then contact M.O. Motors to confirm availability."],
+      ["Can a cheap used car still be reliable in winter?","It can be, depending on its present condition, maintenance and tires. Age or price alone cannot confirm reliability, so inspect and test-drive the specific vehicle."],
+      ["Are winter tires more important than AWD?","Winter tires improve braking, steering and traction. AWD can help acceleration, but every drivetrain still relies on its tires for grip."],
+      ["What if there are no suitable beaters listed?","Submit a vehicle-sourcing request with your budget and requirements. The team can contact you when a suitable option is found."]
     ]
   };
   const pageFaqs=faqByPage[path];
