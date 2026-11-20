@@ -7,9 +7,11 @@
   }
   if (!document.querySelector('script[src^="seo.js"]')) {
     const seo = document.createElement('script');
-    seo.src = 'seo.js?v=7';
+    seo.src = 'seo.js?v=10';
     document.head.appendChild(seo);
   }
+  document.querySelectorAll('link[rel="icon"]').forEach(link=>{link.href='/favicon-v2.png';link.type='image/png';link.sizes='512x512'});
+  document.querySelectorAll('link[rel="apple-touch-icon"]').forEach(link=>{link.href='/apple-touch-icon-v2.png';link.sizes='180x180'});
   const dealerAddress='Unit 104, 420 Des Meurons St, Winnipeg, MB R2H 2N9';
   const dealerMapUrl='https://share.google/PErWD86BbGRDqupQl';
   const dealerMapEmbed='https://www.google.com/maps?q=420+Des+Meurons+St,+Winnipeg,+MB+R2H+2N9&output=embed';

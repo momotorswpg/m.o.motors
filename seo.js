@@ -48,7 +48,7 @@
   ensureMeta('meta[name="description"]', { name:"description", content:page[1] });
   ensureMeta('meta[name="robots"]', { name:"robots", content:"index,follow,max-image-preview:large" });
   ensureMeta('meta[property="og:type"]', { property:"og:type", content:path === "vehicle.html" ? "product" : "website" });
-  ensureMeta('meta[property="og:site_name"]', { property:"og:site_name", content:"M.O. Motors" });
+  ensureMeta('meta[property="og:site_name"]', { property:"og:site_name", content:"M.O.Motors" });
   ensureMeta('meta[property="og:title"]', { property:"og:title", content:page[0] });
   ensureMeta('meta[property="og:description"]', { property:"og:description", content:page[1] });
   ensureMeta('meta[property="og:url"]', { property:"og:url", content:canonical });
@@ -107,8 +107,8 @@
     "@type":"WebSite",
     "@id":`${site}/#website`,
     url:`${site}/`,
-    name:"M.O. Motors",
-    alternateName:"M.O. Motors Winnipeg",
+    name:"M.O.Motors",
+    alternateName:["M.O. Motors","M.O Motors Winnipeg","M.O. Motors Winnipeg"],
     publisher:{"@id":`${site}/#dealership`},
     inLanguage:"en-CA"
   });
