@@ -16,6 +16,9 @@
   <url><loc>https://www.momotors.ca/affordable-used-cars-winnipeg.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.momotors.ca/used-cars-under-10000-winnipeg.html</loc><lastmod>2026-11-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.momotors.ca/winter-beaters-winnipeg.html</loc><lastmod>2026-11-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/used-suvs-winnipeg.html</loc><lastmod>2026-11-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/used-trucks-winnipeg.html</loc><lastmod>2026-11-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.momotors.ca/used-minivans-winnipeg.html</loc><lastmod>2026-11-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.momotors.ca/review.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <!-- Current and recently sold inventory pages. Available listings use a
        higher priority; sold pages remain crawlable as inventory history. -->

@@ -19,6 +19,9 @@
     "used-cars-under-10000-winnipeg.html": ["Used Cars Under $10,000 in Winnipeg | M.O. Motors", "Shop used cars and used vehicles under $10,000 or $10K in Winnipeg. Browse affordable ten-thousand-dollar vehicles, prices and photos at M.O. Motors."],
     "affordable-used-cars-winnipeg.html": ["Affordable Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, vans and trucks in Winnipeg. Compare current vehicles under $10,000 and from $10,000 to $15,000 at M.O. Motors."],
     "winter-beaters-winnipeg.html": ["Winter Beaters for Sale in Winnipeg | M.O. Motors", "Shop affordable winter beaters and cheap used cars in Winnipeg. Compare current vehicles, cold-weather basics and practical winter buying tips."],
+    "used-suvs-winnipeg.html": ["Used SUVs for Sale in Winnipeg | M.O. Motors", "Shop used SUVs for sale in Winnipeg. Compare current SUV prices, photos, mileage, drivetrain and practical buying considerations."],
+    "used-trucks-winnipeg.html": ["Used Trucks for Sale in Winnipeg | M.O. Motors", "Shop used pickup trucks for sale in Winnipeg. Compare current truck prices, photos, mileage, drivetrain and practical buying considerations."],
+    "used-minivans-winnipeg.html": ["Used Minivans for Sale in Winnipeg | M.O. Motors", "Shop used minivans and family vans for sale in Winnipeg. Compare current prices, photos, seating, mileage and practical features."],
     "contact.html": ["Contact M.O. Motors | Winnipeg Used Car Dealership", "Contact M.O. Motors at Unit 104, 420 Des Meurons St in Winnipeg. Call 204-963-4462, get directions, browse used vehicles or book a test drive."]
   };
   const page = pages[path];
@@ -128,6 +131,9 @@
     "used-cars-under-10000-winnipeg.html": ["CollectionPage", "Used Cars Under $10,000 in Winnipeg"],
     "affordable-used-cars-winnipeg.html": ["CollectionPage", "Affordable Used Cars in Winnipeg"],
     "winter-beaters-winnipeg.html": ["CollectionPage", "Winter Beaters for Sale in Winnipeg"],
+    "used-suvs-winnipeg.html": ["CollectionPage", "Used SUVs for Sale in Winnipeg"],
+    "used-trucks-winnipeg.html": ["CollectionPage", "Used Trucks for Sale in Winnipeg"],
+    "used-minivans-winnipeg.html": ["CollectionPage", "Used Minivans for Sale in Winnipeg"],
     "contact.html": ["ContactPage", "Contact M.O. Motors in Winnipeg"]
   };
   const pageType = pageTypes[path];
@@ -207,6 +213,21 @@
       ["Can a cheap used car still be reliable in winter?","It can be, depending on its present condition, maintenance and tires. Age or price alone cannot confirm reliability, so inspect and test-drive the specific vehicle."],
       ["Are winter tires more important than AWD?","Winter tires improve braking, steering and traction. AWD can help acceleration, but every drivetrain still relies on its tires for grip."],
       ["What if there are no suitable beaters listed?","Submit a vehicle-sourcing request with your budget and requirements. The team can contact you when a suitable option is found."]
+    ],
+    "used-suvs-winnipeg.html":[
+      ["What used SUVs are available now?","Use the live SUV inventory filter for current prices, photos and availability."],
+      ["Can I book a test drive without selecting an SUV?","Yes. Reserve a time first and discuss suitable SUVs when the M.O. Motors team follows up."],
+      ["Can M.O. Motors find a specific SUV?","Yes. Submit a vehicle-sourcing request with your preferred makes, models, budget and features."]
+    ],
+    "used-trucks-winnipeg.html":[
+      ["What used trucks are available now?","Use the live truck inventory filter for current prices, photos and availability."],
+      ["Can you confirm towing capacity?","Towing capacity depends on the exact engine, drivetrain, axle ratio, cab, box and equipment. Confirm the specifications for the individual truck before towing."],
+      ["Can M.O. Motors source a specific pickup?","Yes. Submit your preferred budget, cab, box, drivetrain and towing needs through the vehicle-sourcing form."]
+    ],
+    "used-minivans-winnipeg.html":[
+      ["What used minivans are available now?","Use the live minivan inventory filter for current prices, photos and availability."],
+      ["Can I test all the seating configurations?","Yes. A useful test drive should include checking the doors, seats, cargo area and features you plan to use."],
+      ["Can M.O. Motors find a specific family van?","Yes. Submit your seating, budget, mileage and feature requirements through the vehicle-sourcing form."]
     ]
   };
   const pageFaqs=faqByPage[path];
