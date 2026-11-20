@@ -2,8 +2,8 @@
   const site = "https://www.momotors.ca";
   const path = location.pathname.split("/").pop() || "index.html";
   const pages = {
-    "index.html": ["Used Cars in Winnipeg | M.O. Motors", "Shop affordable used cars, SUVs, trucks and vans in Winnipeg at M.O. Motors. Browse current prices and photos, value your trade or book a test drive."],
-    "inventory.html": ["Used Vehicle Inventory in Winnipeg | M.O. Motors", "Browse used cars, SUVs, trucks and vans for sale in Winnipeg. View current pre-owned inventory, pricing, photos and payment estimates from M.O. Motors."],
+    "index.html": ["M.O. Motors | Winnipeg Used Car Dealership", "Shop affordable used cars, SUVs, trucks and vans in Winnipeg at M.O. Motors. Browse current prices and photos, value your trade or book a test drive."],
+    "inventory.html": ["Used Cars for Sale in Winnipeg | M.O. Motors", "Shop used cars, SUVs, trucks and vans for sale in Winnipeg at M.O. Motors. Compare current prices, photos, mileage and payment estimates online."],
     "vehicle.html": ["Used Vehicle for Sale in Winnipeg | M.O. Motors", "View pricing, photos, specifications and purchase options for this pre-owned vehicle at M.O. Motors in Winnipeg."],
     "pre-approval.html": ["Used Car Financing Pre-Approval Winnipeg | M.O. Motors", "Apply online for used vehicle financing pre-approval in Winnipeg. M.O. Motors offers a simple application for a range of credit situations."],
     "payment-estimator.html": ["Used Car Payment Calculator Winnipeg | M.O. Motors", "Estimate payments for a used vehicle in Winnipeg. Adjust the vehicle price, down payment, trade-in, term, rate, fees and warranty."],
@@ -113,7 +113,7 @@
   });
 
   const pageTypes = {
-    "inventory.html": ["CollectionPage", "Used Vehicle Inventory in Winnipeg"],
+    "inventory.html": ["CollectionPage", "Used Cars for Sale in Winnipeg"],
     "pre-approval.html": ["WebPage", "Used Car Financing Pre-Approval"],
     "payment-estimator.html": ["WebApplication", "Used Car Payment Calculator"],
     "warranty.html": ["Service", "Used Vehicle Warranty Options"],
@@ -173,6 +173,12 @@
   }
 
   const faqByPage = {
+    "inventory.html":[
+      ["Can I book a test drive without selecting a vehicle?","Yes. You can reserve an available time first and discuss suitable vehicles when the M.O. Motors team follows up."],
+      ["Are prices and availability updated online?","The inventory displays the latest information available from the M.O. Motors dealership database. Vehicles can sell or change status, so contact the dealership to confirm availability before travelling."],
+      ["Can I trade in or sell my current vehicle?","Yes. Use the online trade-in form to request a trade, sale or consignment review."],
+      ["What if I cannot find the make or model I want?","Submit a vehicle sourcing request with your preferred makes, models, budget, mileage and features."]
+    ],
     "used-car-buying-guide-winnipeg.html":[
       ["Should I get a pre-purchase inspection?","It is a sensible step whenever you want an independent assessment of a used vehicle's current mechanical condition."],
       ["Can I test drive without choosing a vehicle online?","Yes. You can reserve a time first and discuss suitable vehicles when the M.O. Motors team contacts you."],
